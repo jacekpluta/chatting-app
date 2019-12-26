@@ -21,9 +21,52 @@ class Register extends Component {
       username: "",
       email: "",
       password: "",
-      passwordConfirmation: ""
+      passwordConfirmation: "",
+      error: ""
     };
   }
+
+  isFormIsValid = () => {
+    let error;
+
+    if (this.isFormEmpty()) {
+      error = "Fill all fields";
+      this.setState({ error: error });
+      return false;
+    } else if (this.isPasswordValid()) {
+      console.log("lol");
+      error = "Password is invalid";
+      this.setState({ error: error });
+      return false;
+    } else {
+      this.setState({ error: "" });
+      return true;
+    }
+  };
+
+  isFormEmpty = () => {
+    return (
+      !this.state.username.length ||
+      !this.state.email.length ||
+      !this.state.password.length ||
+      !this.state.passwordConfirmation.length
+    );
+  };
+
+  isPasswordValid = () => {
+    if (
+      this.state.password.length < 6 ||
+      this.state.passwordConfirmation.length < 6
+    ) {
+      return true;
+    } else if (
+      this.state.password.length !== this.state.passwordConfirmation.length
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
@@ -31,16 +74,22 @@ class Register extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(this.state.email, this.state.password)
-      .then(createdUser => {});
+    if (this.isFormIsValid()) {
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(this.state.email, this.state.password)
+        .then(createdUser => {
+          console.log(createdUser);
+        })
+        .catch(err => {
+          console.log("create user error", err);
+        });
+    }
   };
 
   state = { username: "", email: "", password: "", passwordConfirmation: "" };
   render() {
     const { username, email, password, passwordConfirmation } = this.state;
-
     return (
       <Grid textAlign="center" verticalAlign="middle" className="app">
         <GridColumn style={{ maxWidth: 450 }}>
@@ -93,11 +142,18 @@ class Register extends Component {
               </Button>
             </Segment>
           </Form>
+          {console.log(this.state.error)}
+          {this.state.error !== "" && (
+            <Message error>
+              {" "}
+              <h3>Error</h3>
+              {this.state.error}
+            </Message>
+          )}
           <Message>
             Already a user? <Link to="/login">Login</Link>
           </Message>
         </GridColumn>
-        Register
       </Grid>
     );
   }
