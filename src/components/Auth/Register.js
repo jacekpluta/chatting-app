@@ -9,7 +9,7 @@ import {
   Icon,
   GridColumn
 } from "semantic-ui-react";
-
+import md5 from "md5";
 import firebase from "../Firebase";
 
 import { Link } from "react-router-dom";
@@ -22,7 +22,9 @@ class Register extends Component {
       email: "",
       password: "",
       passwordConfirmation: "",
-      error: ""
+      error: "",
+      loading: false,
+      users: firebase.database().ref("users")
     };
   }
 
@@ -75,19 +77,43 @@ class Register extends Component {
   handleSubmit = event => {
     event.preventDefault();
     if (this.isFormIsValid()) {
+      this.setState({ loading: true });
       firebase
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then(createdUser => {
           console.log(createdUser);
+          createdUser.user
+            .updateProfile({
+              displayName: this.state.username,
+              photoURL: `https://www.gravatar.com/avatar/${md5(
+                createdUser.user.email
+              )}?d=identicon`
+            })
+            .then(() => {
+              this.saveUser(createdUser).then(() => {
+                console.log("user saved");
+              });
+            })
+            .then(() => {
+              this.setState({ loading: false, error: "" });
+            })
+            .catch(err => {
+              console.log("create user error", err);
+              this.setState({ loading: false, error: err.message });
+            });
         })
         .catch(err => {
           console.log("create user error", err);
+          this.setState({ loading: false, error: err.message });
         });
     }
   };
 
-  state = { username: "", email: "", password: "", passwordConfirmation: "" };
+  saveUser = createdUser => {
+    return this.state.users.child(createdUser);
+  };
+
   render() {
     const { username, email, password, passwordConfirmation } = this.state;
     return (
@@ -116,6 +142,11 @@ class Register extends Component {
                 type="email"
                 onChange={this.handleChange}
                 value={email}
+                className={
+                  this.state.error.toLowerCase().includes("email")
+                    ? "error"
+                    : ""
+                }
               />
 
               <Form.Input
@@ -126,6 +157,11 @@ class Register extends Component {
                 type="password"
                 onChange={this.handleChange}
                 value={password}
+                className={
+                  this.state.error.toLowerCase().includes("password")
+                    ? "error"
+                    : ""
+                }
               />
 
               <Form.Input
@@ -136,8 +172,19 @@ class Register extends Component {
                 type="password"
                 onChange={this.handleChange}
                 value={passwordConfirmation}
+                className={
+                  this.state.error.toLowerCase().includes("password")
+                    ? "error"
+                    : ""
+                }
               />
-              <Button color="red" fluid size="large">
+              <Button
+                disabled={this.state.loading}
+                className={this.state.loading ? "loading" : ""}
+                color="red"
+                fluid
+                size="large"
+              >
                 Submit
               </Button>
             </Segment>
