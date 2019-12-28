@@ -5,12 +5,12 @@ const menuStyle = {
   background: "#4c3c4c",
   fontSize: "1.2 rem"
 };
-export default function SidePanel() {
+export default function SidePanel(props) {
   return (
     <div>
       {" "}
       <Menu size="large" inverted fixed="left" vertical style={menuStyle}>
-        <UserPanel></UserPanel>
+        <UserPanel currentUser={props.currentUser}></UserPanel>
       </Menu>
     </div>
   );
