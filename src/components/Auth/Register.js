@@ -24,19 +24,19 @@ class Register extends Component {
       passwordConfirmation: "",
       error: "",
       loading: false,
-      users: firebase.database().ref("users")
+      //state of users in database
+      usersRef: firebase.database().ref("users")
     };
   }
 
+  //checking if the form is valid or not then returns true or false
   isFormIsValid = () => {
     let error;
-
     if (this.isFormEmpty()) {
       error = "Fill all fields";
       this.setState({ error: error });
       return false;
     } else if (this.isPasswordValid()) {
-      console.log("lol");
       error = "Password is invalid";
       this.setState({ error: error });
       return false;
@@ -46,6 +46,7 @@ class Register extends Component {
     }
   };
 
+  //checking if the form is empty or not then returns true or false
   isFormEmpty = () => {
     return (
       !this.state.username.length ||
@@ -55,6 +56,7 @@ class Register extends Component {
     );
   };
 
+  //checking if the password is valid or not then returns true or false
   isPasswordValid = () => {
     if (
       this.state.password.length < 6 ||
@@ -70,10 +72,12 @@ class Register extends Component {
     }
   };
 
+  //sets current Form Input row into a state
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
   };
 
+  //runs on submit form button click, sets loading, updates user with display name and random photo URL from gravatar
   handleSubmit = event => {
     event.preventDefault();
     if (this.isFormIsValid()) {
@@ -110,8 +114,13 @@ class Register extends Component {
     }
   };
 
+  //saves user into the database using "usersRef" from state
   saveUser = createdUser => {
-    return this.state.users.child(createdUser);
+    return this.state.usersRef.child(createdUser.user.uid).set({
+      name: createdUser.user.displayName,
+      avatar: createdUser.user.photoURL,
+      email: createdUser.user.email
+    });
   };
 
   render() {
@@ -119,7 +128,7 @@ class Register extends Component {
     return (
       <Grid textAlign="center" verticalAlign="middle" className="app">
         <GridColumn style={{ maxWidth: 450 }}>
-          <Header as="h2" icon color="blue" textAlign="center">
+          <Header as="h1" icon color="blue" textAlign="center">
             <Icon name="rocket" color="blue" />
             Register
           </Header>
@@ -181,7 +190,7 @@ class Register extends Component {
               <Button
                 disabled={this.state.loading}
                 className={this.state.loading ? "loading" : ""}
-                color="red"
+                color="blue"
                 fluid
                 size="large"
               >
@@ -189,7 +198,7 @@ class Register extends Component {
               </Button>
             </Segment>
           </Form>
-          {console.log(this.state.error)}
+
           {this.state.error !== "" && (
             <Message error>
               {" "}
