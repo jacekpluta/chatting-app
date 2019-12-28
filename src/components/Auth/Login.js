@@ -28,7 +28,13 @@ class Login extends Component {
     this.setState({ [event.target.name]: event.target.value });
   };
 
-  isFormIsValid = () => !this.state.password.length || !this.state.email.length;
+  isFormIsValid = () => {
+    if (this.state.password.length > 5 || this.state.email.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 
   handleSubmit = event => {
     event.preventDefault();

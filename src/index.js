@@ -6,7 +6,7 @@ import App from "./components/App";
 import registerServiceWorker from "./registerServiceWorker";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
-import { setUser } from "./actions";
+import { setUser, clearUser } from "./actions";
 import Spinner from "./components/Spinner";
 
 import {
@@ -32,6 +32,9 @@ const Root = props => {
       if (user) {
         props.setUser(user);
         props.history.push("/");
+      } else {
+        props.history.push("/login");
+        props.clearUser();
       }
     });
   }, [props.history.push]);
@@ -51,7 +54,9 @@ const mapStateFromProps = state => ({
   isLoading: state.user.isLoading
 });
 
-const RootWithAuth = withRouter(connect(mapStateFromProps, { setUser })(Root));
+const RootWithAuth = withRouter(
+  connect(mapStateFromProps, { setUser, clearUser })(Root)
+);
 
 ReactDOM.render(
   <Provider store={store}>
