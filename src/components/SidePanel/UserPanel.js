@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Grid, Header, Icon, Dropdown } from "semantic-ui-react";
+import React, { useState } from "react";
+import { Grid, Header, Icon, Dropdown, Image } from "semantic-ui-react";
 import firebase from "../Firebase";
 
 const handleSignout = () => {
@@ -19,18 +19,14 @@ const gridRowStyle = {
 };
 
 const UserPanel = props => {
-  const [currentUser, setCurrentUser] = useState();
-
-  useEffect(() => {
-    setCurrentUser(props.currentUser.displayName);
-  }, [props.currentUser.displayName]);
+  const [currentUser] = useState(props.currentUser);
 
   const dropdownOptions = () => [
     {
       key: "user",
       text: (
         <span>
-          Signed in as <strong>{currentUser}</strong>
+          Signed in as <strong>{currentUser.displayName}</strong>
         </span>
       ),
       disabled: true
@@ -53,15 +49,24 @@ const UserPanel = props => {
             <Icon name="code" />
             <Header.Content>DevChat</Header.Content>
           </Header>
+          {/* User Dropdown  */}
+          <Header style={{ padding: "0.25em" }} as="h4" inverted>
+            <Dropdown
+              trigger={
+                <span>
+                  Hello,{" "}
+                  <Image
+                    src={currentUser.photoURL}
+                    spaced="right"
+                    avatar
+                  ></Image>{" "}
+                  {currentUser.displayName}
+                </span>
+              }
+              options={dropdownOptions()}
+            />
+          </Header>
         </Grid.Row>
-
-        {/* User Dropdown  */}
-        <Header style={{ padding: "0.25em" }} as="h4" inverted>
-          <Dropdown
-            trigger={<span>Hello, {currentUser}</span>}
-            options={dropdownOptions()}
-          />
-        </Header>
       </Grid.Column>
     </Grid>
   );
