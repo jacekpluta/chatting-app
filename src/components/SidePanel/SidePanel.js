@@ -13,7 +13,7 @@ export default function SidePanel(props) {
       {" "}
       <Menu size="large" inverted fixed="left" vertical style={menuStyle}>
         <UserPanel currentUser={props.currentUser}></UserPanel>
-        <Channels></Channels>
+        <Channels currentUser={props.currentUser}> </Channels>
       </Menu>
     </div>
   );

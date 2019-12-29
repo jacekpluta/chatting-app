@@ -40,6 +40,7 @@ const UserPanel = props => {
       text: <span onClick={handleSignout}>Sign Out</span>
     }
   ];
+
   return (
     <Grid style={userStyle}>
       <Grid.Column>
