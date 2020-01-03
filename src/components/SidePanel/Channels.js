@@ -9,13 +9,16 @@ import {
   Message
 } from "semantic-ui-react";
 import firebase from "../Firebase";
+import { connect } from "react-redux";
+import { setCurrentChannel } from "../../actions";
+import { Loader } from "semantic-ui-react";
 
-export default function Channels(props) {
-  const [allChannels, setAllChannels] = useState();
-
+function Channels(props) {
   const menuStyle = { paddingBottm: "2em" };
-
+  const [allChannels, setAllChannels] = useState([]);
+  const [firstLoad, setfirstLoad] = useState(true);
   const [modal, setModal] = useState(false);
+  const [activeChannel, setActiveChannel] = useState();
 
   const [channelName, setChannelName] = useState("");
   const [channelDetail, setChannelDetail] = useState("");
@@ -42,18 +45,20 @@ export default function Channels(props) {
 
   useEffect(() => {
     showChannels();
+    return () => {
+      channelsRef.off();
+    };
   }, []);
 
   const showChannels = () => {
     let loadedChannels = [];
-    channelsRef.on("child_added", snapshot => {
-      loadedChannels.push(snapshot.val());
-
-      setAllChannels(loadedChannels[0].createdBy.name);
-
-      console.log(loadedChannels[0].createdBy.name);
-      console.log(allChannels);
-    });
+    channelsRef
+      .orderByChild("name")
+      .limitToFirst(99)
+      .on("child_added", function(snapshot) {
+        loadedChannels.push(snapshot.val());
+        setAllChannels({ channels: loadedChannels });
+      });
   };
 
   const isFormIsValid = () => {
@@ -83,8 +88,6 @@ export default function Channels(props) {
       }
     };
 
-    console.log(newChannel);
-
     channelsRef
       .child(refKey)
       .update(newChannel)
@@ -97,19 +100,6 @@ export default function Channels(props) {
       .catch(error => {
         console.log(error);
       });
-
-    // channelsRef
-    //   .child(refKey)
-    //   .set(newChannel)
-    //   .then(() => {
-    //     setChannelName("");
-    //     setChannelDetail("");
-    //     handleCloseModal();
-    //     console.log("channel added");
-    //   })
-    //   .catch(error => {
-    //     console.log(error);
-    //   });
   };
   const handleSubmit = event => {
     event.preventDefault();
@@ -120,17 +110,31 @@ export default function Channels(props) {
   };
 
   const displayChannels = () => {
-    if (allChannels.channel.length > 0)
-      return allChannels.channel.map(channel => (
+    if (allChannels.channels) {
+      if (firstLoad) {
+        props.setCurrentChannel(allChannels.channels[0]);
+        setfirstLoad(false);
+        setActiveChannel(allChannels.channels[0].id);
+      }
+
+      return allChannels.channels.map(channel => (
         <Menu.Item
           key={channel.id}
-          onClick={() => console.log(channel)}
+          onClick={() => changeChannel(channel)}
           name={channel.name}
+          active={activeChannel === channel.id}
         >
           # {channel.name}
         </Menu.Item>
       ));
+    }
   };
+
+  const changeChannel = channel => {
+    setActiveChannel(channel.id);
+    props.setCurrentChannel(channel);
+  };
+
   return (
     <React.Fragment>
       <Menu.Menu style={menuStyle}>
@@ -138,9 +142,15 @@ export default function Channels(props) {
           <span>
             <Icon name="exchange"></Icon> CHANNELS
           </span>
-          {"  "}({}) <Icon onClick={handleOpenModal} name="add"></Icon>
+          {"  "}(
+          {allChannels.channels !== undefined && allChannels.channels.length})
+          <Icon onClick={handleOpenModal} name="add"></Icon>
         </Menu.Item>
-        {displayChannels}
+
+        {allChannels.channels === undefined && (
+          <Loader active="true" size="huge" content="Loading"></Loader>
+        )}
+        {displayChannels()}
       </Menu.Menu>
 
       <Modal open={modal} onClose={handleCloseModal} basic size="small">
@@ -194,3 +204,5 @@ export default function Channels(props) {
     </React.Fragment>
   );
 }
+
+export default connect(null, { setCurrentChannel })(Channels);

@@ -1,5 +1,19 @@
 import React from "react";
+import { Sidebar, Menu, Divider, Button } from "semantic-ui-react";
 
 export default function ColorPanel() {
-  return <div> ColorPanel</div>;
+  return (
+    <Sidebar
+      as={Menu}
+      inverted
+      vertical
+      visible
+      width="very thin"
+      icon="labeled"
+    >
+      <Divider>
+        <Button icon="add" size="small" color="blue"></Button>
+      </Divider>
+    </Sidebar>
+  );
 }
