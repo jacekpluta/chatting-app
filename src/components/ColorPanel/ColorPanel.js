@@ -11,9 +11,8 @@ export default function ColorPanel() {
       width="very thin"
       icon="labeled"
     >
-      <Divider>
-        <Button icon="add" size="small" color="blue"></Button>
-      </Divider>
+      <Divider></Divider>
+      <Button icon="add" size="small" color="blue"></Button>
     </Sidebar>
   );
 }

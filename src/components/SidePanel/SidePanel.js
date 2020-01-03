@@ -8,13 +8,13 @@ const menuStyle = {
   fontSize: "1.2 rem"
 };
 export default function SidePanel(props) {
+  const { currentUser } = props;
   return (
-    <div>
-      {" "}
+    <React.Fragment>
       <Menu size="large" inverted fixed="left" vertical style={menuStyle}>
-        <UserPanel currentUser={props.currentUser}></UserPanel>
-        <Channels currentUser={props.currentUser}> </Channels>
+        <UserPanel currentUser={currentUser}></UserPanel>
+        <Channels currentUser={currentUser}> </Channels>
       </Menu>
-    </div>
+    </React.Fragment>
   );
 }

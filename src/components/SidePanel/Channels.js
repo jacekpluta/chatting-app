@@ -148,7 +148,7 @@ function Channels(props) {
         </Menu.Item>
 
         {allChannels.channels === undefined && (
-          <Loader active="true" size="huge" content="Loading"></Loader>
+          <Loader active size="huge" content="Loading"></Loader>
         )}
         {displayChannels()}
       </Menu.Menu>
