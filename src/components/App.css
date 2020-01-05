@@ -19,3 +19,8 @@ body,
   right: 1em;
   z-index: 100;
 }
+
+.MyMessage {
+  border-left: 2px solid orange;
+  padding-left: 8px;
+}
