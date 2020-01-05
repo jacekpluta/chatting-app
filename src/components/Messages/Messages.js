@@ -3,7 +3,7 @@ import MessagesHeader from "./MessagesHeader";
 import { Segment, Comment } from "semantic-ui-react";
 import firebase from "../Firebase";
 import React, { useState, useEffect } from "react";
-import { Loader } from "semantic-ui-react";
+
 import Message from "./Message";
 
 export default function Messages(props) {
@@ -32,7 +32,7 @@ export default function Messages(props) {
       setMessagesLoading(false);
     });
   };
-  // <Loader size="huge" active={messagesLoading} content="Loading"></Loader>{" "}
+
   return (
     <React.Fragment>
       <MessagesHeader></MessagesHeader>

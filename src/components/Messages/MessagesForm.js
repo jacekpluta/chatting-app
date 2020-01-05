@@ -1,24 +1,20 @@
-import {
-  Segment,
-  Input,
-  Button,
-  Icon,
-  Modal,
-  Form,
-  Message
-} from "semantic-ui-react";
-import React, { useState } from "react";
+import { Segment, Input, Button } from "semantic-ui-react";
+import React, { useState, useEffect } from "react";
 import firebase from "../Firebase";
 import mime from "mime-types";
 import ModalFile from "./ModalFile";
+import { uuid } from "uuidv4";
 
 export default function MessagesForm(props) {
-  const [message, setMessage] = useState("");
+  const [storageRef] = useState(firebase.storage().ref());
+
+  const [message, setMessage] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [modal, setModal] = useState(false);
-
-  const [file, setFile] = useState();
+  const [uploadState, setUploadState] = useState("");
+  const [uploadTask, setUploadTask] = useState(null);
+  const [file, setFile] = useState(null);
   const [authorized] = useState(["image/jpeg", "image/png"]);
 
   const { messagesRef, currentChannel, currentUser } = props;
@@ -27,16 +23,20 @@ export default function MessagesForm(props) {
     setMessage(event.target.value);
   };
 
-  const createMessage = () => {
+  const createMessage = (downloadURL = null) => {
     const createMessage = {
       timeStamp: firebase.database.ServerValue.TIMESTAMP,
-      content: message,
       currentUser: {
         id: currentUser.uid,
         name: currentUser.displayName,
         avatar: currentUser.photoURL
       }
     };
+    if (downloadURL !== null) {
+      createMessage.image = downloadURL;
+    } else {
+      createMessage.content = message;
+    }
     return createMessage;
   };
 
@@ -95,8 +95,45 @@ export default function MessagesForm(props) {
   };
 
   const uploadFile = (file, metadata) => {
-    const pathToUpload = currentChannel.uid;
-    const ref = messagesRef;
+    const pathToUpload = currentChannel.id;
+    const messRef = messagesRef;
+    const filePath = `chat/public/${uuid()}.jpg`;
+
+    setUploadState("uploading");
+
+    const task = storageRef
+      .child(filePath)
+      .put(file, metadata)
+      .then(snapshot => {
+        setUploadTask(task);
+
+        snapshot.ref.getDownloadURL().then(downloadURL => {
+          sendFileMessage(downloadURL, messRef, pathToUpload);
+        });
+      })
+
+      .catch(error => {
+        setUploadState("error");
+        setUploadTask(null);
+        setError(error);
+        console.log(error);
+      });
+  };
+
+  const sendFileMessage = (downloadURL, messRef, pathToUpload) => {
+    messRef
+      .child(pathToUpload)
+      .push()
+      .set(createMessage(downloadURL))
+      .then(() => {
+        setUploadState("done");
+      })
+      .catch(error => {
+        setUploadState("error");
+        setUploadTask(null);
+        setError(error);
+        console.log(error);
+      });
   };
 
   return (
@@ -131,7 +168,6 @@ export default function MessagesForm(props) {
           ></Button>
         </Button.Group>
       </Segment>
-
       <ModalFile
         modal={modal}
         closeModal={closeModal}
