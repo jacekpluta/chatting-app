@@ -3,19 +3,35 @@ import MessagesHeader from "./MessagesHeader";
 import { Segment, Comment } from "semantic-ui-react";
 import firebase from "../Firebase";
 import React, { useState, useEffect } from "react";
+import { Loader } from "semantic-ui-react";
 
 import Message from "./Message";
 
 export default function Messages(props) {
+  const [messageImageLoading, setMessageImageLoading] = useState(false);
   const [messagesRef] = useState(firebase.database().ref("messages"));
-  const { currentChannel, currentUser } = props;
   const [allChannelMessages, setAllChannelMessages] = useState([]);
   const [messagesLoading, setMessagesLoading] = useState(true);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchResult, setSearchResult] = useState([]);
+
+  const { currentChannel, currentUser } = props;
+
+  const setMessageImageLoadingTrue = () => {
+    setMessageImageLoading(true);
+  };
+
+  const setMessageImageLoadingFalse = () => {
+    setMessageImageLoading(false);
+  };
 
   useEffect(() => {
     if (currentChannel && currentUser) {
       addListeners();
     }
+
     return () => {};
   }, []);
 
@@ -23,28 +39,99 @@ export default function Messages(props) {
     addMessageListeners();
   };
 
-  const addMessageListeners = () => {
-    let loadedMessages = [];
-    messagesRef.child(currentChannel.id).on("child_added", snapshot => {
-      loadedMessages.push(snapshot.val());
+  const handleSearchChange = event => {
+    setSearchTerm(event.target.value);
+    setSearchLoading(true);
+  };
 
-      setAllChannelMessages({ loadedMessages });
+  useEffect(() => {
+    if (searchTerm) {
+      handleSearchMessages();
+    } else {
+    }
+  }, [searchTerm]);
+
+  const handleSearchMessages = () => {
+    const channelMessages = [...allChannelMessages.loadedMessages];
+    const regex = new RegExp(searchTerm, "gi");
+    const searchResults = channelMessages.reduce((acc, message) => {
+      if (
+        (message.content && message.content.match(regex)) ||
+        message.currentUser.name.match(regex)
+      ) {
+        acc.push(message);
+      }
+      return acc;
+    }, []);
+
+    setSearchResult(searchResults);
+    setTimeout(() => {
+      setSearchLoading(false);
+    }, 1000);
+  };
+
+  const displayChannelName = () => {
+    if (currentChannel) {
+      return `${currentChannel.name}`;
+    } else {
+      return "";
+    }
+  };
+  const addMessageListeners = () => {
+    let myFirstPromise = new Promise((resolve, reject) => {
+      let loadedMessages = [];
+      resolve(
+        messagesRef.child(currentChannel.id).on("child_added", snapshot => {
+          loadedMessages.push(snapshot.val());
+          setAllChannelMessages({ loadedMessages });
+        })
+      );
+    });
+
+    myFirstPromise.then(successMessage => {
       setMessagesLoading(false);
     });
   };
 
   return (
     <React.Fragment>
-      <MessagesHeader></MessagesHeader>
+      <MessagesHeader
+        handleSearchChange={handleSearchChange}
+        displayChannelName={displayChannelName}
+        searchLoading={searchLoading}
+      ></MessagesHeader>
       <Segment>
+        <Loader
+          active={messagesLoading}
+          size="huge"
+          content="Loading Messages"
+        ></Loader>
         <Comment.Group className="messages">
-          {allChannelMessages.loadedMessages
+          {allChannelMessages.loadedMessages && searchTerm === ""
             ? allChannelMessages.loadedMessages.map(message => {
                 return (
                   <Message
                     key={message.timeStamp}
                     message={message}
                     currentUser={currentUser}
+                    messageImageLoading={messageImageLoading}
+                    searchResult={searchResult}
+                    searchTerm={searchTerm}
+                  />
+                );
+              })
+            : ""}
+
+          {allChannelMessages.loadedMessages && searchTerm
+            ? searchResult.map(message => {
+                return (
+                  <Message
+                    key={message.timeStamp}
+                    message={message}
+                    currentUser={currentUser}
+                    messageImageLoading={messageImageLoading}
+                    searchResult={searchResult}
+                    searchTerm={searchTerm}
                   />
                 );
               })
@@ -52,9 +139,12 @@ export default function Messages(props) {
         </Comment.Group>
       </Segment>
       <MessagesForm
+        setMessageImageLoadingTrue={setMessageImageLoadingTrue}
+        setMessageImageLoadingFalse={setMessageImageLoadingFalse}
         messagesRef={messagesRef}
         currentChannel={currentChannel}
         currentUser={currentUser}
+        messageImageLoading={messageImageLoading}
       ></MessagesForm>
     </React.Fragment>
   );

@@ -10,6 +10,7 @@ export default function MessagesForm(props) {
 
   const [message, setMessage] = useState();
   const [loading, setLoading] = useState(false);
+
   const [error, setError] = useState("");
   const [modal, setModal] = useState(false);
   const [uploadState, setUploadState] = useState("");
@@ -101,24 +102,37 @@ export default function MessagesForm(props) {
 
     setUploadState("uploading");
 
+    props.setMessageImageLoadingTrue();
+
     const task = storageRef
       .child(filePath)
       .put(file, metadata)
       .then(snapshot => {
         setUploadTask(task);
-
         snapshot.ref.getDownloadURL().then(downloadURL => {
           sendFileMessage(downloadURL, messRef, pathToUpload);
         });
       })
-
+      .then(() => {
+        props.setMessageImageLoadingFalse();
+      })
       .catch(error => {
         setUploadState("error");
         setUploadTask(null);
-        setError(error);
         console.log(error);
       });
   };
+
+  useEffect(() => {
+    if (uploadTask) {
+      uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, function(
+        snapshot
+      ) {
+        var percent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(percent + "% done");
+      });
+    }
+  }, []);
 
   const sendFileMessage = (downloadURL, messRef, pathToUpload) => {
     messRef
@@ -159,7 +173,7 @@ export default function MessagesForm(props) {
             icon="edit"
           ></Button>
           <Button
-            disabled={loading}
+            disabled={props.messageImageLoading}
             onClick={openModal}
             color="teal"
             content="Upload Media"
@@ -172,7 +186,6 @@ export default function MessagesForm(props) {
         modal={modal}
         closeModal={closeModal}
         error={error}
-        loading={loading}
         handleChangeFileUpload={handleChangeFileUpload}
         sendFile={sendFile}
       ></ModalFile>

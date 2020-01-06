@@ -2,21 +2,25 @@ import React from "react";
 
 import { Header, Segment, Input, Icon } from "semantic-ui-react";
 
-export default function MessagesHeader() {
+export default function MessagesHeader(props) {
+  const { displayChannelName, handleSearchChange, searchLoading } = props;
+
   return (
     <Segment clearing>
       <Header fluid="true" as="h2" floated="left" style={{ marginBottom: 0 }}>
         <span>
-          Channel
+          {displayChannelName()}
           <Icon name="chess rock" color="black"></Icon>
         </span>
-        <Header.Subheader>2 Users</Header.Subheader>
+        <Header.Subheader></Header.Subheader>
       </Header>
       <Header floated="right">
         <Input
+          onChange={handleSearchChange}
           size="mini"
           icon="search"
           name="searchTerm"
+          loading={searchLoading}
           placeholder="Search messages"
         ></Input>
       </Header>

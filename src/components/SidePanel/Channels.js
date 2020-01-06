@@ -14,7 +14,6 @@ import { setCurrentChannel } from "../../actions";
 import { Loader } from "semantic-ui-react";
 
 function Channels(props) {
-  const menuStyle = { paddingBottm: "2em" };
   const [allChannels, setAllChannels] = useState([]);
   const [firstLoad, setfirstLoad] = useState(true);
   const [modal, setModal] = useState(false);
@@ -24,6 +23,7 @@ function Channels(props) {
   const [channelDetail, setChannelDetail] = useState("");
   const [error, setError] = useState("");
   const [currentUser] = useState(props.currentUser);
+
   const [loading] = useState(false);
   const [channelsRef] = useState(firebase.database().ref("channels"));
 
@@ -137,7 +137,7 @@ function Channels(props) {
 
   return (
     <React.Fragment>
-      <Menu.Menu style={menuStyle}>
+      <Menu.Menu className="menu">
         <Menu.Item>
           <span>
             <Icon name="exchange"></Icon> CHANNELS
@@ -148,7 +148,7 @@ function Channels(props) {
         </Menu.Item>
 
         {allChannels.channels === undefined && (
-          <Loader active size="huge" content="Loading"></Loader>
+          <Loader active size="huge" content="Loading Channels"></Loader>
         )}
         {displayChannels()}
       </Menu.Menu>

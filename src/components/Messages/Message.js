@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Comment, Image } from "semantic-ui-react";
 import moment from "moment";
+import { Loader } from "semantic-ui-react";
 
 export default function Message(props) {
-  const { message, currentUser } = props;
+  const { message, currentUser, messageImageLoading } = props;
   const [isMyMessage, setIsMyMessage] = useState(false);
 
   useEffect(() => {
@@ -12,7 +13,9 @@ export default function Message(props) {
   });
 
   const isImage = () => {
-    return true;
+    return (
+      message.hasOwnProperty("image") && !message.hasOwnProperty("content")
+    );
   };
 
   const isOwnMessage = () => {
@@ -29,7 +32,17 @@ export default function Message(props) {
       <Comment.Content className={isMyMessage ? "MyMessage" : ""}>
         <Comment.Author as="a">{message.currentUser.name}</Comment.Author>
         <Comment.Metadata>{timeFromNow(message.timeStamp)}</Comment.Metadata>
-        <Comment.Text>{message.content}</Comment.Text>
+
+        {messageImageLoading ? (
+          <Loader
+            size="medium"
+            active={messageImageLoading}
+            content="Loading"
+          ></Loader>
+        ) : (
+          ""
+        )}
+
         {isImage() ? (
           <Image src={message.image} className="messageImage"></Image>
         ) : (
