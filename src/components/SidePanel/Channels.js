@@ -10,14 +10,16 @@ import {
 } from "semantic-ui-react";
 import firebase from "../Firebase";
 import { connect } from "react-redux";
-import { setCurrentChannel } from "../../actions";
+import { setCurrentChannel, setPrivateChannel } from "../../actions";
 import { Loader } from "semantic-ui-react";
 
 function Channels(props) {
   const [allChannels, setAllChannels] = useState([]);
   const [firstLoad, setfirstLoad] = useState(true);
   const [modal, setModal] = useState(false);
-  const [activeChannel, setActiveChannel] = useState();
+  const [activeChannel, setActiveChannel] = useState(null);
+
+  const [channel, setChannel] = useState(null);
 
   const [channelName, setChannelName] = useState("");
   const [channelDetail, setChannelDetail] = useState("");
@@ -26,6 +28,9 @@ function Channels(props) {
 
   const [loading] = useState(false);
   const [channelsRef] = useState(firebase.database().ref("channels"));
+  const [messagesRef] = useState(firebase.database().ref("messages"));
+
+  const [notification, setNotification] = useState([]);
 
   const handleCloseModal = () => {
     setModal(false);
@@ -113,8 +118,8 @@ function Channels(props) {
     if (allChannels.channels) {
       if (firstLoad) {
         props.setCurrentChannel(allChannels.channels[0]);
+        props.setPrivateChannel(false);
         setfirstLoad(false);
-        setActiveChannel(allChannels.channels[0].id);
       }
 
       return allChannels.channels.map(channel => (
@@ -122,7 +127,7 @@ function Channels(props) {
           key={channel.id}
           onClick={() => changeChannel(channel)}
           name={channel.name}
-          active={activeChannel === channel.id}
+          active={allChannels.channels[0] === channel.id}
         >
           # {channel.name}
         </Menu.Item>
@@ -133,6 +138,8 @@ function Channels(props) {
   const changeChannel = channel => {
     setActiveChannel(channel.id);
     props.setCurrentChannel(channel);
+    props.setPrivateChannel(false);
+    setChannel(channel);
   };
 
   return (
@@ -155,6 +162,7 @@ function Channels(props) {
 
       <Modal open={modal} onClose={handleCloseModal} basic size="small">
         <Modal.Header>Add chanel</Modal.Header>
+
         <Modal.Content>
           <Form onSubmit={handleSubmit}>
             <Form.Field>
@@ -205,4 +213,6 @@ function Channels(props) {
   );
 }
 
-export default connect(null, { setCurrentChannel })(Channels);
+export default connect(null, { setCurrentChannel, setPrivateChannel })(
+  Channels
+);

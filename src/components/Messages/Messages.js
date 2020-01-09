@@ -10,6 +10,9 @@ import Message from "./Message";
 export default function Messages(props) {
   const [messageImageLoading, setMessageImageLoading] = useState(false);
   const [messagesRef] = useState(firebase.database().ref("messages"));
+  const [privateMessagesRef] = useState(
+    firebase.database().ref("privateMessages")
+  );
   const [allChannelMessages, setAllChannelMessages] = useState([]);
   const [messagesLoading, setMessagesLoading] = useState(true);
 
@@ -17,7 +20,7 @@ export default function Messages(props) {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
 
-  const { currentChannel, currentUser } = props;
+  const { currentChannel, currentUser, isPrivateChannel } = props;
 
   const setMessageImageLoadingTrue = () => {
     setMessageImageLoading(true);
@@ -42,6 +45,10 @@ export default function Messages(props) {
   const handleSearchChange = event => {
     setSearchTerm(event.target.value);
     setSearchLoading(true);
+  };
+
+  const getMessagesRef = () => {
+    return isPrivateChannel ? privateMessagesRef : messagesRef;
   };
 
   useEffect(() => {
@@ -71,17 +78,22 @@ export default function Messages(props) {
   };
 
   const displayChannelName = () => {
-    if (currentChannel) {
-      return `${currentChannel.name}`;
+    if (currentChannel && !isPrivateChannel) {
+      return `#${currentChannel.name}`;
+    } else if (currentChannel && isPrivateChannel) {
+      return `@${currentChannel.name}`;
     } else {
       return "";
     }
   };
+
   const addMessageListeners = () => {
     let myFirstPromise = new Promise((resolve, reject) => {
       let loadedMessages = [];
+      const ref = getMessagesRef();
+
       resolve(
-        messagesRef.child(currentChannel.id).on("child_added", snapshot => {
+        ref.child(currentChannel.id).on("child_added", snapshot => {
           loadedMessages.push(snapshot.val());
           setAllChannelMessages({ loadedMessages });
         })
@@ -99,6 +111,7 @@ export default function Messages(props) {
         handleSearchChange={handleSearchChange}
         displayChannelName={displayChannelName}
         searchLoading={searchLoading}
+        isPrivateChannel={isPrivateChannel}
       ></MessagesHeader>
       <Segment>
         <Loader
@@ -145,6 +158,7 @@ export default function Messages(props) {
         currentChannel={currentChannel}
         currentUser={currentUser}
         messageImageLoading={messageImageLoading}
+        getMessagesRef={getMessagesRef}
       ></MessagesForm>
     </React.Fragment>
   );

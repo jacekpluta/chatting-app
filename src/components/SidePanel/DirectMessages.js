@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import firebase from "./../Firebase";
 import { Menu, Icon, Image } from "semantic-ui-react";
+import { connect } from "react-redux";
+import { setCurrentChannel, setPrivateChannel } from "../../actions";
 
-export default function DirectMessages(props) {
+const DirectMessages = props => {
   const { currentUser } = props;
-  const [usersRef] = useState(firebase.database().ref("users"));
+  // const [usersRef] = useState(firebase.database().ref("users"));
   const [connectedRef] = useState(firebase.database().ref(".info/connected"));
   const [users, setUsers] = useState([]);
 
@@ -93,12 +95,17 @@ export default function DirectMessages(props) {
   );
 
   const changeChannel = user => {
-    console.log(user);
-    const channel = getChannelId(users.uid);
+    const channelId = getChannelId(user.uid);
+    const channelData = { id: channelId, name: user.name };
+    props.setCurrentChannel(channelData);
+    props.setPrivateChannel(true);
   };
 
-  const getChannelId = () => {
-    const currentUserId = users.uid;
+  const getChannelId = userId => {
+    const currentUserId = currentUser.uid;
+    return userId < currentUserId
+      ? `${userId}/${currentUser.uid}`
+      : `${currentUser.uid}/${userId}`;
   };
 
   return (
@@ -113,7 +120,7 @@ export default function DirectMessages(props) {
         <Menu.Item
           key={user.uid}
           style={{ opacity: 0.7 }}
-          onClick={() => changeChannel(user.uid)}
+          onClick={() => changeChannel(user)}
         >
           <Icon
             name="circle"
@@ -134,4 +141,8 @@ export default function DirectMessages(props) {
       ))}
     </Menu.Menu>
   );
-}
+};
+
+export default connect(null, { setCurrentChannel, setPrivateChannel })(
+  DirectMessages
+);

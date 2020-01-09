@@ -1,5 +1,8 @@
 import React from "react";
 
-export default function MetaPanel() {
-  return <div> MetaPanel</div>;
-}
+import { connect } from "react-redux";
+
+const MetaPanel = props => {
+  return <div></div>;
+};
+export default connect(null)(MetaPanel);

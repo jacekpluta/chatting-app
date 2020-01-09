@@ -18,7 +18,13 @@ export default function MessagesForm(props) {
   const [file, setFile] = useState(null);
   const [authorized] = useState(["image/jpeg", "image/png"]);
 
-  const { messagesRef, currentChannel, currentUser } = props;
+  const {
+    messagesRef,
+    currentChannel,
+    currentUser,
+    isPrivateChannel,
+    getMessagesRef
+  } = props;
 
   const handleChange = event => {
     setMessage(event.target.value);
@@ -52,7 +58,7 @@ export default function MessagesForm(props) {
   const sendMessage = () => {
     if (message) {
       setLoading(true);
-      messagesRef
+      getMessagesRef()
         .child(currentChannel.id)
         .push()
         .set(createMessage())
@@ -95,10 +101,19 @@ export default function MessagesForm(props) {
     return authorized.includes(mime.lookup(file.name));
   };
 
+  const getPath = () => {
+    if (currentUser) {
+      return `chat/private-${currentChannel.id}`;
+    } else {
+      return `chat/public`;
+    }
+  };
+
   const uploadFile = (file, metadata) => {
+    console.log(getPath());
     const pathToUpload = currentChannel.id;
-    const messRef = messagesRef;
-    const filePath = `chat/public/${uuid()}.jpg`;
+    const messRef = getMessagesRef();
+    const filePath = `${getPath()}/${uuid()}.jpg`;
 
     setUploadState("uploading");
 
