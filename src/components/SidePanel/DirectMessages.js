@@ -67,7 +67,7 @@ const DirectMessages = props => {
       });
 
       presenceRef.on("child_removed", snapshot => {
-        if (currentUserUid !== snapshot.key) {
+        if (currentUser.uid !== snapshot.key) {
           setUsers(users => [
             ...users,
             {
@@ -82,17 +82,18 @@ const DirectMessages = props => {
     });
   };
 
-  const usersList = users.filter(
-    (ele, ind) =>
-      ind ===
-      users.findIndex(
-        elem =>
-          elem.status === ele.status &&
-          elem.uid === ele.uid &&
-          elem.name === ele.name &&
-          elem.photoURL === ele.photoURL
-      )
-  );
+  const usersList = () =>
+    users.filter(
+      (ele, ind) =>
+        ind ===
+        users.findIndex(
+          elem =>
+            elem.status === ele.status &&
+            elem.uid === ele.uid &&
+            elem.name === ele.name &&
+            elem.photoURL === ele.photoURL
+        )
+    );
 
   const changeChannel = user => {
     const channelId = getChannelId(user.uid);
@@ -114,9 +115,9 @@ const DirectMessages = props => {
         <span>
           <Icon name="mail"></Icon>
         </span>
-        DIRECT MESSAGES ({usersList.length})
+        DIRECT MESSAGES ({usersList().length})
       </Menu.Item>
-      {usersList.map(user => (
+      {usersList().map(user => (
         <Menu.Item
           key={user.uid}
           style={{ opacity: 0.7 }}

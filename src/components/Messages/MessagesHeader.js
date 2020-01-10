@@ -7,7 +7,9 @@ export default function MessagesHeader(props) {
     displayChannelName,
     handleSearchChange,
     searchLoading,
-    isPrivateChannel
+    isPrivateChannel,
+    handleStarred,
+    isChannelStarred
   } = props;
 
   return (
@@ -15,8 +17,15 @@ export default function MessagesHeader(props) {
       <Header fluid="true" as="h2" floated="left" style={{ marginBottom: 0 }}>
         <span>
           {displayChannelName()}
-          {!isPrivateChannel && <Icon name="chess rock" color="black"></Icon>}
-          {isPrivateChannel && <Icon name="star" color="black"></Icon>}
+
+          {!isPrivateChannel && (
+            <Icon
+              name={isChannelStarred ? "star" : "star outline"}
+              color={isChannelStarred ? "red" : "red"}
+              onClick={handleStarred}
+              color="golden"
+            ></Icon>
+          )}
         </span>
         <Header.Subheader></Header.Subheader>
       </Header>

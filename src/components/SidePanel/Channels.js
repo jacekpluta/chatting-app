@@ -11,26 +11,26 @@ import {
 import firebase from "../Firebase";
 import { connect } from "react-redux";
 import { setCurrentChannel, setPrivateChannel } from "../../actions";
-import { Loader } from "semantic-ui-react";
 
 function Channels(props) {
   const [allChannels, setAllChannels] = useState([]);
-  const [firstLoad, setfirstLoad] = useState(true);
+  const [firstLoad, setfirstLoad] = useState(false);
   const [modal, setModal] = useState(false);
   const [activeChannel, setActiveChannel] = useState(null);
-
-  const [channel, setChannel] = useState(null);
 
   const [channelName, setChannelName] = useState("");
   const [channelDetail, setChannelDetail] = useState("");
   const [error, setError] = useState("");
-  const [currentUser] = useState(props.currentUser);
+
+  const [channel, setChannel] = useState([]);
 
   const [loading] = useState(false);
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [messagesRef] = useState(firebase.database().ref("messages"));
 
-  const [notification, setNotification] = useState([]);
+  const [notifications, setNotification] = useState([]);
+
+  const { currentUser, currentChannel } = props;
 
   const handleCloseModal = () => {
     setModal(false);
@@ -57,14 +57,68 @@ function Channels(props) {
 
   const showChannels = () => {
     let loadedChannels = [];
+
     channelsRef
       .orderByChild("name")
       .limitToFirst(99)
       .on("child_added", function(snapshot) {
         loadedChannels.push(snapshot.val());
+        props.setCurrentChannel(loadedChannels[0]);
         setAllChannels({ channels: loadedChannels });
+        //  addNotificationListener(snapshot.key);
+      });
+
+    setfirstLoad(true);
+  };
+
+  useEffect(() => {
+    if (currentChannel) {
+      loadAllCurrentChannels();
+    }
+  }, [currentChannel]);
+
+  const loadAllCurrentChannels = () => {
+    channelsRef
+      .orderByChild("name")
+      .limitToFirst(99)
+      .on("child_added", function(snap) {
+        //    addNotificationListener(snap.key);
       });
   };
+
+  // const addNotificationListener = channelId => {
+  //   if (currentChannel) {
+  //     // messagesRef.child(channelId).once("value", snapshot => {
+  //     //   console.log(snapshot.val());
+  //     // });
+  //     console.log(channelId);
+  //     console.log(currentChannel.id);
+  //     if (channelId !== currentChannel.id) {
+  //       messagesRef
+  //         .child(channelId)
+  //         .endAt()
+  //         .limitToLast(1)
+  //         .on("child_added", function(snapshot) {
+  //           console.log(snapshot);
+  //           setNotification(notifications => [
+  //             ...notifications,
+  //             {
+  //               channelId: channelId,
+  //               lastData: snapshot.val().timeStamp,
+  //               total: snapshot.numChildren(),
+  //               lastKnownTotal: snapshot.numChildren(),
+  //               count: 0
+  //             }
+  //           ]);
+  //         });
+  //     }
+  //   } else {
+  //   }
+  // };
+  // if (notifications && notifications.length >= 1) {
+  //   console.log(notifications);
+  //   // console.log(notifications.length - 1);
+  // }
 
   const isFormIsValid = () => {
     if (channelName.length < 3 || channelDetail.length < 3) {
@@ -106,6 +160,7 @@ function Channels(props) {
         console.log(error);
       });
   };
+
   const handleSubmit = event => {
     event.preventDefault();
 
@@ -117,9 +172,9 @@ function Channels(props) {
   const displayChannels = () => {
     if (allChannels.channels) {
       if (firstLoad) {
-        props.setCurrentChannel(allChannels.channels[0]);
         props.setPrivateChannel(false);
         setfirstLoad(false);
+        props.setCurrentChannel(allChannels.channels[0]);
       }
 
       return allChannels.channels.map(channel => (
@@ -127,7 +182,6 @@ function Channels(props) {
           key={channel.id}
           onClick={() => changeChannel(channel)}
           name={channel.name}
-          active={allChannels.channels[0] === channel.id}
         >
           # {channel.name}
         </Menu.Item>
@@ -139,7 +193,7 @@ function Channels(props) {
     setActiveChannel(channel.id);
     props.setCurrentChannel(channel);
     props.setPrivateChannel(false);
-    setChannel(channel);
+    setChannel({ channel });
   };
 
   return (
@@ -154,9 +208,6 @@ function Channels(props) {
           <Icon onClick={handleOpenModal} name="add"></Icon>
         </Menu.Item>
 
-        {allChannels.channels === undefined && (
-          <Loader active size="huge" content="Loading Channels"></Loader>
-        )}
         {displayChannels()}
       </Menu.Menu>
 
