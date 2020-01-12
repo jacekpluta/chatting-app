@@ -8,6 +8,8 @@ import SidePanel from "./SidePanel/SidePanel";
 import { connect } from "react-redux";
 
 //count current online users in channel (if they are online and if they have written a message)
+//przeleciec wszystkie channele w bazie danych i poudatowac avatar
+
 const App = props => {
   const { currentUser, currentChannel, isPrivateChannel, userPosts } = props;
   const [messagesBool, setMessagesBool] = useState(false);

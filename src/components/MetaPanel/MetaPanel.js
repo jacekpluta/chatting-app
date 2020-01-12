@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Segment,
   Accordion,
@@ -31,8 +31,7 @@ const MetaPanel = props => {
             <List.Description>{val.count}</List.Description>
           </ListContent>
         </List.Item>
-      ))
-      .slice(0, 5);
+      ));
 
   if (isPrivateChannel) return null;
 

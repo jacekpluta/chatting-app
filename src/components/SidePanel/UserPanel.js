@@ -1,13 +1,17 @@
-import React, { useState } from "react";
-import { Grid, Header, Icon, Dropdown, Image } from "semantic-ui-react";
+import React, { useState, useEffect } from "react";
+import {
+  Grid,
+  Header,
+  Icon,
+  Dropdown,
+  Image,
+  Modal,
+  Button
+} from "semantic-ui-react";
 import firebase from "../Firebase";
-
-const handleSignout = () => {
-  firebase
-    .auth()
-    .signOut()
-    .then(() => console.log("signed out!"));
-};
+import OnDrop from "./OnDrop";
+import { setUser } from "../../actions";
+import { connect } from "react-redux";
 
 const userStyle = {
   background: "#4c3c4c"
@@ -19,7 +23,132 @@ const gridRowStyle = {
 };
 
 const UserPanel = props => {
-  const [currentUser] = useState(props.currentUser);
+  const [modal, setModal] = useState(false);
+  const [newAvatar, setNewAvatar] = useState(null);
+  const { currentUser, currentChannel } = props;
+  const [uploadedCroppedImaged, setUploadedCroppedImaged] = useState(null);
+  const [metaData, setMetaData] = useState({ contentType: "image/jpeg" });
+
+  const [channelsRef] = useState(firebase.database().ref("channels"));
+  const [messagesRef] = useState(firebase.database().ref("messages"));
+
+  const [usersRef] = useState(firebase.database().ref("users"));
+  const [storageRef] = useState(firebase.storage().ref());
+
+  function base64StringtoFile(base64String, filename) {
+    var arr = base64String.split(","),
+      mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]),
+      n = bstr.length,
+      u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+  }
+
+  const saveAvatar = image => {
+    setNewAvatar(image);
+    const fileName = "croppedImage";
+    const fileImage = base64StringtoFile(image, fileName);
+
+    uploadCroppedImage(fileImage);
+  };
+
+  useEffect(() => {
+    if (uploadedCroppedImaged) {
+      console.log(uploadedCroppedImaged);
+      changeAvatar();
+    }
+
+    return () => {};
+  }, [uploadedCroppedImaged]);
+
+  const uploadCroppedImage = croppedAvatar => {
+    storageRef
+      .child(`avatars/user-${currentUser.uid}`)
+      .put(croppedAvatar, metaData)
+      .then(snap => {
+        snap.ref.getDownloadURL().then(downloadURL => {
+          setUploadedCroppedImaged(downloadURL);
+        });
+      });
+  };
+
+  const changeAvatar = () => {
+    firebase
+      .auth()
+      .currentUser.updateProfile({
+        photoURL: uploadedCroppedImaged
+      })
+      .then(() => {
+        console.log("photo url updated");
+        closeModal();
+      })
+      .catch(err => {
+        console.log(err);
+      });
+
+    usersRef
+      .child(currentUser.uid)
+      .update({ avatar: uploadedCroppedImaged })
+      .then(() => {
+        console.log("User avatar updated");
+      })
+      .catch(err => {
+        console.log(err);
+      });
+
+    // channelsRef
+    //   .child(currentChannel.id)
+    //   .update({
+    //     createdBy: {
+    //       avatar: uploadedCroppedImaged,
+    //       name: currentUser.name
+    //     }
+    //   })
+    //   .then(() => {
+    //     console.log("Channel info updated");
+    //   })
+    //   .catch(err => {
+    //     console.log(err);
+    //   });
+  };
+
+  useEffect(() => {
+    if (currentChannel) {
+      loadAllCurrentChannels();
+    }
+  }, [currentChannel]);
+
+  const loadAllCurrentChannels = () => {
+    channelsRef.orderByChild("name").on("child_added", function(snap) {
+      addNotificationListener(snap.key);
+    });
+  };
+
+  const addNotificationListener = channelId => {
+    if (currentChannel) {
+      messagesRef.child(channelId).once("value", snapshot => {
+        console.log(snapshot.val());
+      });
+    }
+  };
+
+  const openModal = () => {
+    setModal(true);
+  };
+
+  const closeModal = () => {
+    setModal(false);
+  };
+
+  const handleSignout = () => {
+    firebase
+      .auth()
+      .signOut()
+      .then(() => console.log("signed out!"));
+  };
 
   const dropdownOptions = () => [
     {
@@ -33,7 +162,7 @@ const UserPanel = props => {
     },
     {
       key: "avatar",
-      text: <span>Change Avatar</span>
+      text: <span onClick={openModal}>Change Avatar</span>
     },
     {
       key: "signout",
@@ -51,16 +180,21 @@ const UserPanel = props => {
             <Header.Content>DevChat</Header.Content>
           </Header>
           {/* User Dropdown  */}
+
           <Header style={{ padding: "0.25em" }} as="h4" inverted>
             <Dropdown
               trigger={
                 <span>
                   Hello,{" "}
-                  <Image
-                    src={currentUser.photoURL}
-                    spaced="right"
-                    avatar
-                  ></Image>{" "}
+                  {newAvatar ? (
+                    <Image src={newAvatar} spaced="right" avatar></Image>
+                  ) : (
+                    <Image
+                      src={currentUser.photoURL}
+                      spaced="right"
+                      avatar
+                    ></Image>
+                  )}
                   {currentUser.displayName}
                 </span>
               }
@@ -68,9 +202,23 @@ const UserPanel = props => {
             />
           </Header>
         </Grid.Row>
+
+        <Modal basic onClose={closeModal} open={modal}>
+          <Modal.Header>Change Avatar</Modal.Header>
+          <Modal.Content>
+            {" "}
+            <OnDrop currentUser={currentUser} saveAvatar={saveAvatar}></OnDrop>
+          </Modal.Content>
+
+          <Modal.Actions>
+            <Button color="red" inverted onClick={closeModal}>
+              <Icon name="cancel" /> Cancel
+            </Button>
+          </Modal.Actions>
+        </Modal>
       </Grid.Column>
     </Grid>
   );
 };
 
-export default UserPanel;
+export default connect(null, { setUser })(UserPanel);

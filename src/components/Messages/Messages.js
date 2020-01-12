@@ -17,7 +17,7 @@ const Messages = props => {
     firebase.database().ref("privateMessages")
   );
   const [allChannelMessages, setAllChannelMessages] = useState([]);
-  const [messagesLoading, setMessagesLoading] = useState(true);
+  const [messagesLoaded, setMessagesLoaded] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
@@ -45,18 +45,18 @@ const Messages = props => {
     if (currentChannel && currentUser) {
       addUserStarsListeners(currentChannel.id, currentUser.uid);
       addListeners();
+      loadData();
     }
   }, []);
-  //console.log(allChannelMessages.loadedMessages);
 
   useEffect(() => {
-    if (allChannelMessages.loadedMessages) {
+    if (messagesLoaded) {
       countUserPosts();
       setMessagesFull();
     } else {
       setMessagesEmpty();
     }
-  }, [allChannelMessages.loadedMessages]);
+  }, [messagesLoaded]);
 
   const addListeners = () => {
     addMessageListeners();
@@ -152,21 +152,22 @@ const Messages = props => {
   };
 
   const addMessageListeners = () => {
-    let myFirstPromise = new Promise((resolve, reject) => {
-      let loadedMessages = [];
-      const ref = getMessagesRef();
+    let loadedMessages = [];
+    const ref = getMessagesRef();
 
-      resolve(
-        ref.child(currentChannel.id).on("child_added", snapshot => {
-          loadedMessages.push(snapshot.val());
-          setAllChannelMessages({ loadedMessages });
-        })
-      );
+    ref.child(currentChannel.id).on("child_added", snapshot => {
+      loadedMessages.push(snapshot.val());
+      setAllChannelMessages({ loadedMessages });
     });
+  };
 
-    myFirstPromise.then(successMessage => {
-      setMessagesLoading(false);
-    });
+  const loadData = () => {
+    messagesRef
+      .child(currentChannel.id)
+      .once("value", snapshot => {})
+      .then(snapshot => {
+        setMessagesLoaded(true);
+      });
   };
 
   const countUserPosts = () => {
@@ -204,7 +205,7 @@ const Messages = props => {
       ></MessagesHeader>
       <Segment>
         <Loader
-          active={messagesLoading}
+          active={!messagesLoaded}
           size="huge"
           content="Loading Messages"
         ></Loader>

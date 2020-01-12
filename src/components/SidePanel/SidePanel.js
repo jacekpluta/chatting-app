@@ -15,11 +15,12 @@ export default function SidePanel(props) {
   return (
     <React.Fragment>
       <Menu size="large" inverted fixed="left" vertical style={menuStyle}>
-        <UserPanel currentUser={currentUser}></UserPanel>
+        <UserPanel
+          currentChannel={currentChannel}
+          currentUser={currentUser}
+        ></UserPanel>
         <Starred currentUser={currentUser} currentChannel={currentChannel} />
-        <Channels currentChannel={currentChannel} currentUser={currentUser}>
-          {" "}
-        </Channels>
+        <Channels currentChannel={currentChannel} currentUser={currentUser} />
 
         <DirectMessages currentUser={currentUser}></DirectMessages>
       </Menu>
