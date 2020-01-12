@@ -6,15 +6,6 @@ const initialUserState = {
   isLoading: true
 };
 
-const initialChannelState = {
-  currentChannel: null,
-  isPrivateChannel: false
-};
-
-const initialYesState = {
-  yes: true
-};
-
 const user_reducer = (state = initialUserState, action) => {
   switch (action.type) {
     case actionTypes.SET_USER:
@@ -33,6 +24,12 @@ const user_reducer = (state = initialUserState, action) => {
   }
 };
 
+const initialChannelState = {
+  currentChannel: null,
+  isPrivateChannel: false,
+  userPosts: null
+};
+
 const channel_reducer = (state = initialChannelState, action) => {
   switch (action.type) {
     case actionTypes.SET_CURRENT_CHANNEL:
@@ -45,7 +42,11 @@ const channel_reducer = (state = initialChannelState, action) => {
         ...state,
         isPrivateChannel: action.payload.isPrivateChannel
       };
-
+    case actionTypes.SET_USER_POSTS:
+      return {
+        ...state,
+        userPosts: action.payload.userPosts
+      };
     default:
       return state;
   }
@@ -55,5 +56,4 @@ const rootReducer = combineReducers({
   user: user_reducer,
   channel: channel_reducer
 });
-
 export default rootReducer;

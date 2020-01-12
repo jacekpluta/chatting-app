@@ -16,7 +16,7 @@ export default function SidePanel(props) {
     <React.Fragment>
       <Menu size="large" inverted fixed="left" vertical style={menuStyle}>
         <UserPanel currentUser={currentUser}></UserPanel>
-        <Starred />
+        <Starred currentUser={currentUser} currentChannel={currentChannel} />
         <Channels currentChannel={currentChannel} currentUser={currentUser}>
           {" "}
         </Channels>

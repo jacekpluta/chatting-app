@@ -2,12 +2,14 @@ import MessagesForm from "./MessagesForm";
 import MessagesHeader from "./MessagesHeader";
 import { Segment, Comment } from "semantic-ui-react";
 import firebase from "../Firebase";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Loader } from "semantic-ui-react";
 
-import Message from "./Message";
+import { connect } from "react-redux";
+import { setUserPosts } from "../../actions";
 
-export default function Messages(props) {
+import Message from "./Message";
+const Messages = props => {
   const [messageImageLoading, setMessageImageLoading] = useState(false);
   const [messagesRef] = useState(firebase.database().ref("messages"));
   const [usersRef] = useState(firebase.database().ref("users"));
@@ -20,9 +22,16 @@ export default function Messages(props) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
-  const [isChannelStarred, setIsChannelStarred] = useState(false);
 
-  const { currentChannel, currentUser, isPrivateChannel } = props;
+  const [channelStarred, setChannelStarred] = useState(false);
+
+  const {
+    currentChannel,
+    currentUser,
+    isPrivateChannel,
+    setMessagesFull,
+    setMessagesEmpty
+  } = props;
 
   const setMessageImageLoadingTrue = () => {
     setMessageImageLoading(true);
@@ -34,19 +43,39 @@ export default function Messages(props) {
 
   useEffect(() => {
     if (currentChannel && currentUser) {
-      addListeners();
       addUserStarsListeners(currentChannel.id, currentUser.uid);
+      addListeners();
     }
-
-    return () => {};
   }, []);
+  //console.log(allChannelMessages.loadedMessages);
+
+  useEffect(() => {
+    if (allChannelMessages.loadedMessages) {
+      countUserPosts();
+      setMessagesFull();
+    } else {
+      setMessagesEmpty();
+    }
+  }, [allChannelMessages.loadedMessages]);
 
   const addListeners = () => {
     addMessageListeners();
   };
 
+  const unstarChannel = () => {
+    usersRef
+      .child(`${currentUser.uid}/starred`)
+      .child(currentChannel.id)
+      .remove(err => {
+        if (err !== null) {
+          console.log(err);
+        }
+      });
+    setChannelStarred(false);
+  };
+
   useEffect(() => {
-    if (isChannelStarred) {
+    if (channelStarred) {
       usersRef.child(`${currentUser.uid}/starred`).update({
         [currentChannel.id]: {
           name: currentChannel.name,
@@ -57,17 +86,11 @@ export default function Messages(props) {
           }
         }
       });
-    } else {
-      usersRef.child(`${currentUser.uid}/starred`).remove(err => {
-        if (err !== null) {
-          console.log(err);
-        }
-      });
     }
-  }, [isChannelStarred]);
+  }, [channelStarred]);
 
   const handleStarred = () => {
-    setIsChannelStarred(!isChannelStarred);
+    setChannelStarred(true);
   };
 
   const handleSearchChange = event => {
@@ -87,8 +110,8 @@ export default function Messages(props) {
       .then(data => {
         if (data.val() !== null) {
           const channelIds = Object.keys(data.val());
-          const prevStarred = channelIds.includes(channelId);
-          setIsChannelStarred(prevStarred);
+          const prevStarred = channelIds.includes(currentChannel.id);
+          setChannelStarred(prevStarred);
         }
       });
   };
@@ -146,15 +169,38 @@ export default function Messages(props) {
     });
   };
 
+  const countUserPosts = () => {
+    if (allChannelMessages.loadedMessages) {
+      let userPosts = allChannelMessages.loadedMessages.reduce(
+        (acc, message) => {
+          if (message.currentUser.name in acc) {
+            acc[message.currentUser.name].count += 1;
+          } else {
+            acc[message.currentUser.name] = {
+              avatar: message.currentUser.avatar,
+              count: 1
+            };
+          }
+          return acc;
+        },
+        {}
+      );
+      props.setUserPosts(userPosts);
+    } else {
+      props.setUserPosts(null);
+    }
+  };
+
   return (
     <React.Fragment>
       <MessagesHeader
+        unstarChannel={unstarChannel}
         handleSearchChange={handleSearchChange}
         displayChannelName={displayChannelName}
         searchLoading={searchLoading}
         isPrivateChannel={isPrivateChannel}
         handleStarred={handleStarred}
-        isChannelStarred={isChannelStarred}
+        channelStarred={channelStarred}
       ></MessagesHeader>
       <Segment>
         <Loader
@@ -205,17 +251,6 @@ export default function Messages(props) {
       ></MessagesForm>
     </React.Fragment>
   );
-}
-function usePrevious(value) {
-  // The ref object is a generic container whose current property is mutable ...
-  // ... and can hold any value, similar to an instance property on a class
-  const ref = useRef();
+};
 
-  // Store current value in ref
-  useEffect(() => {
-    ref.current = value;
-  }, [value]); // Only re-run if value changes
-
-  // Return previous value (happens before update in useEffect above)
-  return ref.current;
-}
+export default connect(null, { setUserPosts })(Messages);
