@@ -20,14 +20,14 @@ export default function MessagesHeader(props) {
           {displayChannelName()}
 
           {!isPrivateChannel && channelStarred && (
-            <Icon name={"star"} onClick={unstarChannel} color="golden"></Icon>
+            <Icon name={"star"} onClick={unstarChannel} color="yellow"></Icon>
           )}
 
           {!isPrivateChannel && !channelStarred && (
             <Icon
               name={"star outline"}
               onClick={handleStarred}
-              color="golden"
+              color="yellow"
             ></Icon>
           )}
         </span>

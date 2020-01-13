@@ -35,6 +35,8 @@ const UserPanel = props => {
   const [usersRef] = useState(firebase.database().ref("users"));
   const [storageRef] = useState(firebase.storage().ref());
 
+  const [messagesToUpdate, setMessagesToUpdate] = useState([]);
+
   function base64StringtoFile(base64String, filename) {
     var arr = base64String.split(","),
       mime = arr[0].match(/:(.*?);/)[1],
@@ -118,11 +120,12 @@ const UserPanel = props => {
   useEffect(() => {
     if (currentChannel) {
       loadAllCurrentChannels();
+      handleMessagesToUpdate();
     }
   }, [currentChannel]);
 
   const loadAllCurrentChannels = () => {
-    channelsRef.orderByChild("name").on("child_added", function(snap) {
+    channelsRef.orderByChild("name").on("child_added", snap => {
       addNotificationListener(snap.key);
     });
   };
@@ -130,8 +133,23 @@ const UserPanel = props => {
   const addNotificationListener = channelId => {
     if (currentChannel) {
       messagesRef.child(channelId).once("value", snapshot => {
-        console.log(snapshot.val());
+        setMessagesToUpdate(messagesToUpdate => [
+          ...messagesToUpdate,
+          {
+            data: snapshot.val()
+          }
+        ]);
       });
+    }
+  };
+
+  //current user id musi byc rowne message send id wtedy zmiena avatara
+
+  const handleMessagesToUpdate = () => {
+    if (messagesToUpdate) {
+      return messagesToUpdate.map(messagesToUpdate =>
+        console.log(messagesToUpdate)
+      );
     }
   };
 
