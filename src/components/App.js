@@ -11,7 +11,13 @@ import { connect } from "react-redux";
 //przeleciec wszystkie channele w bazie danych i poudatowac avatar
 
 const App = props => {
-  const { currentUser, currentChannel, isPrivateChannel, userPosts } = props;
+  const {
+    currentUser,
+    currentChannel,
+    isPrivateChannel,
+    userPosts,
+    userTyping
+  } = props;
   const [messagesBool, setMessagesBool] = useState(false);
 
   const setMessagesFull = () => {
@@ -38,6 +44,7 @@ const App = props => {
           isPrivateChannel={isPrivateChannel}
           setMessagesFull={setMessagesFull}
           setMessagesEmpty={setMessagesEmpty}
+          userTyping={userTyping}
         />
       </Grid.Column>
 
@@ -48,6 +55,7 @@ const App = props => {
           isPrivateChannel={isPrivateChannel}
           userPosts={userPosts}
           messagesBool={messagesBool}
+          currentUser={currentUser}
         />
       </Grid.Column>
     </Grid>
@@ -58,6 +66,7 @@ const mapStateToProps = state => ({
   currentUser: state.user.currentUser,
   currentChannel: state.channel.currentChannel,
   isPrivateChannel: state.channel.isPrivateChannel,
-  userPosts: state.channel.userPosts
+  userPosts: state.channel.userPosts,
+  userTyping: state.userTyping.userTyping
 });
 export default connect(mapStateToProps)(App);

@@ -49,6 +49,7 @@ function Channels(props) {
   };
 
   useEffect(() => {
+    addMainChannel();
     showChannels();
     return () => {
       channelsRef.off();
@@ -131,6 +132,29 @@ function Channels(props) {
     }
   };
 
+  const addMainChannel = () => {
+    const mainChannel = {
+      id: "mainChannel",
+      name: "Main Channel",
+      details: "This is main channel",
+      createdBy: {
+        uid: "111",
+        name: "Admin",
+        avatar: ""
+      }
+    };
+
+    channelsRef
+      .child("mainChannel")
+      .update(mainChannel)
+      .then(() => {
+        console.log("main channel added");
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
   const handleAddChannel = () => {
     // Generate a reference to a new location and add some data using push()
     const newPostRef = channelsRef.push();
@@ -142,6 +166,7 @@ function Channels(props) {
       name: channelName,
       details: channelDetail,
       createdBy: {
+        uid: currentUser.uid,
         name: currentUser.displayName,
         avatar: currentUser.photoURL
       }

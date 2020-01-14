@@ -41,3 +41,12 @@ export const setUserPosts = userPosts => {
     }
   };
 };
+
+export const setUserTyping = userTyping => {
+  return {
+    type: actionTypes.SET_USER_TYPING,
+    payload: {
+      userTyping
+    }
+  };
+};

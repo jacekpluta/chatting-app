@@ -5,6 +5,7 @@
   "dependencies": {
     "emoji-mart": "^2.11.2",
     "firebase": "^5.11.1",
+    "framer-motion": "^1.7.0",
     "md5": "^2.2.1",
     "mime-types": "^2.1.25",
     "moment": "^2.24.0",

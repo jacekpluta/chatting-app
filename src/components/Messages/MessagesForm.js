@@ -5,9 +5,15 @@ import mime from "mime-types";
 import ModalFile from "./ModalFile";
 import { uuid } from "uuidv4";
 
-export default function MessagesForm(props) {
-  const [storageRef] = useState(firebase.storage().ref());
+import { connect } from "react-redux";
+import { setUserTyping } from "../../actions";
 
+import { Picker, emojiIndex } from "emoji-mart";
+import "emoji-mart/css/emoji-mart.css";
+
+const MessagesForm = props => {
+  const [storageRef] = useState(firebase.storage().ref());
+  const [channelsRef] = useState(firebase.database().ref("channels"));
   const [message, setMessage] = useState();
   const [loading, setLoading] = useState(false);
 
@@ -18,17 +24,72 @@ export default function MessagesForm(props) {
   const [file, setFile] = useState(null);
   const [authorized] = useState(["image/jpeg", "image/png"]);
 
-  const {
-    messagesRef,
-    currentChannel,
-    currentUser,
-    isPrivateChannel,
-    getMessagesRef
-  } = props;
+  const [isTyping, setIsTyping] = useState(false);
+
+  const [showTypingAnimation, setShowTypingAnimation] = useState(false);
+  const [userTypingName, setUserTypingName] = useState("");
+
+  const { currentChannel, currentUser, getMessagesRef } = props;
 
   const handleChange = event => {
+    if (event.target.value) {
+      setIsTyping(true);
+    } else {
+      setIsTyping(false);
+    }
     setMessage(event.target.value);
   };
+
+  const loadCurrentChannel = () => {
+    channelsRef.child(currentChannel.id).on("value", snapshot => {
+      if (snapshot.val()) {
+        const isUserTyping = snapshot.val().isUserTyping.isTyping;
+        const userTypingName = snapshot.val().isUserTyping.user;
+
+        setShowTypingAnimation(isUserTyping);
+        setUserTypingName(userTypingName);
+        const userTyping = {
+          isUserTyping: isUserTyping,
+          userTypingName: userTypingName
+        };
+        console.log(userTyping);
+        props.setUserTyping(userTyping);
+      }
+    });
+  };
+
+  useEffect(() => {
+    const isTypingObj = {
+      isUserTyping: {
+        isTyping: isTyping,
+        user: currentUser.displayName
+      }
+    };
+    if (currentChannel && currentChannel.id) {
+      loadCurrentChannel();
+      if (isTyping) {
+        channelsRef
+          .child(currentChannel.id)
+          .update(isTypingObj)
+          .catch(error => {
+            console.log(error);
+            setLoading(false);
+            setMessage("");
+            setError(error);
+          });
+      } else {
+        channelsRef
+          .child(currentChannel.id)
+          .update(isTypingObj)
+          .catch(error => {
+            console.log(error);
+            setLoading(false);
+            setMessage("");
+            setError(error);
+          });
+      }
+    }
+  }, [isTyping]);
 
   const createMessage = (downloadURL = null) => {
     const createMessage = {
@@ -66,6 +127,7 @@ export default function MessagesForm(props) {
           setLoading(false);
           setMessage("");
           setError("");
+          setIsTyping(false);
         })
         .catch(error => {
           console.log(error);
@@ -178,6 +240,7 @@ export default function MessagesForm(props) {
           onChange={handleChange}
           className={error.includes("message") ? "error" : ""}
         />
+
         <Button.Group icon widths="2">
           <Button
             disabled={loading}
@@ -206,4 +269,6 @@ export default function MessagesForm(props) {
       ></ModalFile>
     </React.Fragment>
   );
-}
+};
+
+export default connect(null, { setUserTyping })(MessagesForm);

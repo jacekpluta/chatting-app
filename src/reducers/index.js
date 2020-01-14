@@ -52,8 +52,27 @@ const channel_reducer = (state = initialChannelState, action) => {
   }
 };
 
+const initialUserTypingState = {
+  userTyping: null
+};
+
+const userTyping_reducer = (state = initialUserTypingState, action) => {
+  switch (action.type) {
+    case actionTypes.SET_USER_TYPING:
+      return {
+        ...state,
+        userTyping: action.payload.userTyping
+      };
+
+    default:
+      return state;
+  }
+};
+
 const rootReducer = combineReducers({
   user: user_reducer,
-  channel: channel_reducer
+  channel: channel_reducer,
+  userTyping: userTyping_reducer
 });
+
 export default rootReducer;

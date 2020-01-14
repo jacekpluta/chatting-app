@@ -25,30 +25,28 @@ export default function Message(props) {
   };
 
   const timeFromNow = timeStamp => moment(timeStamp).fromNow();
-
-  return (
-    <Comment>
-      <Comment.Avatar src={message.currentUser.avatar} />
-      <Comment.Content className={isMyMessage ? "MyMessage" : ""}>
-        <Comment.Author as="a">{message.currentUser.name}</Comment.Author>
-        <Comment.Metadata>{timeFromNow(message.timeStamp)}</Comment.Metadata>
-
-        {messageImageLoading ? (
-          <Loader
-            size="medium"
-            active={messageImageLoading}
-            content="Loading"
-          ></Loader>
-        ) : (
-          ""
-        )}
-
-        {isImage() ? (
-          <Image src={message.image} className="messageImage"></Image>
-        ) : (
-          <Comment.Text>{message.content}</Comment.Text>
-        )}
-      </Comment.Content>
-    </Comment>
-  );
+  if (messageImageLoading) {
+    return (
+      <Loader
+        size="medium"
+        active={messageImageLoading}
+        content="Loading"
+      ></Loader>
+    );
+  } else {
+    return (
+      <Comment>
+        <Comment.Avatar src={message.currentUser.avatar} />
+        <Comment.Content className={isMyMessage ? "MyMessage" : ""}>
+          <Comment.Author as="a">{message.currentUser.name}</Comment.Author>
+          <Comment.Metadata>{timeFromNow(message.timeStamp)}</Comment.Metadata>:
+          {isImage() ? (
+            <Image src={message.image} className="messageImage"></Image>
+          ) : (
+            <Comment.Text>{message.content}</Comment.Text>
+          )}
+        </Comment.Content>
+      </Comment>
+    );
+  }
 }

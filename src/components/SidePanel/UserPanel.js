@@ -10,8 +10,6 @@ import {
 } from "semantic-ui-react";
 import firebase from "../Firebase";
 import OnDrop from "./OnDrop";
-import { setUser } from "../../actions";
-import { connect } from "react-redux";
 
 const userStyle = {
   background: "#4c3c4c"
@@ -59,7 +57,6 @@ const UserPanel = props => {
 
   useEffect(() => {
     if (uploadedCroppedImaged) {
-      console.log(uploadedCroppedImaged);
       changeAvatar();
     }
 
@@ -100,57 +97,62 @@ const UserPanel = props => {
       .catch(err => {
         console.log(err);
       });
-
-    // channelsRef
-    //   .child(currentChannel.id)
-    //   .update({
-    //     createdBy: {
-    //       avatar: uploadedCroppedImaged,
-    //       name: currentUser.name
-    //     }
-    //   })
-    //   .then(() => {
-    //     console.log("Channel info updated");
-    //   })
-    //   .catch(err => {
-    //     console.log(err);
-    //   });
   };
+
+  /////////////////////////////ON CHANNEL CHANGE UPDATE AVATAR/////////////////// wywolac raz po zmiania to samo tamto
 
   useEffect(() => {
     if (currentChannel) {
       loadAllCurrentChannels();
-      handleMessagesToUpdate();
     }
   }, [currentChannel]);
 
   const loadAllCurrentChannels = () => {
-    channelsRef.orderByChild("name").on("child_added", snap => {
-      addNotificationListener(snap.key);
+    channelsRef.orderByChild("name").on("child_added", snapshot => {
+      updateAvatarListener(snapshot.key);
     });
   };
 
-  const addNotificationListener = channelId => {
-    if (currentChannel) {
-      messagesRef.child(channelId).once("value", snapshot => {
-        setMessagesToUpdate(messagesToUpdate => [
-          ...messagesToUpdate,
-          {
-            data: snapshot.val()
-          }
-        ]);
-      });
+  const updateAvatarListener = channelId => {
+    if (channelId === currentChannel.id) {
+      messagesRef
+        .child(channelId)
+        .once("value", snapshot => {
+          setMessagesToUpdate(snapshot.val());
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   };
 
-  //current user id musi byc rowne message send id wtedy zmiena avatara
+  useEffect(() => {
+    if (messagesToUpdate && messagesToUpdate.length !== 0) {
+      handleMessagesToUpdate();
+    }
+  }, [messagesToUpdate]);
 
   const handleMessagesToUpdate = () => {
-    if (messagesToUpdate) {
-      return messagesToUpdate.map(messagesToUpdate =>
-        console.log(messagesToUpdate)
-      );
-    }
+    const currentChanelMessagesIds = Object.entries(messagesToUpdate).map(
+      ([messageId, message], i) => {
+        if (message.currentUser.id === currentUser.uid) {
+          if (message.content) {
+            const newUserAvatar = {
+              currentUser: {
+                avatar: currentUser.photoURL,
+                id: currentUser.uid,
+                name: currentUser.displayName
+              }
+            };
+
+            messagesRef
+              .child(currentChannel.id)
+              .child(messageId)
+              .update(newUserAvatar);
+          }
+        }
+      }
+    );
   };
 
   const openModal = () => {
@@ -239,4 +241,4 @@ const UserPanel = props => {
   );
 };
 
-export default connect(null, { setUser })(UserPanel);
+export default UserPanel;

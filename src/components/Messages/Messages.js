@@ -1,15 +1,19 @@
 import MessagesForm from "./MessagesForm";
 import MessagesHeader from "./MessagesHeader";
+import TypingLoader from "./TypingLoader";
+
 import { Segment, Comment } from "semantic-ui-react";
 import firebase from "../Firebase";
 import React, { useState, useEffect } from "react";
 import { Loader } from "semantic-ui-react";
 
 import { connect } from "react-redux";
-import { setUserPosts } from "../../actions";
+import { setUserPosts, setCurrentChannel } from "../../actions";
 
 import Message from "./Message";
 const Messages = props => {
+  const [channelsRef] = useState(firebase.database().ref("channels"));
+
   const [messageImageLoading, setMessageImageLoading] = useState(false);
   const [messagesRef] = useState(firebase.database().ref("messages"));
   const [usersRef] = useState(firebase.database().ref("users"));
@@ -30,7 +34,8 @@ const Messages = props => {
     currentUser,
     isPrivateChannel,
     setMessagesFull,
-    setMessagesEmpty
+    setMessagesEmpty,
+    userTyping
   } = props;
 
   const setMessageImageLoadingTrue = () => {
@@ -62,6 +67,26 @@ const Messages = props => {
     addMessageListeners();
   };
 
+  useEffect(() => {
+    if (messagesLoaded) {
+      if (currentChannel.createdBy.uid === currentUser.uid) {
+        const newCurrentChannelInfo = {
+          id: currentChannel.id,
+          name: currentChannel.name,
+          details: currentChannel.details,
+          createdBy: {
+            uid: currentChannel.createdBy.uid,
+            name: currentChannel.createdBy.name,
+            avatar: currentUser.photoURL
+          }
+        };
+
+        channelsRef.child(currentChannel.id).update(newCurrentChannelInfo);
+        props.setCurrentChannel(newCurrentChannelInfo);
+      }
+    }
+  }, [messagesLoaded]);
+
   const unstarChannel = () => {
     usersRef
       .child(`${currentUser.uid}/starred`)
@@ -81,6 +106,7 @@ const Messages = props => {
           name: currentChannel.name,
           details: currentChannel.details,
           createdBy: {
+            uid: currentChannel.createdBy.uid,
             name: currentChannel.createdBy.name,
             avatar: currentChannel.createdBy.avatar
           }
@@ -222,7 +248,10 @@ const Messages = props => {
                     searchTerm={searchTerm}
                   />
                 );
-              })
+              }) &&
+              <div> {userTyping.userTypingName}</div> && (
+                <TypingLoader userTyping={userTyping}></TypingLoader>
+              )
             : ""}
 
           {allChannelMessages.loadedMessages && searchTerm
@@ -254,4 +283,4 @@ const Messages = props => {
   );
 };
 
-export default connect(null, { setUserPosts })(Messages);
+export default connect(null, { setUserPosts, setCurrentChannel })(Messages);
