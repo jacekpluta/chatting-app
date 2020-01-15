@@ -13,9 +13,11 @@ import "emoji-mart/css/emoji-mart.css";
 
 const MessagesForm = props => {
   const [storageRef] = useState(firebase.storage().ref());
-  const [channelsRef] = useState(firebase.database().ref("channels"));
+  const [isTypingRef] = useState(firebase.database().ref("isTyping"));
   const [message, setMessage] = useState();
   const [loading, setLoading] = useState(false);
+  const [emojiPicker, setEmojiPicker] = useState(false);
+  const [focusInput, setFocusInput] = useState(true);
 
   const [error, setError] = useState("");
   const [modal, setModal] = useState(false);
@@ -41,7 +43,7 @@ const MessagesForm = props => {
   };
 
   const loadCurrentChannel = () => {
-    channelsRef.child(currentChannel.id).on("value", snapshot => {
+    isTypingRef.child(currentChannel.id).on("value", snapshot => {
       if (snapshot.val()) {
         const isUserTyping = snapshot.val().isUserTyping.isTyping;
         const userTypingName = snapshot.val().isUserTyping.user;
@@ -52,7 +54,7 @@ const MessagesForm = props => {
           isUserTyping: isUserTyping,
           userTypingName: userTypingName
         };
-        console.log(userTyping);
+
         props.setUserTyping(userTyping);
       }
     });
@@ -66,9 +68,9 @@ const MessagesForm = props => {
       }
     };
     if (currentChannel && currentChannel.id) {
-      loadCurrentChannel();
       if (isTyping) {
-        channelsRef
+        loadCurrentChannel();
+        isTypingRef
           .child(currentChannel.id)
           .update(isTypingObj)
           .catch(error => {
@@ -78,7 +80,7 @@ const MessagesForm = props => {
             setError(error);
           });
       } else {
-        channelsRef
+        isTypingRef
           .child(currentChannel.id)
           .update(isTypingObj)
           .catch(error => {
@@ -172,7 +174,7 @@ const MessagesForm = props => {
   };
 
   const uploadFile = (file, metadata) => {
-    console.log(getPath());
+    // console.log(getPath());
     const pathToUpload = currentChannel.id;
     const messRef = getMessagesRef();
     const filePath = `${getPath()}/${uuid()}.jpg`;
@@ -227,18 +229,57 @@ const MessagesForm = props => {
       });
   };
 
+  const handleEmojiPicker = () => {
+    setEmojiPicker(!emojiPicker);
+  };
+
+  const handleAddEmoji = emoji => {
+    const oldMessage = message;
+    const newMessage = colonToUnicode(` ${oldMessage} ${emoji.colons} `);
+    setMessage(newMessage);
+    setEmojiPicker(false);
+    setFocusInput(true);
+  };
+
+  const colonToUnicode = message => {
+    return message.replace(/:[A-Za-z0-9_+-]+:/g, x => {
+      x = x.replace(/:/g, "");
+      let emoji = emojiIndex.emojis[x];
+      if (typeof emoji !== "undefined") {
+        let unicode = emoji.native;
+        if (typeof unicode !== "undefined") {
+          return unicode;
+        }
+      }
+      x = ":" + x + ":";
+      return x;
+    });
+  };
+
   return (
     <React.Fragment>
       <Segment className="messageForm">
+        {emojiPicker ? (
+          <Picker
+            set="apple"
+            className={emojiPicker}
+            title="Pick your emoji"
+            emoji={"point_up"}
+            onSelect={handleAddEmoji}
+          ></Picker>
+        ) : (
+          ""
+        )}
         <Input
           value={message}
           fluid
           name="message"
           style={{ marginBottom: "0.7 em" }}
-          label={<Button icon={"add"}></Button>}
+          label={<Button icon={"add"} onClick={handleEmojiPicker}></Button>}
           placeholder="Write your message"
           onChange={handleChange}
           className={error.includes("message") ? "error" : ""}
+          focus={focusInput}
         />
 
         <Button.Group icon widths="2">

@@ -114,7 +114,6 @@ class Register extends Component {
     }
   };
 
-  //saves user into the database using "usersRef" from state
   saveUser = createdUser => {
     return this.state.usersRef.child(createdUser.user.uid).set({
       name: createdUser.user.displayName,

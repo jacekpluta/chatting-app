@@ -68,10 +68,9 @@ const Messages = props => {
   };
 
   useEffect(() => {
-    if (messagesLoaded) {
+    if (messagesLoaded && !isPrivateChannel) {
       if (currentChannel.createdBy.uid === currentUser.uid) {
         const newCurrentChannelInfo = {
-          id: currentChannel.id,
           name: currentChannel.name,
           details: currentChannel.details,
           createdBy: {
@@ -80,8 +79,8 @@ const Messages = props => {
             avatar: currentUser.photoURL
           }
         };
-
-        channelsRef.child(currentChannel.id).update(newCurrentChannelInfo);
+        //musi rozroznic miedzy private a zwyklym i do private doda jego id
+        //channelsRef.child(currentChannel.id).update(newCurrentChannelInfo);
         props.setCurrentChannel(newCurrentChannelInfo);
       }
     }
@@ -217,7 +216,14 @@ const Messages = props => {
       props.setUserPosts(null);
     }
   };
-
+  const messagesEndRef = React.createRef();
+  const scrollToBottom = () => {
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  };
+  console.log(messagesEndRef.current);
+  useEffect(() => {
+    //scrollToBottom();
+  }, []);
   return (
     <React.Fragment>
       <MessagesHeader
@@ -248,11 +254,17 @@ const Messages = props => {
                     searchTerm={searchTerm}
                   />
                 );
-              }) &&
-              <div> {userTyping.userTypingName}</div> && (
-                <TypingLoader userTyping={userTyping}></TypingLoader>
-              )
+              })
             : ""}
+
+          {userTyping && userTyping.isUserTyping
+            ? "User " + userTyping.userTypingName + " is writing"
+            : ""}
+          {userTyping ? (
+            <TypingLoader userTyping={userTyping}></TypingLoader>
+          ) : (
+            ""
+          )}
 
           {allChannelMessages.loadedMessages && searchTerm
             ? searchResult.map(message => {
@@ -268,6 +280,10 @@ const Messages = props => {
                 );
               })
             : ""}
+          <div
+            style={{ float: "left", clear: "both" }}
+            ref={messagesEndRef.current}
+          ></div>
         </Comment.Group>
       </Segment>
       <MessagesForm
