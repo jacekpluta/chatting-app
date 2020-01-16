@@ -1,5 +1,5 @@
 import { Segment, Input, Button } from "semantic-ui-react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import firebase from "../Firebase";
 import mime from "mime-types";
 import ModalFile from "./ModalFile";
@@ -11,25 +11,34 @@ import { setUserTyping } from "../../actions";
 import { Picker, emojiIndex } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
 
+//cutom hook to focus after sending an emoji
+const useFocus = () => {
+  const htmlElRef = useRef(null);
+  const setFocus = () => {
+    htmlElRef.current && htmlElRef.current.focus();
+  };
+
+  return [htmlElRef, setFocus];
+};
+
 const MessagesForm = props => {
   const [storageRef] = useState(firebase.storage().ref());
   const [isTypingRef] = useState(firebase.database().ref("isTyping"));
+
   const [message, setMessage] = useState();
   const [loading, setLoading] = useState(false);
   const [emojiPicker, setEmojiPicker] = useState(false);
-  const [focusInput, setFocusInput] = useState(true);
-
   const [error, setError] = useState("");
   const [modal, setModal] = useState(false);
-  const [uploadState, setUploadState] = useState("");
+  const [uploadState, setUploadState] = useState(false);
   const [uploadTask, setUploadTask] = useState(null);
   const [file, setFile] = useState(null);
   const [authorized] = useState(["image/jpeg", "image/png"]);
-
   const [isTyping, setIsTyping] = useState(false);
-
   const [showTypingAnimation, setShowTypingAnimation] = useState(false);
   const [userTypingName, setUserTypingName] = useState("");
+
+  const [inputRef, setInputFocus] = useFocus();
 
   const { currentChannel, currentUser, getMessagesRef } = props;
 
@@ -179,7 +188,7 @@ const MessagesForm = props => {
     const messRef = getMessagesRef();
     const filePath = `${getPath()}/${uuid()}.jpg`;
 
-    setUploadState("uploading");
+    setUploadState(true);
 
     props.setMessageImageLoadingTrue();
 
@@ -219,10 +228,10 @@ const MessagesForm = props => {
       .push()
       .set(createMessage(downloadURL))
       .then(() => {
-        setUploadState("done");
+        setUploadState(true);
       })
       .catch(error => {
-        setUploadState("error");
+        setUploadState(false);
         setUploadTask(null);
         setError(error);
         console.log(error);
@@ -235,10 +244,10 @@ const MessagesForm = props => {
 
   const handleAddEmoji = emoji => {
     const oldMessage = message;
-    const newMessage = colonToUnicode(` ${oldMessage} ${emoji.colons} `);
+    const newMessage = colonToUnicode(`${oldMessage} ${emoji.colons}`);
     setMessage(newMessage);
     setEmojiPicker(false);
-    setFocusInput(true);
+    setInputFocus();
   };
 
   const colonToUnicode = message => {
@@ -272,6 +281,7 @@ const MessagesForm = props => {
         )}
         <Input
           value={message}
+          autoFocus
           fluid
           name="message"
           style={{ marginBottom: "0.7 em" }}
@@ -279,7 +289,7 @@ const MessagesForm = props => {
           placeholder="Write your message"
           onChange={handleChange}
           className={error.includes("message") ? "error" : ""}
-          focus={focusInput}
+          ref={inputRef}
         />
 
         <Button.Group icon widths="2">

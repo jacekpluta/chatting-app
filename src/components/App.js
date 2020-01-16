@@ -8,7 +8,10 @@ import SidePanel from "./SidePanel/SidePanel";
 import { connect } from "react-redux";
 
 //count current online users in channel (if they are online and if they have written a message)
-//przeleciec wszystkie channele w bazie danych i poudatowac avatar
+//czasami zle cropuje przy wiekszych obrazkach
+// jak kto w chodzi na kanal, is typing znika, czyli przy zmianie kanalu zmienic na istyping na false
+//newcurrent channel blad przy zmianie kanalu (w messages 85)
+//popraiwc ogolnie i wizualnie uplaoding avatar, np error przy i niemozliwosc wyslania przy zlym image
 
 const App = props => {
   const {

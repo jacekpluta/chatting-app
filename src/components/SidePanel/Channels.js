@@ -147,9 +147,6 @@ function Channels(props) {
     channelsRef
       .child("mainChannel")
       .update(mainChannel)
-      .then(() => {
-        console.log("main channel added");
-      })
       .catch(error => {
         console.log(error);
       });

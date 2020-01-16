@@ -4,7 +4,7 @@ import TypingLoader from "./TypingLoader";
 
 import { Segment, Comment } from "semantic-ui-react";
 import firebase from "../Firebase";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Loader } from "semantic-ui-react";
 
 import { connect } from "react-redux";
@@ -28,6 +28,8 @@ const Messages = props => {
   const [searchResult, setSearchResult] = useState([]);
 
   const [channelStarred, setChannelStarred] = useState(false);
+
+  const messagesEndRef = useRef(null);
 
   const {
     currentChannel,
@@ -81,7 +83,7 @@ const Messages = props => {
         };
         //musi rozroznic miedzy private a zwyklym i do private doda jego id
         //channelsRef.child(currentChannel.id).update(newCurrentChannelInfo);
-        props.setCurrentChannel(newCurrentChannelInfo);
+        //props.setCurrentChannel(newCurrentChannelInfo);
       }
     }
   }, [messagesLoaded]);
@@ -216,14 +218,13 @@ const Messages = props => {
       props.setUserPosts(null);
     }
   };
-  const messagesEndRef = React.createRef();
+
   const scrollToBottom = () => {
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
   };
-  console.log(messagesEndRef.current);
-  useEffect(() => {
-    //scrollToBottom();
-  }, []);
+
+  useEffect(scrollToBottom, [allChannelMessages]);
+
   return (
     <React.Fragment>
       <MessagesHeader
@@ -241,6 +242,7 @@ const Messages = props => {
           size="huge"
           content="Loading Messages"
         ></Loader>
+
         <Comment.Group className="messages">
           {allChannelMessages.loadedMessages && searchTerm === ""
             ? allChannelMessages.loadedMessages.map(message => {
@@ -280,10 +282,7 @@ const Messages = props => {
                 );
               })
             : ""}
-          <div
-            style={{ float: "left", clear: "both" }}
-            ref={messagesEndRef.current}
-          ></div>
+          <div ref={messagesEndRef} />
         </Comment.Group>
       </Segment>
       <MessagesForm
