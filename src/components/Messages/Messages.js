@@ -9,6 +9,7 @@ import { Loader } from "semantic-ui-react";
 
 import { connect } from "react-redux";
 import { setUserPosts, setCurrentChannel } from "../../actions";
+import SkeletonMessages from "./SkeletonMessages";
 
 import Message from "./Message";
 const Messages = props => {
@@ -37,7 +38,8 @@ const Messages = props => {
     isPrivateChannel,
     setMessagesFull,
     setMessagesEmpty,
-    userTyping
+    userTyping,
+    biggerText
   } = props;
 
   const setMessageImageLoadingTrue = () => {
@@ -73,17 +75,19 @@ const Messages = props => {
     if (messagesLoaded && !isPrivateChannel) {
       if (currentChannel.createdBy.uid === currentUser.uid) {
         const newCurrentChannelInfo = {
-          name: currentChannel.name,
-          details: currentChannel.details,
           createdBy: {
-            uid: currentChannel.createdBy.uid,
+            avatar: currentUser.photoURL,
             name: currentChannel.createdBy.name,
-            avatar: currentUser.photoURL
-          }
+            uid: currentChannel.createdBy.uid
+          },
+          details: currentChannel.details,
+          id: currentChannel.id,
+          name: currentChannel.name
         };
-        //musi rozroznic miedzy private a zwyklym i do private doda jego id
-        //channelsRef.child(currentChannel.id).update(newCurrentChannelInfo);
-        //props.setCurrentChannel(newCurrentChannelInfo);
+        console.log(currentChannel);
+        console.log(newCurrentChannelInfo);
+        channelsRef.child(currentChannel.id).update(newCurrentChannelInfo);
+        props.setCurrentChannel(newCurrentChannelInfo);
       }
     }
   }, [messagesLoaded]);
@@ -193,7 +197,14 @@ const Messages = props => {
       .child(currentChannel.id)
       .once("value", snapshot => {})
       .then(snapshot => {
-        setMessagesLoaded(true);
+        if (snapshot) {
+          if (snapshot.val()) {
+            setMessagesLoaded(true);
+            scrollToBottom();
+          } else {
+            setMessagesEmpty();
+          }
+        }
       });
   };
 

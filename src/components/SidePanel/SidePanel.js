@@ -6,15 +6,27 @@ import DirectMessages from "./DirectMessages";
 import Starred from "./Starred";
 
 const menuStyle = {
-  background: "#4c3c4c",
+  background: "#636D21",
   fontSize: "1.2 rem"
 };
 
+const biggerTextStyle = {
+  background: "#636D21",
+  fontSize: "1.4em"
+};
+
 export default function SidePanel(props) {
-  const { currentUser, currentChannel } = props;
+  const { currentUser, currentChannel, biggerText } = props;
   return (
     <React.Fragment>
-      <Menu size="large" inverted fixed="left" vertical style={menuStyle}>
+      <Menu
+        size="=h"
+        inverted
+        fixed="left"
+        vertical
+        style={biggerText ? biggerTextStyle : menuStyle}
+        className="sidePanel"
+      >
         <UserPanel
           currentChannel={currentChannel}
           currentUser={currentUser}

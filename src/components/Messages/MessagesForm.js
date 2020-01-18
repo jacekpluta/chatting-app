@@ -69,6 +69,12 @@ const MessagesForm = props => {
     });
   };
 
+  const handlePressEnterToSend = event => {
+    if (event.keyCode === 13) {
+      sendMessage();
+    }
+  };
+
   useEffect(() => {
     const isTypingObj = {
       isUserTyping: {
@@ -219,6 +225,11 @@ const MessagesForm = props => {
         var percent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         console.log(percent + "% done");
       });
+
+      return () => {
+        uploadTask.cancel();
+        setUploadTask(null);
+      };
     }
   }, []);
 
@@ -290,6 +301,7 @@ const MessagesForm = props => {
           onChange={handleChange}
           className={error.includes("message") ? "error" : ""}
           ref={inputRef}
+          onKeyDown={handlePressEnterToSend}
         />
 
         <Button.Group icon widths="2">

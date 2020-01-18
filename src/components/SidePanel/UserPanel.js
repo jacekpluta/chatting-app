@@ -12,7 +12,7 @@ import firebase from "../Firebase";
 import OnDrop from "./OnDrop";
 
 const userStyle = {
-  background: "#4c3c4c"
+  background: "#636D21"
 };
 
 const gridRowStyle = {
@@ -128,11 +128,11 @@ const UserPanel = props => {
 
   useEffect(() => {
     if (messagesToUpdate && messagesToUpdate.length !== 0) {
-      handleMessagesToUpdate();
+      updatingMessages();
     }
   }, [messagesToUpdate]);
 
-  const handleMessagesToUpdate = () => {
+  const updatingMessages = () => {
     const currentChanelMessagesIds = Object.entries(messagesToUpdate).map(
       ([messageId, message], i) => {
         if (message.currentUser.id === currentUser.uid) {
@@ -154,6 +154,7 @@ const UserPanel = props => {
       }
     );
   };
+  ////////////////////////////////////////////////
 
   const openModal = () => {
     setModal(true);

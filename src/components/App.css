@@ -7,7 +7,7 @@ body,
 }
 
 .messages {
-  height: 440px;
+  height: 50vh;
   overflow-y: scroll;
 }
 
@@ -41,5 +41,6 @@ body,
   align-items: center;
 }
 
-.dropzone p {
+.sidePanel {
+  overflow-y: scroll;
 }

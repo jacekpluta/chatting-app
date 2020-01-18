@@ -6,13 +6,22 @@ import Messages from "./Messages/Messages";
 import MetaPanel from "./MetaPanel/MetaPanel";
 import SidePanel from "./SidePanel/SidePanel";
 import { connect } from "react-redux";
+//TO DO:
+//count current online users in channel (if they are online and if they have written a message) NOTIFICATION
+// usunac wszystkich userow i zrobic ich dodawanie do znajomych
 
-//count current online users in channel (if they are online and if they have written a message)
-//czasami zle cropuje przy wiekszych obrazkach
-// jak kto w chodzi na kanal, is typing znika, czyli przy zmianie kanalu zmienic na istyping na false
-//newcurrent channel blad przy zmianie kanalu (w messages 85)
+// jak kto w chodzi na kanal, is typing znika, i przy zmianie kanalu zmienic na istyping na false
+
+// 2 krotnie trzeba przeladowac zeby avatar sie zupdatowal
+
 //popraiwc ogolnie i wizualnie uplaoding avatar, np error przy i niemozliwosc wyslania przy zlym image
+//czasami zle cropuje przy wiekszych obrazkach
 
+//zmiana font size, nie wraca do poprzedniogo stanu
+
+//dzwiek przy powiadomieniach
+
+//przywijanie do samego konca na starcie apki
 const App = props => {
   const {
     currentUser,
@@ -21,47 +30,58 @@ const App = props => {
     userPosts,
     userTyping
   } = props;
-  const [messagesBool, setMessagesBool] = useState(false);
+  const [messagesIsFull, setMessagesIsFull] = useState(false);
+  const [biggerText, setBiggerText] = useState(false);
 
   const setMessagesFull = () => {
-    setMessagesBool(true);
+    setMessagesIsFull(true);
   };
 
   const setMessagesEmpty = () => {
-    setMessagesBool(false);
+    setMessagesIsFull(false);
+  };
+
+  const handleBiggerText = () => {
+    setBiggerText(!biggerText);
   };
 
   return (
-    <Grid columns="equal" className="app" style={{ background: "#eee" }}>
-      <ColorPanel />
-      <SidePanel
-        currentUser={currentUser}
-        key={currentUser && currentUser.id}
-        currentChannel={currentChannel}
-      />
-      <Grid.Column style={{ marginLeft: 320 }}>
-        <Messages
-          currentChannel={currentChannel}
-          key={currentChannel && currentChannel.id}
+    <div>
+      <Grid columns="equal" className="app" style={{ background: "#eee" }}>
+        <ColorPanel handleBiggerText={handleBiggerText} />
+        <SidePanel
           currentUser={currentUser}
-          isPrivateChannel={isPrivateChannel}
-          setMessagesFull={setMessagesFull}
-          setMessagesEmpty={setMessagesEmpty}
-          userTyping={userTyping}
+          key={currentUser && currentUser.id}
+          currentChannel={currentChannel}
+          biggerText={biggerText}
         />
-      </Grid.Column>
+        <Grid.Column style={{ marginLeft: 320 }}>
+          <Messages
+            currentChannel={currentChannel}
+            key={currentChannel && currentChannel.id}
+            currentUser={currentUser}
+            isPrivateChannel={isPrivateChannel}
+            setMessagesFull={setMessagesFull}
+            setMessagesEmpty={setMessagesEmpty}
+            userTyping={userTyping}
+            biggerText={biggerText}
+            messagesIsFull={messagesIsFull}
+          />
+        </Grid.Column>
 
-      <Grid.Column width={4}>
-        <MetaPanel
-          key={currentChannel && currentChannel.id}
-          currentChannel={currentChannel}
-          isPrivateChannel={isPrivateChannel}
-          userPosts={userPosts}
-          messagesBool={messagesBool}
-          currentUser={currentUser}
-        />
-      </Grid.Column>
-    </Grid>
+        <Grid.Column width={4}>
+          <MetaPanel
+            key={currentChannel && currentChannel.id}
+            currentChannel={currentChannel}
+            isPrivateChannel={isPrivateChannel}
+            userPosts={userPosts}
+            messagesIsFull={messagesIsFull}
+            currentUser={currentUser}
+            biggerText={biggerText}
+          />
+        </Grid.Column>
+      </Grid>
+    </div>
   );
 };
 
