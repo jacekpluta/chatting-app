@@ -17,7 +17,7 @@ const Starred = props => {
     }
 
     return () => {};
-  }, []);
+  }, [currentUser]);
 
   const addListenersStarAdded = userId => {
     usersRef
@@ -49,9 +49,11 @@ const Starred = props => {
       });
       setStarredChannels(filteredChannel);
       setChannelToRemove(null);
-    }
 
-    return () => {};
+      return () => {
+        usersRef.child(`{currentUser.uid}/starred`).off();
+      };
+    }
   }, [channelToRemove]);
 
   const changeChannel = channel => {

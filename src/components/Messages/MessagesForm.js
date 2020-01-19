@@ -25,12 +25,14 @@ const MessagesForm = props => {
   const [storageRef] = useState(firebase.storage().ref());
   const [isTypingRef] = useState(firebase.database().ref("isTyping"));
 
+  const [input, setInput] = useState("");
   const [message, setMessage] = useState();
+
   const [loading, setLoading] = useState(false);
   const [emojiPicker, setEmojiPicker] = useState(false);
   const [error, setError] = useState("");
   const [modal, setModal] = useState(false);
-  const [uploadState, setUploadState] = useState(false);
+  const [setUploadState] = useState(false);
   const [uploadTask, setUploadTask] = useState(null);
   const [file, setFile] = useState(null);
   const [authorized] = useState(["image/jpeg", "image/png"]);
@@ -56,12 +58,15 @@ const MessagesForm = props => {
       if (snapshot.val()) {
         const isUserTyping = snapshot.val().isUserTyping.isTyping;
         const userTypingName = snapshot.val().isUserTyping.user;
+        const userTypingUid = snapshot.val().isUserTyping.uid;
 
         setShowTypingAnimation(isUserTyping);
         setUserTypingName(userTypingName);
+
         const userTyping = {
           isUserTyping: isUserTyping,
-          userTypingName: userTypingName
+          userTypingName: userTypingName,
+          userTypingUid: userTypingUid
         };
 
         props.setUserTyping(userTyping);
@@ -79,9 +84,11 @@ const MessagesForm = props => {
     const isTypingObj = {
       isUserTyping: {
         isTyping: isTyping,
-        user: currentUser.displayName
+        user: currentUser.displayName,
+        uid: currentUser.uid
       }
     };
+
     if (currentChannel && currentChannel.id) {
       if (isTyping) {
         loadCurrentChannel();
@@ -143,12 +150,14 @@ const MessagesForm = props => {
         .then(() => {
           setLoading(false);
           setMessage("");
+          setInput("");
           setError("");
           setIsTyping(false);
         })
         .catch(error => {
           console.log(error);
           setLoading(false);
+          setInput("");
           setMessage("");
           setError(error);
         });
@@ -291,7 +300,8 @@ const MessagesForm = props => {
           ""
         )}
         <Input
-          value={message}
+          value={input}
+          onInput={e => setInput(e.target.value)}
           autoFocus
           fluid
           name="message"

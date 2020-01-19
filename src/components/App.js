@@ -6,8 +6,10 @@ import Messages from "./Messages/Messages";
 import MetaPanel from "./MetaPanel/MetaPanel";
 import SidePanel from "./SidePanel/SidePanel";
 import { connect } from "react-redux";
+
 //TO DO:
 //count current online users in channel (if they are online and if they have written a message) NOTIFICATION
+
 // usunac wszystkich userow i zrobic ich dodawanie do znajomych
 
 // jak kto w chodzi na kanal, is typing znika, i przy zmianie kanalu zmienic na istyping na false
@@ -17,11 +19,10 @@ import { connect } from "react-redux";
 //popraiwc ogolnie i wizualnie uplaoding avatar, np error przy i niemozliwosc wyslania przy zlym image
 //czasami zle cropuje przy wiekszych obrazkach
 
+//powiadomienia i dzwiek przy powiadomieniach
+
 //zmiana font size, nie wraca do poprzedniogo stanu
 
-//dzwiek przy powiadomieniach
-
-//przywijanie do samego konca na starcie apki
 const App = props => {
   const {
     currentUser,
@@ -30,16 +31,8 @@ const App = props => {
     userPosts,
     userTyping
   } = props;
-  const [messagesIsFull, setMessagesIsFull] = useState(false);
+
   const [biggerText, setBiggerText] = useState(false);
-
-  const setMessagesFull = () => {
-    setMessagesIsFull(true);
-  };
-
-  const setMessagesEmpty = () => {
-    setMessagesIsFull(false);
-  };
 
   const handleBiggerText = () => {
     setBiggerText(!biggerText);
@@ -54,6 +47,7 @@ const App = props => {
           key={currentUser && currentUser.id}
           currentChannel={currentChannel}
           biggerText={biggerText}
+          isPrivateChannel={isPrivateChannel}
         />
         <Grid.Column style={{ marginLeft: 320 }}>
           <Messages
@@ -61,11 +55,8 @@ const App = props => {
             key={currentChannel && currentChannel.id}
             currentUser={currentUser}
             isPrivateChannel={isPrivateChannel}
-            setMessagesFull={setMessagesFull}
-            setMessagesEmpty={setMessagesEmpty}
             userTyping={userTyping}
             biggerText={biggerText}
-            messagesIsFull={messagesIsFull}
           />
         </Grid.Column>
 
@@ -75,7 +66,6 @@ const App = props => {
             currentChannel={currentChannel}
             isPrivateChannel={isPrivateChannel}
             userPosts={userPosts}
-            messagesIsFull={messagesIsFull}
             currentUser={currentUser}
             biggerText={biggerText}
           />

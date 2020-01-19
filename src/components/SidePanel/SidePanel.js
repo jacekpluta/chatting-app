@@ -16,11 +16,11 @@ const biggerTextStyle = {
 };
 
 export default function SidePanel(props) {
-  const { currentUser, currentChannel, biggerText } = props;
+  const { currentUser, currentChannel, biggerText, isPrivateChannel } = props;
   return (
     <React.Fragment>
       <Menu
-        size="=h"
+        size="large"
         inverted
         fixed="left"
         vertical
@@ -30,6 +30,7 @@ export default function SidePanel(props) {
         <UserPanel
           currentChannel={currentChannel}
           currentUser={currentUser}
+          isPrivateChannel={isPrivateChannel}
         ></UserPanel>
         <Starred currentUser={currentUser} currentChannel={currentChannel} />
         <Channels currentChannel={currentChannel} currentUser={currentUser} />

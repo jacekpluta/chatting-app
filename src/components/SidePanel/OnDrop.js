@@ -35,7 +35,7 @@ const rejectStyle = {
 export default function OnDrop(props) {
   const [files, setFiles] = useState([]);
 
-  const { saveAvatar, currentUser } = props;
+  const { saveAvatar } = props;
   const imageRef = useRef();
 
   const [crop, setCrop] = useState({
@@ -80,7 +80,7 @@ export default function OnDrop(props) {
       ...(isDragAccept ? acceptStyle : {}),
       ...(isDragReject ? rejectStyle : {})
     }),
-    [isDragActive, isDragReject]
+    [isDragActive, isDragReject, isDragAccept]
   );
 
   const acceptedFilesItems = acceptedFiles.map(file => (

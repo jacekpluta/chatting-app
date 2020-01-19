@@ -6,7 +6,6 @@ import { setCurrentChannel, setPrivateChannel } from "../../actions";
 
 const DirectMessages = props => {
   const { currentUser } = props;
-  // const [usersRef] = useState(firebase.database().ref("users"));
   const [connectedRef] = useState(firebase.database().ref(".info/connected"));
   const [users, setUsers] = useState([]);
 
@@ -20,7 +19,10 @@ const DirectMessages = props => {
         currentUser.photoURL
       );
     }
-    return () => {};
+    return () => {
+      connectedRef.off();
+      presenceRef.off();
+    };
   }, []);
 
   const addListeners = (

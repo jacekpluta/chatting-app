@@ -5,7 +5,6 @@ import TypingLoader from "./TypingLoader";
 import { Segment, Comment } from "semantic-ui-react";
 import firebase from "../Firebase";
 import React, { useState, useEffect, useRef } from "react";
-import { Loader } from "semantic-ui-react";
 
 import { connect } from "react-redux";
 import { setUserPosts, setCurrentChannel } from "../../actions";
@@ -14,33 +13,24 @@ import SkeletonMessages from "./SkeletonMessages";
 import Message from "./Message";
 const Messages = props => {
   const [channelsRef] = useState(firebase.database().ref("channels"));
-
-  const [messageImageLoading, setMessageImageLoading] = useState(false);
-  const [messagesRef] = useState(firebase.database().ref("messages"));
-  const [usersRef] = useState(firebase.database().ref("users"));
   const [privateMessagesRef] = useState(
     firebase.database().ref("privateMessages")
   );
-  const [allChannelMessages, setAllChannelMessages] = useState([]);
-  const [messagesLoaded, setMessagesLoaded] = useState(false);
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [searchResult, setSearchResult] = useState([]);
-
-  const [channelStarred, setChannelStarred] = useState(false);
+  const [messagesRef] = useState(firebase.database().ref("messages"));
+  const [usersRef] = useState(firebase.database().ref("users"));
 
   const messagesEndRef = useRef(null);
 
-  const {
-    currentChannel,
-    currentUser,
-    isPrivateChannel,
-    setMessagesFull,
-    setMessagesEmpty,
-    userTyping,
-    biggerText
-  } = props;
+  const [messageImageLoading, setMessageImageLoading] = useState(false);
+  const [allChannelMessages, setAllChannelMessages] = useState([]);
+  const [messagesLoaded, setMessagesLoaded] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchResult, setSearchResult] = useState([]);
+  const [channelStarred, setChannelStarred] = useState(false);
+  const [noMessages, setNoMessages] = useState(false);
+
+  const { currentChannel, currentUser, isPrivateChannel, userTyping } = props;
 
   const setMessageImageLoadingTrue = () => {
     setMessageImageLoading(true);
@@ -52,25 +42,29 @@ const Messages = props => {
 
   useEffect(() => {
     if (currentChannel && currentUser) {
-      addUserStarsListeners(currentChannel.id, currentUser.uid);
       addListeners();
-      loadData();
+
+      return () => {
+        const ref = getMessagesRef();
+        ref.child(currentChannel.id).off("child_added");
+        messagesRef.off();
+      };
     }
   }, []);
 
   useEffect(() => {
     if (messagesLoaded) {
       countUserPosts();
-      setMessagesFull();
-    } else {
-      setMessagesEmpty();
     }
   }, [messagesLoaded]);
 
   const addListeners = () => {
     addMessageListeners();
+    loadData();
+    addUserStarsListeners(currentChannel.id, currentUser.uid);
   };
 
+  //Update current channel info
   useEffect(() => {
     if (messagesLoaded && !isPrivateChannel) {
       if (currentChannel.createdBy.uid === currentUser.uid) {
@@ -84,8 +78,7 @@ const Messages = props => {
           id: currentChannel.id,
           name: currentChannel.name
         };
-        console.log(currentChannel);
-        console.log(newCurrentChannelInfo);
+
         channelsRef.child(currentChannel.id).update(newCurrentChannelInfo);
         props.setCurrentChannel(newCurrentChannelInfo);
       }
@@ -189,22 +182,33 @@ const Messages = props => {
     ref.child(currentChannel.id).on("child_added", snapshot => {
       loadedMessages.push(snapshot.val());
       setAllChannelMessages({ loadedMessages });
+      setNoMessages(false);
     });
+  };
+
+  const wereMessagesLoaded = () => {
+    if (!messagesLoaded) {
+      setNoMessages(true);
+    } else {
+      setNoMessages(false);
+    }
   };
 
   const loadData = () => {
     messagesRef
       .child(currentChannel.id)
+      .limitToLast(200)
       .once("value", snapshot => {})
       .then(snapshot => {
         if (snapshot) {
           if (snapshot.val()) {
-            setMessagesLoaded(true);
-            scrollToBottom();
           } else {
-            setMessagesEmpty();
+            wereMessagesLoaded();
           }
         }
+      })
+      .then(() => {
+        setMessagesLoaded(true);
       });
   };
 
@@ -224,17 +228,46 @@ const Messages = props => {
         },
         {}
       );
+
       props.setUserPosts(userPosts);
     } else {
       props.setUserPosts(null);
     }
   };
 
+  //renders messages
+  const renderMessages = () =>
+    allChannelMessages.loadedMessages.map(message => {
+      return (
+        <Message
+          key={message.timeStamp}
+          message={message}
+          currentUser={currentUser}
+          messageImageLoading={messageImageLoading}
+          searchResult={searchResult}
+          searchTerm={searchTerm}
+        />
+      );
+    });
+
+  //scroll to bottom on channel start
   const scrollToBottom = () => {
-    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current.scrollIntoView({ behavior: "auto" }); //smooth
   };
 
-  useEffect(scrollToBottom, [allChannelMessages]);
+  useEffect(() => {
+    if (messagesLoaded === true) {
+      const timer = setTimeout(() => {
+        scrollToBottom();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [messagesLoaded]);
+
+  useEffect(() => {
+    if (userTyping) scrollToBottom();
+    else scrollToBottom();
+  }, [userTyping]);
 
   return (
     <React.Fragment>
@@ -248,32 +281,35 @@ const Messages = props => {
         channelStarred={channelStarred}
       ></MessagesHeader>
       <Segment>
-        <Loader
-          active={!messagesLoaded}
-          size="huge"
-          content="Loading Messages"
-        ></Loader>
-
         <Comment.Group className="messages">
-          {allChannelMessages.loadedMessages && searchTerm === ""
-            ? allChannelMessages.loadedMessages.map(message => {
-                return (
-                  <Message
-                    key={message.timeStamp}
-                    message={message}
-                    currentUser={currentUser}
-                    messageImageLoading={messageImageLoading}
-                    searchResult={searchResult}
-                    searchTerm={searchTerm}
-                  />
-                );
-              })
-            : ""}
+          {/*shows messages skeleton on messages loading then checks if there is a messages in channel and displays an error or shows all messages*/}
+          {allChannelMessages.loadedMessages &&
+          searchTerm === "" &&
+          messagesLoaded
+            ? renderMessages()
+            : [
+                noMessages
+                  ? "No messages in the channel"
+                  : [
+                      allChannelMessages.loadedMessages &&
+                      searchTerm === "" &&
+                      messagesLoaded
+                        ? renderMessages()
+                        : [searchTerm === "" ? <SkeletonMessages /> : ""]
+                    ]
+              ]}
 
-          {userTyping && userTyping.isUserTyping
+          {/*displays user name + usertypeing animation*/}
+
+          {userTyping &&
+          userTyping.isUserTyping &&
+          userTyping.userTypingUid !== currentUser.uid
             ? "User " + userTyping.userTypingName + " is writing"
             : ""}
-          {userTyping ? (
+
+          {userTyping &&
+          userTyping.isUserTyping &&
+          userTyping.userTypingUid !== currentUser.uid ? (
             <TypingLoader userTyping={userTyping}></TypingLoader>
           ) : (
             ""

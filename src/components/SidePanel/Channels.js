@@ -28,7 +28,7 @@ function Channels(props) {
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [messagesRef] = useState(firebase.database().ref("messages"));
 
-  const [notifications, setNotification] = useState([]);
+  //const [notifications, setNotification] = useState([]);
 
   const { currentUser, currentChannel } = props;
 
@@ -49,11 +49,17 @@ function Channels(props) {
   };
 
   useEffect(() => {
-    addMainChannel();
-    showChannels();
-    return () => {
-      channelsRef.off();
-    };
+    if (allChannels) {
+      addMainChannel();
+      showChannels();
+
+      return () => {
+        channelsRef.off();
+        allChannels.channels.forEach(channel => {
+          messagesRef.child(channel.id).off();
+        });
+      };
+    }
   }, []);
 
   const showChannels = () => {
@@ -61,7 +67,7 @@ function Channels(props) {
 
     channelsRef
       .orderByChild("name")
-      .limitToFirst(99)
+      .limitToFirst(200)
       .on("child_added", function(snapshot) {
         loadedChannels.push(snapshot.val());
         props.setCurrentChannel(loadedChannels[0]);
@@ -135,7 +141,7 @@ function Channels(props) {
   const addMainChannel = () => {
     const mainChannel = {
       id: "mainChannel",
-      name: "Main Channel",
+      name: "main channel",
       details: "This is main channel",
       createdBy: {
         uid: "111",
@@ -160,7 +166,7 @@ function Channels(props) {
 
     const newChannel = {
       id: refKey,
-      name: channelName,
+      name: channelName.toLowerCase(),
       details: channelDetail,
       createdBy: {
         uid: currentUser.uid,

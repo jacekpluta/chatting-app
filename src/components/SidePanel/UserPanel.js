@@ -23,12 +23,15 @@ const gridRowStyle = {
 const UserPanel = props => {
   const [modal, setModal] = useState(false);
   const [newAvatar, setNewAvatar] = useState(null);
-  const { currentUser, currentChannel } = props;
+  const { currentUser, currentChannel, isPrivateChannel } = props;
   const [uploadedCroppedImaged, setUploadedCroppedImaged] = useState(null);
   const [metaData, setMetaData] = useState({ contentType: "image/jpeg" });
 
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [messagesRef] = useState(firebase.database().ref("messages"));
+  const [privateMessagesRef] = useState(
+    firebase.database().ref("privateMessages")
+  );
 
   const [usersRef] = useState(firebase.database().ref("users"));
   const [storageRef] = useState(firebase.storage().ref());
@@ -51,7 +54,6 @@ const UserPanel = props => {
     setNewAvatar(image);
     const fileName = "croppedImage";
     const fileImage = base64StringtoFile(image, fileName);
-
     uploadCroppedImage(fileImage);
   };
 
@@ -59,8 +61,6 @@ const UserPanel = props => {
     if (uploadedCroppedImaged) {
       changeAvatar();
     }
-
-    return () => {};
   }, [uploadedCroppedImaged]);
 
   const uploadCroppedImage = croppedAvatar => {
@@ -99,18 +99,28 @@ const UserPanel = props => {
       });
   };
 
-  /////////////////////////////ON CHANNEL CHANGE UPDATE AVATAR/////////////////// wywolac raz po zmiania to samo tamto
-
+  /////////////////////////////UPDATING AVATAR IN CHANNEL DETAILS AND AVATAR IN PRIVATE MESSAGES///////////////////
   useEffect(() => {
     if (currentChannel) {
       loadAllCurrentChannels();
+
+      return () => {
+        channelsRef.child(currentChannel.id).off();
+        privateMessagesRef.child(currentChannel.id).off();
+      };
     }
   }, [currentChannel]);
 
   const loadAllCurrentChannels = () => {
-    channelsRef.orderByChild("name").on("child_added", snapshot => {
-      updateAvatarListener(snapshot.key);
-    });
+    if (!isPrivateChannel) {
+      channelsRef.on("child_added", snapshot => {
+        updateAvatarListener(snapshot.key);
+      });
+    } else if (isPrivateChannel) {
+      privateMessagesRef.child(currentChannel.id).once("value", snapshot => {
+        setMessagesToUpdate(snapshot.val());
+      });
+    }
   };
 
   const updateAvatarListener = channelId => {
@@ -133,18 +143,23 @@ const UserPanel = props => {
   }, [messagesToUpdate]);
 
   const updatingMessages = () => {
-    const currentChanelMessagesIds = Object.entries(messagesToUpdate).map(
-      ([messageId, message], i) => {
-        if (message.currentUser.id === currentUser.uid) {
-          if (message.content) {
-            const newUserAvatar = {
-              currentUser: {
-                avatar: currentUser.photoURL,
-                id: currentUser.uid,
-                name: currentUser.displayName
-              }
-            };
+    Object.entries(messagesToUpdate).map(([messageId, message], i) => {
+      if (message.currentUser.id === currentUser.uid) {
+        if (message.content) {
+          const newUserAvatar = {
+            currentUser: {
+              avatar: currentUser.photoURL,
+              id: currentUser.uid,
+              name: currentUser.displayName
+            }
+          };
 
+          if (isPrivateChannel) {
+            privateMessagesRef
+              .child(currentChannel.id)
+              .child(messageId)
+              .update(newUserAvatar);
+          } else if (!isPrivateChannel) {
             messagesRef
               .child(currentChannel.id)
               .child(messageId)
@@ -152,7 +167,7 @@ const UserPanel = props => {
           }
         }
       }
-    );
+    });
   };
   ////////////////////////////////////////////////
 
