@@ -12,11 +12,13 @@ const Starred = props => {
 
   useEffect(() => {
     if (currentUser) {
-      addListenersStarAdded(currentUser.uid, starredChannels);
-      addListenersStarRemoved(currentUser.uid, starredChannels, currentChannel);
+      addListenersStarAdded(currentUser.uid);
+      addListenersStarRemoved(currentUser.uid, currentChannel);
     }
 
-    return () => {};
+    return () => {
+      usersRef.off();
+    };
   }, [currentUser]);
 
   const addListenersStarAdded = userId => {
@@ -49,10 +51,6 @@ const Starred = props => {
       });
       setStarredChannels(filteredChannel);
       setChannelToRemove(null);
-
-      return () => {
-        usersRef.child(`{currentUser.uid}/starred`).off();
-      };
     }
   }, [channelToRemove]);
 
@@ -77,7 +75,7 @@ const Starred = props => {
     <Menu.Menu className="menu">
       <Menu.Item>
         <span>
-          <Icon name="star"></Icon> STARRED ({starredChannels.length})
+          <Icon name="star"></Icon> MY CHANNELS ({starredChannels.length})
         </span>
         {starredChannels.lenght}
       </Menu.Item>

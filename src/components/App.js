@@ -29,7 +29,8 @@ const App = props => {
     currentChannel,
     isPrivateChannel,
     userPosts,
-    userTyping
+    userTyping,
+    usersList
   } = props;
 
   const [biggerText, setBiggerText] = useState(false);
@@ -48,6 +49,7 @@ const App = props => {
           currentChannel={currentChannel}
           biggerText={biggerText}
           isPrivateChannel={isPrivateChannel}
+          usersList={usersList}
         />
         <Grid.Column style={{ marginLeft: 320 }}>
           <Messages
@@ -80,6 +82,7 @@ const mapStateToProps = state => ({
   currentChannel: state.channel.currentChannel,
   isPrivateChannel: state.channel.isPrivateChannel,
   userPosts: state.channel.userPosts,
-  userTyping: state.userTyping.userTyping
+  userTyping: state.userTyping.userTyping,
+  usersList: state.usersList.usersList
 });
 export default connect(mapStateToProps)(App);

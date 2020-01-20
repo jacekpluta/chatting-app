@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from "react";
 import firebase from "./../Firebase";
-import { Menu, Icon, Image } from "semantic-ui-react";
+import { Menu, Icon, Image, Header, Input } from "semantic-ui-react";
 import { connect } from "react-redux";
-import { setCurrentChannel, setPrivateChannel } from "../../actions";
+import {
+  setCurrentChannel,
+  setPrivateChannel,
+  setUsersList
+} from "../../actions";
 
 const DirectMessages = props => {
   const { currentUser } = props;
-  const [connectedRef] = useState(firebase.database().ref(".info/connected"));
-  const [users, setUsers] = useState([]);
 
+  const [users, setUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchResult, setSearchResult] = useState([]);
+
+  const [connectedRef] = useState(firebase.database().ref(".info/connected"));
   const [presenceRef] = useState(firebase.database().ref("presence"));
 
   useEffect(() => {
@@ -84,8 +92,10 @@ const DirectMessages = props => {
     });
   };
 
-  const usersList = () =>
-    users.filter(
+  const [usersNew, setUsersNew] = useState([]);
+
+  const filterUserList = () => {
+    const usersFiletered = users.filter(
       (ele, ind) =>
         ind ===
         users.findIndex(
@@ -96,10 +106,24 @@ const DirectMessages = props => {
             elem.photoURL === ele.photoURL
         )
     );
+    setUsersNew(usersFiletered);
+  };
+
+  useEffect(() => {
+    if (users) {
+      filterUserList();
+    }
+    props.setUsersList(usersNew);
+  }, [users]);
 
   const changeChannel = user => {
     const channelId = getChannelId(user.uid);
-    const channelData = { id: channelId, name: user.name };
+    const channelData = {
+      id: channelId,
+      name: user.name,
+      status: user.status,
+      photoURL: user.photoURL
+    };
     props.setCurrentChannel(channelData);
     props.setPrivateChannel(true);
   };
@@ -111,41 +135,87 @@ const DirectMessages = props => {
       : `${currentUser.uid}/${userId}`;
   };
 
-  return (
-    <Menu.Menu className="menu">
-      <Menu.Item>
-        <span>
-          <Icon name="mail"></Icon>
-        </span>
-        DIRECT MESSAGES ({usersList().length})
-      </Menu.Item>
-      {usersList().map(user => (
-        <Menu.Item
-          key={user.uid}
-          style={{ opacity: 0.7 }}
-          onClick={() => changeChannel(user)}
-        >
-          <Icon
-            name="circle"
-            color={user && user.status ? "green" : "red"}
-          ></Icon>
+  //SEARCH BAR
+  const handleSearchChange = event => {
+    setSearchTerm(event.target.value);
+    setSearchLoading(true);
+  };
 
-          {user ? (
-            <Image
-              src={user.photoURL}
-              style={{ width: "10%", height: "10%" }}
-              avatar
-            ></Image>
-          ) : (
-            ""
-          )}
-          <span>{user.name}</span>
+  useEffect(() => {
+    if (searchTerm) {
+      handleSearchMessages();
+    } else {
+      setSearchResult([]);
+    }
+  }, [searchTerm]);
+
+  //USERS SEARCH
+  const handleSearchMessages = () => {
+    const allUsers = [...usersNew];
+
+    const regex = new RegExp(searchTerm, "gi");
+    const searchResults = allUsers.reduce((acc, user) => {
+      if (user.name && user.name.match(regex)) {
+        acc.push(user);
+      }
+      return acc;
+    }, []);
+
+    setSearchResult(searchResults);
+    setTimeout(() => {
+      setSearchLoading(false);
+    }, 1000);
+  };
+
+  return (
+    <div>
+      <Menu.Menu className="menu">
+        <Menu.Item>
+          <span>
+            <Icon name="mail"></Icon>
+          </span>
+          SEARCH USERS ({searchResult !== undefined && searchResult.length})
+          <Input
+            onChange={handleSearchChange}
+            size="mini"
+            icon="search"
+            name="searchTerm"
+            loading={searchLoading}
+            placeholder="Search users"
+          ></Input>
         </Menu.Item>
-      ))}
-    </Menu.Menu>
+        {searchResult
+          ? searchResult.map(user => (
+              <Menu.Item
+                key={user.uid}
+                style={{ opacity: 0.7 }}
+                onClick={() => changeChannel(user)}
+              >
+                <Icon
+                  name="circle"
+                  color={user && user.status ? "green" : "red"}
+                ></Icon>
+
+                {user ? (
+                  <Image
+                    src={user.photoURL}
+                    style={{ width: "10%", height: "10%" }}
+                    avatar
+                  ></Image>
+                ) : (
+                  ""
+                )}
+                <span>{user.name}</span>
+              </Menu.Item>
+            ))
+          : ""}
+      </Menu.Menu>
+    </div>
   );
 };
 
-export default connect(null, { setCurrentChannel, setPrivateChannel })(
-  DirectMessages
-);
+export default connect(null, {
+  setCurrentChannel,
+  setPrivateChannel,
+  setUsersList
+})(DirectMessages);

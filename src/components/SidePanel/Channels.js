@@ -17,18 +17,17 @@ function Channels(props) {
   const [firstLoad, setfirstLoad] = useState(false);
   const [modal, setModal] = useState(false);
   const [activeChannel, setActiveChannel] = useState(null);
-
   const [channelName, setChannelName] = useState("");
   const [channelDetail, setChannelDetail] = useState("");
   const [error, setError] = useState("");
-
-  const [channel, setChannel] = useState([]);
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchResult, setSearchResult] = useState([]);
   const [loading] = useState(false);
+  const [notifications, setNotification] = useState([]);
+
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [messagesRef] = useState(firebase.database().ref("messages"));
-
-  //const [notifications, setNotification] = useState([]);
 
   const { currentUser, currentChannel } = props;
 
@@ -55,9 +54,10 @@ function Channels(props) {
 
       return () => {
         channelsRef.off();
-        allChannels.channels.forEach(channel => {
-          messagesRef.child(channel.id).off();
-        });
+        // console.log(allChannels);
+        // allChannels.forEach(channel => {
+        //   messagesRef.child(channel.id).off();
+        // });
       };
     }
   }, []);
@@ -71,7 +71,7 @@ function Channels(props) {
       .on("child_added", function(snapshot) {
         loadedChannels.push(snapshot.val());
         props.setCurrentChannel(loadedChannels[0]);
-        setAllChannels({ channels: loadedChannels });
+        setAllChannels(loadedChannels);
         //  addNotificationListener(snapshot.key);
       });
 
@@ -89,39 +89,38 @@ function Channels(props) {
       .orderByChild("name")
       .limitToFirst(99)
       .on("child_added", function(snap) {
-        //    addNotificationListener(snap.key);
+        addNotificationListener(snap.key);
       });
   };
 
-  // const addNotificationListener = channelId => {
-  //   if (currentChannel) {
-  //     // messagesRef.child(channelId).once("value", snapshot => {
-  //     //   console.log(snapshot.val());
-  //     // });
-  //     console.log(channelId);
-  //     console.log(currentChannel.id);
-  //     if (channelId !== currentChannel.id) {
-  //       messagesRef
-  //         .child(channelId)
-  //         .endAt()
-  //         .limitToLast(1)
-  //         .on("child_added", function(snapshot) {
-  //           console.log(snapshot);
-  //           setNotification(notifications => [
-  //             ...notifications,
-  //             {
-  //               channelId: channelId,
-  //               lastData: snapshot.val().timeStamp,
-  //               total: snapshot.numChildren(),
-  //               lastKnownTotal: snapshot.numChildren(),
-  //               count: 0
-  //             }
-  //           ]);
-  //         });
-  //     }
-  //   } else {
-  //   }
-  // };
+  const addNotificationListener = channelId => {
+    if (currentChannel) {
+      // messagesRef.child(channelId).once("value", snapshot => {
+      //   console.log(snapshot.val());
+      // });
+
+      if (channelId !== currentChannel.id) {
+        messagesRef
+          .child(channelId)
+          .endAt()
+          .limitToLast(1)
+          .on("child_added", function(snapshot) {
+            console.log(snapshot.val());
+            setNotification(notifications => [
+              ...notifications,
+              {
+                channelId: channelId,
+                lastData: snapshot.val().timeStamp,
+                total: snapshot.numChildren(),
+                lastKnownTotal: snapshot.numChildren(),
+                count: 0
+              }
+            ]);
+          });
+      }
+    } else {
+    }
+  };
   // if (notifications && notifications.length >= 1) {
   //   console.log(notifications);
   //   // console.log(notifications.length - 1);
@@ -149,6 +148,8 @@ function Channels(props) {
         avatar: ""
       }
     };
+
+    setActiveChannel(mainChannel.id);
 
     channelsRef
       .child("mainChannel")
@@ -197,19 +198,26 @@ function Channels(props) {
     }
   };
 
+  const changeChannel = channel => {
+    setActiveChannel(channel.id);
+    props.setCurrentChannel(channel);
+    props.setPrivateChannel(false);
+  };
+  if (currentChannel) console.log(currentChannel.id);
+  console.log(activeChannel);
   const displayChannels = () => {
-    if (allChannels.channels) {
+    if (allChannels) {
       if (firstLoad) {
         props.setPrivateChannel(false);
         setfirstLoad(false);
-        props.setCurrentChannel(allChannels.channels[0]);
+        props.setCurrentChannel(allChannels[0]);
       }
-
-      return allChannels.channels.map(channel => (
+      return allChannels.map(channel => (
         <Menu.Item
           key={channel.id}
           onClick={() => changeChannel(channel)}
           name={channel.name}
+          active={currentChannel.id === activeChannel ? true : false}
         >
           # {channel.name}
         </Menu.Item>
@@ -217,11 +225,51 @@ function Channels(props) {
     }
   };
 
-  const changeChannel = channel => {
-    setActiveChannel(channel.id);
-    props.setCurrentChannel(channel);
-    props.setPrivateChannel(false);
-    setChannel({ channel });
+  const displaySearchedChannels = () => {
+    if (allChannels) {
+      return searchResult.map(channel => (
+        <Menu.Item
+          key={channel.id}
+          onClick={() => changeChannel(channel)}
+          name={channel.name}
+          active={currentChannel.id === activeChannel ? true : false}
+        >
+          # {channel.name}
+        </Menu.Item>
+      ));
+    }
+  };
+
+  //SEARCH BAR
+  const handleSearchChange = event => {
+    setSearchTerm(event.target.value);
+    setSearchLoading(true);
+  };
+
+  useEffect(() => {
+    if (searchTerm) {
+      handleSearchMessages();
+    } else {
+      setSearchResult([]);
+    }
+  }, [searchTerm]);
+
+  //CHANNELS SEARCH
+  const handleSearchMessages = () => {
+    const allPublicChannels = [...allChannels];
+
+    const regex = new RegExp(searchTerm, "gi");
+    const searchResults = allPublicChannels.reduce((acc, channel) => {
+      if (channel.name && channel.name.match(regex)) {
+        acc.push(channel);
+      }
+      return acc;
+    }, []);
+
+    setSearchResult(searchResults);
+    setTimeout(() => {
+      setSearchLoading(false);
+    }, 1000);
   };
 
   return (
@@ -231,12 +279,28 @@ function Channels(props) {
           <span>
             <Icon name="exchange"></Icon> CHANNELS
           </span>
-          {"  "}(
-          {allChannels.channels !== undefined && allChannels.channels.length})
+          {"  "}({allChannels !== undefined && allChannels.length})
           <Icon onClick={handleOpenModal} name="add"></Icon>
         </Menu.Item>
-
         {displayChannels()}
+        <Menu.Item>
+          <span>
+            <Icon name="search"></Icon> SEARCH CHANNELS
+          </span>
+        </Menu.Item>
+
+        <Menu.Item>
+          <Input
+            onChange={handleSearchChange}
+            size="mini"
+            icon="search"
+            name="searchTerm"
+            loading={searchLoading}
+            placeholder="Search channels"
+          ></Input>
+        </Menu.Item>
+
+        {displaySearchedChannels()}
       </Menu.Menu>
 
       <Modal open={modal} onClose={handleCloseModal} basic size="small">

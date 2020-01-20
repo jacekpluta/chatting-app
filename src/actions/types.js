@@ -8,3 +8,5 @@ export const SET_PRIVATE_CHANNEL = "SET_PRIVATE_CHANNEL";
 export const SET_USER_POSTS = "SET_USER_POSTS";
 
 export const SET_USER_TYPING = "SET_USER_TYPING";
+
+export const SET_USERS_LIST = "SET_USERS_LIST";

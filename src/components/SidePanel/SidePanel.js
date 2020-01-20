@@ -4,6 +4,7 @@ import UserPanel from "./UserPanel";
 import Channels from "./Channels";
 import DirectMessages from "./DirectMessages";
 import Starred from "./Starred";
+import Friends from "./Friends";
 
 const menuStyle = {
   background: "#636D21",
@@ -16,7 +17,13 @@ const biggerTextStyle = {
 };
 
 export default function SidePanel(props) {
-  const { currentUser, currentChannel, biggerText, isPrivateChannel } = props;
+  const {
+    currentUser,
+    currentChannel,
+    biggerText,
+    isPrivateChannel,
+    usersList
+  } = props;
   return (
     <React.Fragment>
       <Menu
@@ -32,10 +39,19 @@ export default function SidePanel(props) {
           currentUser={currentUser}
           isPrivateChannel={isPrivateChannel}
         ></UserPanel>
+
+        <Friends
+          currentChannel={currentChannel}
+          currentUser={currentUser}
+          usersList={usersList}
+        ></Friends>
+
+        <DirectMessages
+          currentUser={currentUser}
+          usersList={usersList}
+        ></DirectMessages>
         <Starred currentUser={currentUser} currentChannel={currentChannel} />
         <Channels currentChannel={currentChannel} currentUser={currentUser} />
-
-        <DirectMessages currentUser={currentUser}></DirectMessages>
       </Menu>
     </React.Fragment>
   );

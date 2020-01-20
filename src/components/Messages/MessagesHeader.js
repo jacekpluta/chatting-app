@@ -10,7 +10,10 @@ export default function MessagesHeader(props) {
     isPrivateChannel,
     handleStarred,
     channelStarred,
-    unstarChannel
+    unstarChannel,
+    handleAddFriend,
+    friendAdded,
+    unfriendPerson
   } = props;
 
   return (
@@ -28,6 +31,18 @@ export default function MessagesHeader(props) {
               name={"star outline"}
               onClick={handleStarred}
               color="yellow"
+            ></Icon>
+          )}
+
+          {isPrivateChannel && friendAdded && (
+            <Icon name={"star"} onClick={unfriendPerson} color="red"></Icon>
+          )}
+
+          {isPrivateChannel && !friendAdded && (
+            <Icon
+              name={"star outline"}
+              onClick={handleAddFriend}
+              color="red"
             ></Icon>
           )}
         </span>

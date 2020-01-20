@@ -81,9 +81,7 @@ const MetaPanel = props => {
         </Accordion.Title>
         <Accordion.Content active={activeIndex === 1}>
           <List>
-            {userPosts && currentChannel && messagesIsFull
-              ? displayTopPoster(userPosts)
-              : "none"}
+            {userPosts && currentChannel ? displayTopPoster(userPosts) : "none"}
           </List>
         </Accordion.Content>
         <Accordion.Title

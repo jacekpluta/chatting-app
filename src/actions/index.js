@@ -50,3 +50,12 @@ export const setUserTyping = userTyping => {
     }
   };
 };
+
+export const setUsersList = usersList => {
+  return {
+    type: actionTypes.SET_USERS_LIST,
+    payload: {
+      usersList
+    }
+  };
+};
