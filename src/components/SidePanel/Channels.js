@@ -6,7 +6,8 @@ import {
   Button,
   Form,
   Input,
-  Message
+  Message,
+  Label
 } from "semantic-ui-react";
 import firebase from "../Firebase";
 import { connect } from "react-redux";
@@ -14,9 +15,9 @@ import { setCurrentChannel, setPrivateChannel } from "../../actions";
 
 function Channels(props) {
   const [allChannels, setAllChannels] = useState([]);
-  const [firstLoad, setfirstLoad] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
   const [modal, setModal] = useState(false);
-  const [activeChannel, setActiveChannel] = useState(null);
+  const [activeChannelId, setActiveChannelId] = useState(null);
   const [channelName, setChannelName] = useState("");
   const [channelDetail, setChannelDetail] = useState("");
   const [error, setError] = useState("");
@@ -24,12 +25,13 @@ function Channels(props) {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
   const [loading] = useState(false);
-  const [notifications, setNotification] = useState([]);
+  const [channelChanged, setChannelChanged] = useState(null);
 
+  const [notifications, setNotifications] = useState([]);
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [messagesRef] = useState(firebase.database().ref("messages"));
 
-  const { currentUser, currentChannel } = props;
+  const { currentUser, isPrivateChannel, userPosts } = props;
 
   const handleCloseModal = () => {
     setModal(false);
@@ -38,6 +40,12 @@ function Channels(props) {
   const handleOpenModal = () => {
     setModal(true);
   };
+
+  useEffect(() => {
+    if (isPrivateChannel) {
+      setActiveChannelId(null);
+    }
+  }, [isPrivateChannel]);
 
   const handleChange = event => {
     if (event.target.name === "channelName") {
@@ -54,10 +62,10 @@ function Channels(props) {
 
       return () => {
         channelsRef.off();
-        // console.log(allChannels);
-        // allChannels.forEach(channel => {
-        //   messagesRef.child(channel.id).off();
-        // });
+        clearNotifications();
+        allChannels.forEach(channel => {
+          messagesRef.child(channel.id).off();
+        });
       };
     }
   }, []);
@@ -70,62 +78,88 @@ function Channels(props) {
       .limitToFirst(200)
       .on("child_added", function(snapshot) {
         loadedChannels.push(snapshot.val());
-        props.setCurrentChannel(loadedChannels[0]);
         setAllChannels(loadedChannels);
-        //  addNotificationListener(snapshot.key);
       });
-
-    setfirstLoad(true);
   };
 
+  //////////////NOTIFICATIONS/////////////
   useEffect(() => {
-    if (currentChannel) {
-      loadAllCurrentChannels();
-    }
-  }, [currentChannel]);
-
-  const loadAllCurrentChannels = () => {
-    channelsRef
-      .orderByChild("name")
-      .limitToFirst(99)
-      .on("child_added", function(snap) {
-        addNotificationListener(snap.key);
-      });
-  };
+    channelsRef.on("child_added", function(snap) {
+      addNotificationListener(snap.key);
+    });
+  }, [channelChanged]);
 
   const addNotificationListener = channelId => {
-    if (currentChannel) {
-      // messagesRef.child(channelId).once("value", snapshot => {
-      //   console.log(snapshot.val());
-      // });
-
-      if (channelId !== currentChannel.id) {
-        messagesRef
-          .child(channelId)
-          .endAt()
-          .limitToLast(1)
-          .on("child_added", function(snapshot) {
-            console.log(snapshot.val());
-            setNotification(notifications => [
-              ...notifications,
-              {
-                channelId: channelId,
-                lastData: snapshot.val().timeStamp,
-                total: snapshot.numChildren(),
-                lastKnownTotal: snapshot.numChildren(),
-                count: 0
-              }
-            ]);
-          });
+    messagesRef.child(channelId).on("value", snapshot => {
+      if (channelChanged) {
+        handleNotifications(
+          channelId,
+          activeChannelId,
+          notifications,
+          snapshot
+        );
       }
+    });
+  };
+
+  const handleNotifications = (
+    channelId,
+    currentChannelId,
+    notifications,
+    snap
+  ) => {
+    let lastTotal = 0;
+
+    let index = notifications.findIndex(
+      notification => notification.id === channelId
+    );
+
+    if (index !== -1) {
+      if (channelId !== currentChannelId) {
+        lastTotal = notifications[index].total;
+
+        if (snap.numChildren() - lastTotal > 0) {
+          notifications[index].count = snap.numChildren() - lastTotal;
+        }
+      }
+      notifications[index].lastKnownTotal = snap.numChildren();
     } else {
+      notifications.push({
+        id: channelId,
+        total: snap.numChildren(),
+        lastKnownTotal: snap.numChildren(),
+        count: 0
+      });
+    }
+    setNotifications(notifications);
+  };
+
+  const clearNotifications = () => {
+    let index = notifications.findIndex(
+      notification => notification.id === channelChanged.id
+    );
+
+    if (index !== -1) {
+      let updatedNotifications = [...notifications];
+      updatedNotifications[index].total = notifications[index].lastKnownTotal;
+      updatedNotifications[index].count = 0;
+      setNotifications(updatedNotifications);
     }
   };
-  // if (notifications && notifications.length >= 1) {
-  //   console.log(notifications);
-  //   // console.log(notifications.length - 1);
-  // }
 
+  const getNotificationCount = channel => {
+    let count = 0;
+
+    notifications.forEach(notification => {
+      if (notification.id === channel.id) {
+        count = notification.count;
+      }
+    });
+
+    if (count > 0) return count;
+  };
+
+  //CHECKS IF ADD CHANNEL FORM IS VALID
   const isFormIsValid = () => {
     if (channelName.length < 3 || channelDetail.length < 3) {
       setError(
@@ -149,20 +183,26 @@ function Channels(props) {
       }
     };
 
-    setActiveChannel(mainChannel.id);
-
     channelsRef
       .child("mainChannel")
       .update(mainChannel)
+      .then(() => {
+        props.setCurrentChannel(mainChannel);
+      })
+      .then(() => {
+        setCurrentChannel(mainChannel);
+        setChannelChanged(mainChannel);
+        setActiveChannelId(mainChannel.id);
+      })
       .catch(error => {
         console.log(error);
       });
   };
 
   const handleAddChannel = () => {
-    // Generate a reference to a new location and add some data using push()
-    const newPostRef = channelsRef.push();
     // Get the unique key generated by push()
+    const newPostRef = channelsRef.push();
+
     const refKey = newPostRef.key;
 
     const newChannel = {
@@ -199,26 +239,29 @@ function Channels(props) {
   };
 
   const changeChannel = channel => {
-    setActiveChannel(channel.id);
+    setActiveChannelId(channel.id);
     props.setCurrentChannel(channel);
     props.setPrivateChannel(false);
+    setChannelChanged(channel);
+    clearNotifications();
   };
-  if (currentChannel) console.log(currentChannel.id);
-  console.log(activeChannel);
+
   const displayChannels = () => {
     if (allChannels) {
-      if (firstLoad) {
+      if (firstLoad && allChannels[0]) {
         props.setPrivateChannel(false);
-        setfirstLoad(false);
-        props.setCurrentChannel(allChannels[0]);
+        setFirstLoad(false);
       }
       return allChannels.map(channel => (
         <Menu.Item
           key={channel.id}
           onClick={() => changeChannel(channel)}
           name={channel.name}
-          active={currentChannel.id === activeChannel ? true : false}
+          active={activeChannelId === channel.id}
         >
+          {channel.id !== activeChannelId && getNotificationCount(channel) && (
+            <Label color="red">{getNotificationCount(channel)}</Label>
+          )}
           # {channel.name}
         </Menu.Item>
       ));
@@ -232,7 +275,7 @@ function Channels(props) {
           key={channel.id}
           onClick={() => changeChannel(channel)}
           name={channel.name}
-          active={currentChannel.id === activeChannel ? true : false}
+          active={activeChannelId === channel.id}
         >
           # {channel.name}
         </Menu.Item>

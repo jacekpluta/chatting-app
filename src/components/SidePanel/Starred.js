@@ -75,7 +75,7 @@ const Starred = props => {
     <Menu.Menu className="menu">
       <Menu.Item>
         <span>
-          <Icon name="star"></Icon> MY CHANNELS ({starredChannels.length})
+          <Icon name="star"></Icon> FAV CHANNELS ({starredChannels.length})
         </span>
         {starredChannels.lenght}
       </Menu.Item>

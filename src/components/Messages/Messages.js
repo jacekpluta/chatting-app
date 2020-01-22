@@ -374,19 +374,16 @@ const Messages = props => {
 
           {/*displays user name + usertypeing animation*/}
 
-          {userTyping &&
-          userTyping.isUserTyping &&
-          userTyping.userTypingUid !== currentUser.uid
-            ? "User " + userTyping.userTypingName + " is writing"
+          {userTyping && userTyping.isUserTyping
+            ? userTyping.userTypingUid !== currentUser.uid &&
+              "User " + userTyping.userTypingName + " is writing"
             : ""}
 
-          {userTyping &&
-          userTyping.isUserTyping &&
-          userTyping.userTypingUid !== currentUser.uid ? (
-            <TypingLoader userTyping={userTyping}></TypingLoader>
-          ) : (
-            ""
-          )}
+          {userTyping && userTyping.isUserTyping
+            ? userTyping.userTypingUid !== currentUser.uid && (
+                <TypingLoader userTyping={userTyping}></TypingLoader>
+              )
+            : ""}
 
           {allChannelMessages.loadedMessages && searchTerm
             ? searchResult.map(message => {

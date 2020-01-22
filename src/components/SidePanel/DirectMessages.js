@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import firebase from "./../Firebase";
-import { Menu, Icon, Image, Header, Input } from "semantic-ui-react";
+import { Menu, Icon, Image, Input } from "semantic-ui-react";
 import { connect } from "react-redux";
 import {
   setCurrentChannel,

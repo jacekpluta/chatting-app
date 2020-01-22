@@ -50,7 +50,14 @@ const MessagesForm = props => {
     } else {
       setIsTyping(false);
     }
-    setMessage(event.target.value);
+
+    if (!event.target.value.replace(/\s/g, "").length) {
+      console.log(
+        "string only contains whitespace (ie. spaces, tabs or line breaks)"
+      );
+    } else {
+      setMessage(event.target.value);
+    }
   };
 
   const loadCurrentChannel = () => {
@@ -112,6 +119,9 @@ const MessagesForm = props => {
             setError(error);
           });
       }
+      return () => {
+        isTypingRef.off();
+      };
     }
   }, [isTyping]);
 
@@ -198,7 +208,6 @@ const MessagesForm = props => {
   };
 
   const uploadFile = (file, metadata) => {
-    // console.log(getPath());
     const pathToUpload = currentChannel.id;
     const messRef = getMessagesRef();
     const filePath = `${getPath()}/${uuid()}.jpg`;
@@ -237,6 +246,7 @@ const MessagesForm = props => {
 
       return () => {
         uploadTask.cancel();
+        uploadTask.off();
         setUploadTask(null);
       };
     }

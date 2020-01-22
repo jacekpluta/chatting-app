@@ -22,7 +22,8 @@ export default function SidePanel(props) {
     currentChannel,
     biggerText,
     isPrivateChannel,
-    usersList
+    usersList,
+    userPosts
   } = props;
   return (
     <React.Fragment>
@@ -44,6 +45,7 @@ export default function SidePanel(props) {
           currentChannel={currentChannel}
           currentUser={currentUser}
           usersList={usersList}
+          isPrivateChannel={isPrivateChannel}
         ></Friends>
 
         <DirectMessages
@@ -51,7 +53,12 @@ export default function SidePanel(props) {
           usersList={usersList}
         ></DirectMessages>
         <Starred currentUser={currentUser} currentChannel={currentChannel} />
-        <Channels currentChannel={currentChannel} currentUser={currentUser} />
+        <Channels
+          userPosts={userPosts}
+          currentChannel={currentChannel}
+          isPrivateChannel={isPrivateChannel}
+          currentUser={currentUser}
+        />
       </Menu>
     </React.Fragment>
   );

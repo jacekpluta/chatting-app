@@ -124,11 +124,39 @@ const UserPanel = props => {
   };
 
   const updateAvatarListener = channelId => {
-    if (channelId === currentChannel.id) {
+    if (
+      channelId === currentChannel.id &&
+      messagesToUpdate &&
+      messagesToUpdate.length !== 0
+    ) {
       messagesRef
         .child(channelId)
         .once("value", snapshot => {
-          setMessagesToUpdate(snapshot.val());
+          Object.entries(snapshot.val()).map(([messageId, message], i) => {
+            if (message.currentUser.id === currentUser.uid) {
+              if (message.content) {
+                const newUserAvatar = {
+                  currentUser: {
+                    avatar: currentUser.photoURL,
+                    id: currentUser.uid,
+                    name: currentUser.displayName
+                  }
+                };
+
+                if (isPrivateChannel) {
+                  privateMessagesRef
+                    .child(currentChannel.id)
+                    .child(messageId)
+                    .update(newUserAvatar);
+                } else if (!isPrivateChannel) {
+                  messagesRef
+                    .child(currentChannel.id)
+                    .child(messageId)
+                    .update(newUserAvatar);
+                }
+              }
+            }
+          });
         })
         .catch(err => {
           console.log(err);
@@ -138,7 +166,7 @@ const UserPanel = props => {
 
   useEffect(() => {
     if (messagesToUpdate && messagesToUpdate.length !== 0) {
-      updatingMessages();
+      // updatingMessages();
     }
   }, [messagesToUpdate]);
 

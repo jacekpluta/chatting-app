@@ -7,11 +7,15 @@ import firebase from "../Firebase";
 const Friends = props => {
   const [friendsChannels, setFriendsChannels] = useState([]);
   const [friendToRemove, setFriendToRemove] = useState(null);
-  const [activeFriends, setActiveFriends] = useState([]);
+  const [activeChannelId, setActiveChannelId] = useState(null);
   const [usersRef] = useState(firebase.database().ref("users"));
-  const { currentUser, currentChannel, usersList } = props;
+  const { currentUser, currentChannel, isPrivateChannel } = props;
 
-  //PRZEECIEC USERS LIST I DODAC DO FRIENDSOW AVATARY I STATUS//////////////
+  useEffect(() => {
+    if (!isPrivateChannel) {
+      setActiveChannelId(null);
+    }
+  }, [isPrivateChannel]);
 
   useEffect(() => {
     if (currentUser) {
@@ -64,7 +68,7 @@ const Friends = props => {
       status: friendChannel.status,
       photoURL: friendChannel.photoURL
     };
-
+    setActiveChannelId(friendChannel.id);
     props.setCurrentChannel(channelData);
     props.setPrivateChannel(true);
   };
@@ -75,6 +79,7 @@ const Friends = props => {
         key={friendChannel.id}
         onClick={() => changeChannel(friendChannel)}
         name={friendChannel.name}
+        active={activeChannelId === friendChannel.id}
       >
         <Icon
           name="circle"

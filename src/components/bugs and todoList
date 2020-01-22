@@ -1,0 +1,20 @@
+TO DO:
+
+//1. powiadomienia i dzwiek przy powiadomieniach
+
+//2. count all current online users in channel
+
+//3. popraiwc ogolnie i wizualnie uplaoding avatar, np error przy i niemozliwosc wyslania przy zlym image czasami zle cropuje przy wiekszych obrazkach
+
+//4. blokowanie i ignorowanie uzytkownikow
+
+BUGS:
+//1. Is typing pojawia sie czasami na wszystkich kanaklach
+
+//2. notifications nie pokazuja sie, dopiero po zmienia kanalu zaczynaja sei pokazac
+
+//3. nie wyswietla online offline na biezaco
+
+//4. zmiana font size, nie wraca do poprzedniogo stanu
+
+//5. jak kto w chodzi na kanal, is typing znika, i przy zmianie kanalu zmienic na istyping na false

@@ -12,13 +12,7 @@ import { connect } from "react-redux";
 
 const MetaPanel = props => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const {
-    isPrivateChannel,
-    currentChannel,
-    userPosts,
-    messagesIsFull,
-    biggerText
-  } = props;
+  const { isPrivateChannel, currentChannel, userPosts, biggerText } = props;
 
   const setActive = (event, titleProps) => {
     const { index } = titleProps;
