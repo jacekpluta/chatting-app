@@ -9,7 +9,7 @@ const Friends = props => {
   const [friendToRemove, setFriendToRemove] = useState(null);
   const [activeChannelId, setActiveChannelId] = useState(null);
   const [usersRef] = useState(firebase.database().ref("users"));
-  const { currentUser, currentChannel, isPrivateChannel } = props;
+  const { currentUser, isPrivateChannel, usersList } = props;
 
   useEffect(() => {
     if (!isPrivateChannel) {
@@ -19,26 +19,28 @@ const Friends = props => {
 
   useEffect(() => {
     if (currentUser) {
-      addListenersFriendAdded(currentUser.uid, friendsChannels);
-      addListenersFriendRemoved(
-        currentUser.uid,
-        friendsChannels,
-        currentChannel
-      );
+      addListenersFriendAdded(currentUser.uid);
+      addListenersFriendRemoved(currentUser.uid);
     }
 
     return () => {
       usersRef.off();
     };
-  }, [currentUser]);
-
+  }, [usersList]);
+  console.log(friendsChannels);
   const addListenersFriendAdded = userId => {
+    let friends = [];
+
     usersRef
       .child(userId)
       .child("friends")
       .on("child_added", snapshot => {
-        const friendToAdd = { id: snapshot.key, ...snapshot.val() };
-        setFriendsChannels(friendedUsers => [...friendedUsers, friendToAdd]);
+        // const friendToAdd = { id: snapshot.key, ...snapshot.val() };
+        // setFriendsChannels(friendedUsers => [...friendedUsers, friendToAdd]);
+        if (currentUser.uid !== snapshot.key) {
+          friends.push(snapshot.val());
+          setFriendsChannels(friends);
+        }
       });
   };
 
@@ -61,15 +63,15 @@ const Friends = props => {
     }
   }, [friendToRemove]);
 
-  const changeChannel = friendChannel => {
-    const channelData = {
+  const changePrivateChannel = friendChannel => {
+    const privateChannelData = {
       id: friendChannel.channelId,
       name: friendChannel.name,
       status: friendChannel.status,
       photoURL: friendChannel.photoURL
     };
     setActiveChannelId(friendChannel.id);
-    props.setCurrentChannel(channelData);
+    props.setCurrentChannel(privateChannelData);
     props.setPrivateChannel(true);
   };
 
@@ -77,7 +79,7 @@ const Friends = props => {
     return friendsChannels.map(friendChannel => (
       <Menu.Item
         key={friendChannel.id}
-        onClick={() => changeChannel(friendChannel)}
+        onClick={() => changePrivateChannel(friendChannel)}
         name={friendChannel.name}
         active={activeChannelId === friendChannel.id}
       >

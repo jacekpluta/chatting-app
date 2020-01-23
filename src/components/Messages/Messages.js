@@ -21,6 +21,7 @@ const Messages = props => {
 
   const messagesEndRef = useRef(null);
 
+  const [friendsList, setFriendsList] = useState([]);
   const [messageImageLoading, setMessageImageLoading] = useState(false);
   const [allChannelMessages, setAllChannelMessages] = useState([]);
   const [messagesLoaded, setMessagesLoaded] = useState(false);
@@ -31,7 +32,13 @@ const Messages = props => {
   const [noMessages, setNoMessages] = useState(false);
   const [friendAdded, setFriendAdded] = useState(false);
 
-  const { currentChannel, currentUser, isPrivateChannel, userTyping } = props;
+  const {
+    currentChannel,
+    currentUser,
+    isPrivateChannel,
+    userTyping,
+    usersList
+  } = props;
 
   const setMessageImageLoadingTrue = () => {
     setMessageImageLoading(true);
@@ -212,10 +219,37 @@ const Messages = props => {
           const friendIds = Object.keys(data.val());
           const prevAdded = friendIds.includes(privateChannel);
           setFriendAdded(prevAdded);
+          setFriendsList(allFriendsIds => [...allFriendsIds, friendIds]);
         }
       });
   };
 
+  useEffect(() => {
+    updateFriendsStatusListeners();
+  }, [usersList]);
+
+  const updateFriendsStatusListeners = () => {
+    if (usersList && friendsList[0]) {
+      const numberOfFriends = friendsList.length - 1;
+      for (let i = 0; i < friendsList.length; i++) {
+        usersList.forEach(element => {
+          if (friendsList[numberOfFriends].includes(element.uid)) {
+            let selectPrivateChannel = element.uid.replace(currentUser.uid, "");
+            let privateChannel = selectPrivateChannel.replace("/", "");
+
+            usersRef.child(`${currentUser.uid}/friends`).update({
+              [privateChannel]: {
+                channelId: element.uid,
+                name: element.name,
+                status: element.status,
+                photoURL: element.photoURL
+              }
+            });
+          }
+        });
+      }
+    }
+  };
   //SEARCH BAR
   const handleSearchChange = event => {
     setSearchTerm(event.target.value);
@@ -263,13 +297,14 @@ const Messages = props => {
     }
   };
 
-  //SHOWS ALL CHANNELS MESSAGES
+  //LISTEN FOR MESSAGES
   const addMessageListeners = () => {
     let loadedMessages = [];
     const ref = getMessagesRef();
 
     ref.child(currentChannel.id).on("child_added", snapshot => {
       loadedMessages.push(snapshot.val());
+
       setAllChannelMessages({ loadedMessages });
       setNoMessages(false);
     });

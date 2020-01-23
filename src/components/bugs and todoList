@@ -10,10 +10,10 @@ TO DO:
 
 6. usuwanie kanalow
 
+7. Wyswietlanie wiadomosci ze zostales dodany do znajomych
+
 BUGS:
 1. IsTyping pojawia sie czasami na wszystkich kanaklach
-
-3. popraiwc ogolnie i wizualnie uplaoding avatar, np error przy i niemozliwosc wyslania przy zlym image czasami zle cropuje przy wiekszych obrazkach
 
 2. notifications nie pokazuja sie, dopiero po zmienia kanalu zaczynaja sei pokazac
 
@@ -23,11 +23,14 @@ BUGS:
 
 7. nieintuicyjne UI przy dodawaniu???
 
-8. brak informacji, progrsu o uploadowaniu avataru i informacji ze avatar zostal zmieniaony
+3. popraiwc ogolnie i wizualnie uplaoding avatar, np error przy i niemozliwosc wyslania przy zlym image czasami zle cropuje przy wiekszych obrazkach
 
-12. loading wiadomosci w innym miejscu??
+13. loading obrazkow dac w inynmi miesjcu i loading avatara dodac i informacji ze avatar zostal zmieniaony
 
-13. czasami nie wyswietlaja sie wiadomosci
 
-3. nie wyswietla online offline na biezaco
-9. kanal nie pojawia sie u innych bez odswiezania
+minor bugs: 
+
+1. change updateFriendsStatusListeners (slaba petla)
+
+
+??????????? czasami nie wyswietlaja sie wiadomosci??????????

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import firebase from "./../Firebase";
 import { Menu, Icon, Image, Input } from "semantic-ui-react";
 import { connect } from "react-redux";
@@ -11,7 +11,7 @@ import {
 const DirectMessages = props => {
   const { currentUser } = props;
 
-  const [users, setUsers] = useState([]);
+  const [usersOnline, setUsersOnline] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
@@ -20,18 +20,29 @@ const DirectMessages = props => {
   const [presenceRef] = useState(firebase.database().ref("presence"));
 
   useEffect(() => {
-    if (currentUser) {
-      addListeners(
-        currentUser.uid,
-        currentUser.displayName,
-        currentUser.photoURL
-      );
-    }
-    return () => {
-      connectedRef.off();
-      presenceRef.off();
-    };
+    onlineUsersListener();
+
+    const interval = setInterval(() => {
+      if (currentUser) {
+        onlineUsersListener();
+
+        addListeners(
+          currentUser.uid,
+          currentUser.displayName,
+          currentUser.photoURL
+        );
+      }
+      return () => {
+        connectedRef.off();
+        presenceRef.off();
+      };
+    }, 7000);
+    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    props.setUsersList(usersOnline);
+  }, [usersOnline]);
 
   const addListeners = (
     currentUserUid,
@@ -61,60 +72,26 @@ const DirectMessages = props => {
           .onDisconnect()
           .set(userInfoOffline);
       }
-
-      presenceRef.on("child_added", snapshot => {
-        if (currentUserUid !== snapshot.key) {
-          setUsers(users => [
-            ...users,
-            {
-              uid: snapshot.val().uid,
-              name: snapshot.val().name,
-              status: snapshot.val().status,
-              photoURL: snapshot.val().photoURL
-            }
-          ]);
-        }
-      });
-
-      presenceRef.on("child_removed", snapshot => {
-        if (currentUser.uid !== snapshot.key) {
-          setUsers(users => [
-            ...users,
-            {
-              uid: snapshot.val().uid,
-              name: snapshot.val().name,
-              status: snapshot.val().status,
-              photoURL: snapshot.val().photoURL
-            }
-          ]);
-        }
-      });
     });
   };
 
-  const [usersNew, setUsersNew] = useState([]);
+  const onlineUsersListener = () => {
+    let currentUsers = [];
 
-  const filterUserList = () => {
-    const usersFiletered = users.filter(
-      (ele, ind) =>
-        ind ===
-        users.findIndex(
-          elem =>
-            elem.status === ele.status &&
-            elem.uid === ele.uid &&
-            elem.name === ele.name &&
-            elem.photoURL === ele.photoURL
-        )
-    );
-    setUsersNew(usersFiletered);
+    presenceRef.on("child_added", snapshot => {
+      if (currentUser.uid !== snapshot.key) {
+        currentUsers.push(snapshot.val());
+        setUsersOnline(currentUsers);
+      }
+    });
+
+    presenceRef.on("child_removed", snapshot => {
+      if (currentUser.uid !== snapshot.key) {
+        currentUsers.push(snapshot.val());
+        setUsersOnline(currentUsers);
+      }
+    });
   };
-
-  useEffect(() => {
-    if (users) {
-      filterUserList();
-    }
-    props.setUsersList(usersNew);
-  }, [users]);
 
   const changeChannel = user => {
     const channelId = getChannelId(user.uid);
@@ -124,6 +101,7 @@ const DirectMessages = props => {
       status: user.status,
       photoURL: user.photoURL
     };
+
     props.setCurrentChannel(channelData);
     props.setPrivateChannel(true);
   };
@@ -151,7 +129,7 @@ const DirectMessages = props => {
 
   //USERS SEARCH
   const handleSearchMessages = () => {
-    const allUsers = [...usersNew];
+    const allUsers = [...usersOnline];
 
     const regex = new RegExp(searchTerm, "gi");
     const searchResults = allUsers.reduce((acc, user) => {

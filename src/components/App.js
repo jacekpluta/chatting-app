@@ -34,6 +34,7 @@ const App = props => {
             currentUser={currentUser}
             isPrivateChannel={isPrivateChannel}
             userTyping={userTyping}
+            usersList={usersList}
           />
         </Grid.Column>
 
