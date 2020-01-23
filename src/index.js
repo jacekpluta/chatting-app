@@ -26,17 +26,18 @@ import rootReducer from "./reducers/index";
 const store = createStore(rootReducer, composeWithDevTools());
 
 const Root = props => {
+  const historyPush = props.history.push;
   useEffect(() => {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         props.setUser(user);
-        props.history.push("/");
+        historyPush("/");
       } else {
-        props.history.push("/login");
+        historyPush("/login");
         props.clearUser();
       }
     });
-  }, [props.history.push]);
+  }, [historyPush]);
 
   return props.isLoading ? (
     <Spinner />

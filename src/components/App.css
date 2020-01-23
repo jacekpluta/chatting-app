@@ -20,7 +20,7 @@ body,
   z-index: 100;
 }
 
-.MyMessage {
+.myMessage {
   border-left: 2px solid orange;
   padding-left: 8px;
 }

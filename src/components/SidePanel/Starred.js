@@ -47,7 +47,11 @@ const Starred = props => {
   useEffect(() => {
     if (channelToRemove) {
       const filteredChannel = starredChannels.filter(channel => {
-        if (channel.id !== channelToRemove) return channel;
+        if (channel && channel.id !== channelToRemove) {
+          return channel;
+        } else {
+          return null;
+        }
       });
       setStarredChannels(filteredChannel);
       setChannelToRemove(null);

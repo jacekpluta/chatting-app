@@ -1,20 +1,33 @@
 TO DO:
 
-//1. powiadomienia i dzwiek przy powiadomieniach
+1. dzwiek przy powiadomieniach
 
-//2. count all current online users in channel
+2. count all current online users in channel
 
-//3. popraiwc ogolnie i wizualnie uplaoding avatar, np error przy i niemozliwosc wyslania przy zlym image czasami zle cropuje przy wiekszych obrazkach
+4. blokowanie i ignorowanie uzytkownikow
 
-//4. blokowanie i ignorowanie uzytkownikow
+5. dodac light box na obrazkach
+
+6. usuwanie kanalow
 
 BUGS:
-//1. Is typing pojawia sie czasami na wszystkich kanaklach
+1. IsTyping pojawia sie czasami na wszystkich kanaklach
 
-//2. notifications nie pokazuja sie, dopiero po zmienia kanalu zaczynaja sei pokazac
+3. popraiwc ogolnie i wizualnie uplaoding avatar, np error przy i niemozliwosc wyslania przy zlym image czasami zle cropuje przy wiekszych obrazkach
 
-//3. nie wyswietla online offline na biezaco
+2. notifications nie pokazuja sie, dopiero po zmienia kanalu zaczynaja sei pokazac
 
-//4. zmiana font size, nie wraca do poprzedniogo stanu
+5. jak kto wchodzi na kanal, is typing znika, i przy zmianie kanalu zmienic na istyping na false
 
-//5. jak kto w chodzi na kanal, is typing znika, i przy zmianie kanalu zmienic na istyping na false
+6. responsywnosc na mobilkach
+
+7. nieintuicyjne UI przy dodawaniu???
+
+8. brak informacji, progrsu o uploadowaniu avataru i informacji ze avatar zostal zmieniaony
+
+12. loading wiadomosci w innym miejscu??
+
+13. czasami nie wyswietlaja sie wiadomosci
+
+3. nie wyswietla online offline na biezaco
+9. kanal nie pojawia sie u innych bez odswiezania

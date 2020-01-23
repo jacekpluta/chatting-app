@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import "../components/App.css";
 import { Grid } from "semantic-ui-react";
-import ColorPanel from "./ColorPanel/ColorPanel";
 import Messages from "./Messages/Messages";
 import MetaPanel from "./MetaPanel/MetaPanel";
 import SidePanel from "./SidePanel/SidePanel";
@@ -17,21 +16,13 @@ const App = props => {
     usersList
   } = props;
 
-  const [biggerText, setBiggerText] = useState(false);
-
-  const handleBiggerText = () => {
-    setBiggerText(!biggerText);
-  };
-
   return (
     <div>
       <Grid columns="equal" className="app" style={{ background: "#eee" }}>
-        <ColorPanel handleBiggerText={handleBiggerText} />
         <SidePanel
           currentUser={currentUser}
           key={currentUser && currentUser.id}
           currentChannel={currentChannel}
-          biggerText={biggerText}
           isPrivateChannel={isPrivateChannel}
           usersList={usersList}
           userPosts={userPosts}
@@ -43,7 +34,6 @@ const App = props => {
             currentUser={currentUser}
             isPrivateChannel={isPrivateChannel}
             userTyping={userTyping}
-            biggerText={biggerText}
           />
         </Grid.Column>
 
@@ -54,7 +44,6 @@ const App = props => {
             isPrivateChannel={isPrivateChannel}
             userPosts={userPosts}
             currentUser={currentUser}
-            biggerText={biggerText}
           />
         </Grid.Column>
       </Grid>

@@ -11,16 +11,10 @@ const menuStyle = {
   fontSize: "1.2 rem"
 };
 
-const biggerTextStyle = {
-  background: "#636D21",
-  fontSize: "1.4em"
-};
-
 export default function SidePanel(props) {
   const {
     currentUser,
     currentChannel,
-    biggerText,
     isPrivateChannel,
     usersList,
     userPosts
@@ -32,7 +26,7 @@ export default function SidePanel(props) {
         inverted
         fixed="left"
         vertical
-        style={biggerText ? biggerTextStyle : menuStyle}
+        style={menuStyle}
         className="sidePanel"
       >
         <UserPanel

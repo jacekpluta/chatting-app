@@ -135,15 +135,17 @@ function Channels(props) {
   };
 
   const clearNotifications = () => {
-    let index = notifications.findIndex(
-      notification => notification.id === channelChanged.id
-    );
+    if (currentUser && currentUser.id) {
+      let index = notifications.findIndex(
+        notification => notification.id === channelChanged.id
+      );
 
-    if (index !== -1) {
-      let updatedNotifications = [...notifications];
-      updatedNotifications[index].total = notifications[index].lastKnownTotal;
-      updatedNotifications[index].count = 0;
-      setNotifications(updatedNotifications);
+      if (index !== -1) {
+        let updatedNotifications = [...notifications];
+        updatedNotifications[index].total = notifications[index].lastKnownTotal;
+        updatedNotifications[index].count = 0;
+        setNotifications(updatedNotifications);
+      }
     }
   };
 

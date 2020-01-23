@@ -32,13 +32,10 @@ const MessagesForm = props => {
   const [emojiPicker, setEmojiPicker] = useState(false);
   const [error, setError] = useState("");
   const [modal, setModal] = useState(false);
-  const [setUploadState] = useState(false);
-  const [uploadTask, setUploadTask] = useState(null);
+
   const [file, setFile] = useState(null);
   const [authorized] = useState(["image/jpeg", "image/png"]);
   const [isTyping, setIsTyping] = useState(false);
-  const [showTypingAnimation, setShowTypingAnimation] = useState(false);
-  const [userTypingName, setUserTypingName] = useState("");
 
   const [inputRef, setInputFocus] = useFocus();
 
@@ -66,9 +63,6 @@ const MessagesForm = props => {
         const isUserTyping = snapshot.val().isUserTyping.isTyping;
         const userTypingName = snapshot.val().isUserTyping.user;
         const userTypingUid = snapshot.val().isUserTyping.uid;
-
-        setShowTypingAnimation(isUserTyping);
-        setUserTypingName(userTypingName);
 
         const userTyping = {
           isUserTyping: isUserTyping,
@@ -212,15 +206,12 @@ const MessagesForm = props => {
     const messRef = getMessagesRef();
     const filePath = `${getPath()}/${uuid()}.jpg`;
 
-    setUploadState(true);
-
     props.setMessageImageLoadingTrue();
 
-    const task = storageRef
+    storageRef
       .child(filePath)
       .put(file, metadata)
       .then(snapshot => {
-        setUploadTask(task);
         snapshot.ref.getDownloadURL().then(downloadURL => {
           sendFileMessage(downloadURL, messRef, pathToUpload);
         });
@@ -229,40 +220,16 @@ const MessagesForm = props => {
         props.setMessageImageLoadingFalse();
       })
       .catch(error => {
-        setUploadState("error");
-        setUploadTask(null);
         console.log(error);
       });
   };
-
-  useEffect(() => {
-    if (uploadTask) {
-      uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, function(
-        snapshot
-      ) {
-        var percent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log(percent + "% done");
-      });
-
-      return () => {
-        uploadTask.cancel();
-        uploadTask.off();
-        setUploadTask(null);
-      };
-    }
-  }, []);
 
   const sendFileMessage = (downloadURL, messRef, pathToUpload) => {
     messRef
       .child(pathToUpload)
       .push()
       .set(createMessage(downloadURL))
-      .then(() => {
-        setUploadState(true);
-      })
       .catch(error => {
-        setUploadState(false);
-        setUploadTask(null);
         setError(error);
         console.log(error);
       });
@@ -273,9 +240,17 @@ const MessagesForm = props => {
   };
 
   const handleAddEmoji = emoji => {
-    const oldMessage = message;
+    let oldMessage = "";
+    if (message) {
+      oldMessage = message;
+    } else {
+      oldMessage = "";
+    }
+
+    console.log(oldMessage);
     const newMessage = colonToUnicode(`${oldMessage} ${emoji.colons}`);
     setMessage(newMessage);
+    setInput(newMessage);
     setEmojiPicker(false);
     setInputFocus();
   };

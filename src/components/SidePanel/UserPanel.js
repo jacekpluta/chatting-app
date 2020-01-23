@@ -25,7 +25,7 @@ const UserPanel = props => {
   const [newAvatar, setNewAvatar] = useState(null);
   const { currentUser, currentChannel, isPrivateChannel } = props;
   const [uploadedCroppedImaged, setUploadedCroppedImaged] = useState(null);
-  const [metaData, setMetaData] = useState({ contentType: "image/jpeg" });
+  const [metaData] = useState({ contentType: "image/jpeg" });
 
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [messagesRef] = useState(firebase.database().ref("messages"));

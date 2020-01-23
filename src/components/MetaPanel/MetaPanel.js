@@ -12,20 +12,12 @@ import { connect } from "react-redux";
 
 const MetaPanel = props => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const { isPrivateChannel, currentChannel, userPosts, biggerText } = props;
+  const { isPrivateChannel, currentChannel, userPosts } = props;
 
   const setActive = (event, titleProps) => {
     const { index } = titleProps;
     const newIndex = activeIndex === index ? -1 : index;
     setActiveIndex(newIndex);
-  };
-
-  const biggerTextStyle = {
-    fontSize: "1.6em"
-  };
-
-  const normalTextStyle = {
-    fontSize: "1 em"
   };
 
   const displayTopPoster = posts =>
@@ -44,10 +36,7 @@ const MetaPanel = props => {
   if (isPrivateChannel) return null;
 
   return (
-    <Segment
-      loading={!currentChannel}
-      style={biggerText ? biggerTextStyle : normalTextStyle}
-    >
+    <Segment loading={!currentChannel}>
       <Header as="h3" attached="top">
         {"About #"} {currentChannel && currentChannel.name}
       </Header>

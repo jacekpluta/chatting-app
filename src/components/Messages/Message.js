@@ -4,7 +4,7 @@ import moment from "moment";
 import { Loader } from "semantic-ui-react";
 
 export default function Message(props) {
-  const { message, currentUser, messageImageLoading, biggerText } = props;
+  const { message, currentUser, messageImageLoading } = props;
   const [isMyMessage, setIsMyMessage] = useState(false);
 
   useEffect(() => {
@@ -24,15 +24,8 @@ export default function Message(props) {
     }
   };
 
-  const biggerTextStyle = {
-    fontSize: "1.8em"
-  };
-
-  const normalTextStyle = {
-    fontSize: "1.0 em"
-  };
-
   const timeFromNow = timeStamp => moment(timeStamp).fromNow();
+
   if (messageImageLoading) {
     return (
       <Loader
@@ -43,12 +36,9 @@ export default function Message(props) {
     );
   } else {
     return (
-      <Comment
-        style={biggerText ? biggerTextStyle : normalTextStyle}
-        className="message"
-      >
+      <Comment className="message">
         <Comment.Avatar src={message.currentUser.avatar} />
-        <Comment.Content className={isMyMessage ? "MyMessage" : ""}>
+        <Comment.Content className={isMyMessage ? "myMessage" : ""}>
           <Comment.Author as="a">{message.currentUser.name}</Comment.Author>
           <Comment.Metadata>{timeFromNow(message.timeStamp)}</Comment.Metadata>:
           {isImage() ? (
