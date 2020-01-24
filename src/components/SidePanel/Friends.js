@@ -27,7 +27,7 @@ const Friends = props => {
       usersRef.off();
     };
   }, [usersList]);
-  console.log(friendsChannels);
+
   const addListenersFriendAdded = userId => {
     let friends = [];
 
@@ -35,8 +35,6 @@ const Friends = props => {
       .child(userId)
       .child("friends")
       .on("child_added", snapshot => {
-        // const friendToAdd = { id: snapshot.key, ...snapshot.val() };
-        // setFriendsChannels(friendedUsers => [...friendedUsers, friendToAdd]);
         if (currentUser.uid !== snapshot.key) {
           friends.push(snapshot.val());
           setFriendsChannels(friends);
@@ -76,31 +74,33 @@ const Friends = props => {
   };
 
   const displayFriendChannels = () => {
-    return friendsChannels.map(friendChannel => (
-      <Menu.Item
-        key={friendChannel.id}
-        onClick={() => changePrivateChannel(friendChannel)}
-        name={friendChannel.name}
-        active={activeChannelId === friendChannel.id}
-      >
-        <Icon
-          name="circle"
-          color={friendChannel && friendChannel.status ? "green" : "red"}
-        ></Icon>
+    return friendsChannels
+      .sort((a, b) => (a.name > b.name ? 1 : -1))
+      .map(friendChannel => (
+        <Menu.Item
+          key={friendChannel.id}
+          onClick={() => changePrivateChannel(friendChannel)}
+          name={friendChannel.name}
+          active={activeChannelId === friendChannel.id}
+        >
+          <Icon
+            name="circle"
+            color={friendChannel && friendChannel.status ? "green" : "red"}
+          ></Icon>
 
-        {friendChannel ? (
-          <Image
-            src={friendChannel.photoURL}
-            style={{ width: "10%", height: "10%" }}
-            avatar
-          ></Image>
-        ) : (
-          ""
-        )}
+          {friendChannel ? (
+            <Image
+              src={friendChannel.photoURL}
+              style={{ width: "10%", height: "10%" }}
+              avatar
+            ></Image>
+          ) : (
+            ""
+          )}
 
-        {friendChannel.name}
-      </Menu.Item>
-    ));
+          {friendChannel.name}
+        </Menu.Item>
+      ));
   };
 
   return (

@@ -20,25 +20,20 @@ const DirectMessages = props => {
   const [presenceRef] = useState(firebase.database().ref("presence"));
 
   useEffect(() => {
-    onlineUsersListener();
+    if (currentUser) {
+      onlineUsersListener();
 
-    const interval = setInterval(() => {
-      if (currentUser) {
-        onlineUsersListener();
-
-        addListeners(
-          currentUser.uid,
-          currentUser.displayName,
-          currentUser.photoURL
-        );
-      }
-      return () => {
-        connectedRef.off();
-        presenceRef.off();
-      };
-    }, 7000);
-    return () => clearInterval(interval);
-  }, []);
+      addListeners(
+        currentUser.uid,
+        currentUser.displayName,
+        currentUser.photoURL
+      );
+    }
+    return () => {
+      connectedRef.off();
+      presenceRef.off();
+    };
+  }, [usersOnline]);
 
   useEffect(() => {
     props.setUsersList(usersOnline);

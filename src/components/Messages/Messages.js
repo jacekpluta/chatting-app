@@ -368,8 +368,7 @@ const Messages = props => {
   }, [messagesLoaded]);
 
   useEffect(() => {
-    if (userTyping) scrollToBottom();
-    else scrollToBottom();
+    scrollToBottom();
   }, [userTyping]);
   ////////////////////////////////////////////////////////////
 
@@ -406,20 +405,20 @@ const Messages = props => {
                         : [searchTerm === "" ? <SkeletonMessages /> : ""]
                     ]
               ]}
-
-          {/*displays user name + usertypeing animation*/}
-
-          {userTyping && userTyping.isUserTyping
-            ? userTyping.userTypingUid !== currentUser.uid &&
-              "User " + userTyping.userTypingName + " is writing"
+          {/*displays user name + usertypeing animation*/}{" "}
+          {userTyping &&
+          userTyping.isTyping &&
+          userTyping.channelId === currentChannel.id
+            ? userTyping.uid !== currentUser.uid &&
+              "User " + userTyping.name + " is writing"
             : ""}
-
-          {userTyping && userTyping.isUserTyping
-            ? userTyping.userTypingUid !== currentUser.uid && (
-                <TypingLoader userTyping={userTyping}></TypingLoader>
+          {userTyping &&
+          userTyping.isTyping &&
+          userTyping.channelId === currentChannel.id
+            ? userTyping.uid !== currentUser.uid && (
+                <TypingLoader></TypingLoader>
               )
             : ""}
-
           {allChannelMessages.loadedMessages && searchTerm
             ? searchResult.map(message => {
                 return (

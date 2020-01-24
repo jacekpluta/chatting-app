@@ -13,24 +13,23 @@ TO DO:
 7. Wyswietlanie wiadomosci ze zostales dodany do znajomych
 
 BUGS:
-1. IsTyping pojawia sie czasami na wszystkich kanaklach
-
 2. notifications nie pokazuja sie, dopiero po zmienia kanalu zaczynaja sei pokazac
 
-5. jak kto wchodzi na kanal, is typing znika, i przy zmianie kanalu zmienic na istyping na false
+3. jak kto wchodzi na kanal, lub jak ktos zaczyna pisac, lub wysyla wiadomosc, ISTYPING znika
 
-6. responsywnosc na mobilkach
+4. responsywnosc na mobilkach
 
-7. nieintuicyjne UI przy dodawaniu???
+5. nieintuicyjne UI przy dodawaniu???
 
-3. popraiwc ogolnie i wizualnie uplaoding avatar, np error przy i niemozliwosc wyslania przy zlym image czasami zle cropuje przy wiekszych obrazkach
+6. popraiwc ogolnie i wizualnie uplaoding avatar, np error przy i niemozliwosc wyslania przy zlym image czasami zle cropuje przy wiekszych obrazkach
 
-13. loading obrazkow dac w inynmi miesjcu i loading avatara dodac i informacji ze avatar zostal zmieniaony
+7. loading obrazkow dac w inynmi miesjcu i loading avatara dodac i informacji ze avatar zostal zmieniaony
 
 
 minor bugs: 
 
 1. change updateFriendsStatusListeners (slaba petla)
 
+2. lagi przy useeffect, duza ilosc odswiezania komponentow
 
-??????????? czasami nie wyswietlaja sie wiadomosci??????????
+??????????? chyba czasami nie wyswietlaja sie wiadomosci ??????????

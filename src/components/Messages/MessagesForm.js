@@ -56,18 +56,38 @@ const MessagesForm = props => {
       setMessage(event.target.value);
     }
   };
-
+  const handlePressEnterToSend = event => {
+    if (event.keyCode === 13) {
+      sendMessage();
+    }
+  };
   const loadCurrentChannel = () => {
     isTypingRef.child(currentChannel.id).on("value", snapshot => {
       if (snapshot.val()) {
         const isUserTyping = snapshot.val().isUserTyping.isTyping;
         const userTypingName = snapshot.val().isUserTyping.user;
         const userTypingUid = snapshot.val().isUserTyping.uid;
+        const userTypingChannelId = snapshot.val().isUserTyping.channelId;
 
         const userTyping = {
-          isUserTyping: isUserTyping,
-          userTypingName: userTypingName,
-          userTypingUid: userTypingUid
+          isTyping: isUserTyping,
+          name: userTypingName,
+          uid: userTypingUid,
+          channelId: userTypingChannelId
+        };
+
+        props.setUserTyping(userTyping);
+      } else {
+        const isUserTyping = false;
+        const userTypingName = currentUser.name;
+        const userTypingUid = currentUser.uid;
+        const userTypingChannelId = currentChannel.id;
+
+        const userTyping = {
+          isTyping: isUserTyping,
+          name: userTypingName,
+          uid: userTypingUid,
+          channelId: userTypingChannelId
         };
 
         props.setUserTyping(userTyping);
@@ -75,24 +95,18 @@ const MessagesForm = props => {
     });
   };
 
-  const handlePressEnterToSend = event => {
-    if (event.keyCode === 13) {
-      sendMessage();
-    }
-  };
-
   useEffect(() => {
-    const isTypingObj = {
-      isUserTyping: {
-        isTyping: isTyping,
-        user: currentUser.displayName,
-        uid: currentUser.uid
-      }
-    };
-
     if (currentChannel && currentChannel.id) {
+      const isTypingObj = {
+        isUserTyping: {
+          uid: currentUser.uid,
+          channelId: currentChannel.id,
+          user: currentUser.displayName,
+          isTyping: isTyping
+        }
+      };
+      loadCurrentChannel();
       if (isTyping) {
-        loadCurrentChannel();
         isTypingRef
           .child(currentChannel.id)
           .update(isTypingObj)
@@ -247,7 +261,6 @@ const MessagesForm = props => {
       oldMessage = "";
     }
 
-    console.log(oldMessage);
     const newMessage = colonToUnicode(`${oldMessage} ${emoji.colons}`);
     setMessage(newMessage);
     setInput(newMessage);

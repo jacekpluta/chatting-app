@@ -83,18 +83,11 @@ function Channels(props) {
     channelsRef.on("child_added", function(snap) {
       addNotificationListener(snap.key);
     });
-  }, [channelChanged]);
+  }, [notifications]);
 
   const addNotificationListener = channelId => {
     messagesRef.child(channelId).on("value", snapshot => {
-      if (channelChanged) {
-        handleNotifications(
-          channelId,
-          activeChannelId,
-          notifications,
-          snapshot
-        );
-      }
+      handleNotifications(channelId, activeChannelId, notifications, snapshot);
     });
   };
 
@@ -128,21 +121,6 @@ function Channels(props) {
       });
     }
     setNotifications(notifications);
-  };
-
-  const clearNotifications = () => {
-    if (currentUser && currentUser.id) {
-      let index = notifications.findIndex(
-        notification => notification.id === channelChanged.id
-      );
-
-      if (index !== -1) {
-        let updatedNotifications = [...notifications];
-        updatedNotifications[index].total = notifications[index].lastKnownTotal;
-        updatedNotifications[index].count = 0;
-        setNotifications(updatedNotifications);
-      }
-    }
   };
 
   const getNotificationCount = channel => {
@@ -196,9 +174,7 @@ function Channels(props) {
       .update(mainChannel)
       .then(() => {
         props.setCurrentChannel(mainChannel);
-      })
-      .then(() => {
-        setCurrentChannel(mainChannel);
+        changeChannel(mainChannel);
         setChannelChanged(mainChannel);
         setActiveChannelId(mainChannel.id);
       })
@@ -251,6 +227,21 @@ function Channels(props) {
     props.setPrivateChannel(false);
     setChannelChanged(channel);
     clearNotifications();
+  };
+
+  const clearNotifications = () => {
+    if (currentUser) {
+      let index = notifications.findIndex(
+        notification => notification.id === channelChanged.id
+      );
+
+      if (index !== -1) {
+        let updatedNotifications = [...notifications];
+        updatedNotifications[index].total = notifications[index].lastKnownTotal;
+        updatedNotifications[index].count = 0;
+        setNotifications(updatedNotifications);
+      }
+    }
   };
 
   const displayChannels = () => {

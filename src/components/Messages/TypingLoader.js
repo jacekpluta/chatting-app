@@ -47,9 +47,7 @@ const loadingCircleTransition = {
 export default function ThreeDotsWave(props) {
   return (
     <motion.div
-      style={
-        props.userTyping.isUserTyping ? loadingContainer : { display: "none" }
-      }
+      style={loadingContainer}
       variants={loadingContainerVariants}
       initial="start"
       animate="end"
