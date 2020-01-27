@@ -20,12 +20,10 @@ export default function MessagesHeader(props) {
     <Segment clearing>
       <Header fluid="true" as="h2" floated="left" style={{ marginBottom: 0 }}>
         <span>
-          {displayChannelName()}
-
+          {displayChannelName()}{" "}
           {!isPrivateChannel && channelStarred && (
             <Icon name={"star"} onClick={unstarChannel} color="yellow"></Icon>
           )}
-
           {!isPrivateChannel && !channelStarred && (
             <Icon
               name={"star outline"}
@@ -33,16 +31,18 @@ export default function MessagesHeader(props) {
               color="yellow"
             ></Icon>
           )}
-
           {isPrivateChannel && friendAdded && (
-            <Icon name={"star"} onClick={unfriendPerson} color="red"></Icon>
+            <Icon
+              name={"address card"}
+              onClick={unfriendPerson}
+              color="green"
+            ></Icon>
           )}
-
           {isPrivateChannel && !friendAdded && (
             <Icon
-              name={"star outline"}
+              name={"address card outline"}
               onClick={handleAddFriend}
-              color="red"
+              color="green"
             ></Icon>
           )}
         </span>

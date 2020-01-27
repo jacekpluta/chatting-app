@@ -26,18 +26,20 @@ const Friends = props => {
     return () => {
       usersRef.off();
     };
-  }, [usersList]);
+  }, []);
 
   const addListenersFriendAdded = userId => {
-    let friends = [];
-
     usersRef
       .child(userId)
       .child("friends")
       .on("child_added", snapshot => {
         if (currentUser.uid !== snapshot.key) {
-          friends.push(snapshot.val());
-          setFriendsChannels(friends);
+          const friendToStar = { id: snapshot.key, ...snapshot.val() };
+
+          setFriendsChannels(friendedChannels => [
+            ...friendedChannels,
+            friendToStar
+          ]);
         }
       });
   };
@@ -61,46 +63,62 @@ const Friends = props => {
     }
   }, [friendToRemove]);
 
+  const getChannelId = userId => {
+    const currentUserId = currentUser.uid;
+    return userId < currentUserId
+      ? `${userId}/${currentUser.uid}`
+      : `${currentUser.uid}/${userId}`;
+  };
+
   const changePrivateChannel = friendChannel => {
+    const channelId = getChannelId(friendChannel.id);
+
     const privateChannelData = {
-      id: friendChannel.channelId,
+      id: channelId,
       name: friendChannel.name,
       status: friendChannel.status,
       photoURL: friendChannel.photoURL
     };
+
     setActiveChannelId(friendChannel.id);
     props.setCurrentChannel(privateChannelData);
     props.setPrivateChannel(true);
   };
 
   const displayFriendChannels = () => {
-    return friendsChannels
-      .sort((a, b) => (a.name > b.name ? 1 : -1))
-      .map(friendChannel => (
-        <Menu.Item
-          key={friendChannel.id}
-          onClick={() => changePrivateChannel(friendChannel)}
-          name={friendChannel.name}
-          active={activeChannelId === friendChannel.id}
-        >
-          <Icon
-            name="circle"
-            color={friendChannel && friendChannel.status ? "green" : "red"}
-          ></Icon>
+    if (usersList && friendsChannels) {
+      let result = usersList.filter(o1 =>
+        friendsChannels.some(o2 => o1.id === o2.id)
+      );
 
-          {friendChannel ? (
-            <Image
-              src={friendChannel.photoURL}
-              style={{ width: "10%", height: "10%" }}
-              avatar
-            ></Image>
-          ) : (
-            ""
-          )}
+      return result
+        .sort((a, b) => (a.name > b.name ? 1 : -1))
+        .map(friendChannel => (
+          <Menu.Item
+            key={friendChannel.id}
+            onClick={() => changePrivateChannel(friendChannel)}
+            name={friendChannel.name}
+            active={activeChannelId === friendChannel.id}
+          >
+            <Icon
+              name="circle"
+              color={friendChannel && friendChannel.status ? "green" : "red"}
+            ></Icon>
 
-          {friendChannel.name}
-        </Menu.Item>
-      ));
+            {friendChannel ? (
+              <Image
+                src={friendChannel.photoURL}
+                style={{ width: "10%", height: "10%" }}
+                avatar
+              ></Image>
+            ) : (
+              ""
+            )}
+
+            {friendChannel.name}
+          </Menu.Item>
+        ));
+    }
   };
 
   return (

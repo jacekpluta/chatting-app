@@ -13,17 +13,15 @@ TO DO:
 7. Wyswietlanie wiadomosci ze zostales dodany do znajomych
 
 BUGS:
-2. notifications nie pokazuja sie, dopiero po zmienia kanalu zaczynaja sei pokazac
+1. notifications nie pokazuja sie, dopiero po zmienia kanalu zaczynaja sei pokazac
 
-3. jak kto wchodzi na kanal, lub jak ktos zaczyna pisac, lub wysyla wiadomosc, ISTYPING znika
+2. jak kto wchodzi na kanal, lub jak ktos zaczyna pisac, lub wysyla wiadomosc, ISTYPING znika
 
-4. responsywnosc na mobilkach
+3. responsywnosc na mobilkach
 
-5. nieintuicyjne UI przy dodawaniu???
+4. nieintuicyjne UI, poprawic UI
 
-6. popraiwc ogolnie i wizualnie uplaoding avatar, np error przy i niemozliwosc wyslania przy zlym image czasami zle cropuje przy wiekszych obrazkach
-
-7. loading obrazkow dac w inynmi miesjcu i loading avatara dodac i informacji ze avatar zostal zmieniaony
+5. avatar cropping nie dziala przy niestandardowej wielkosci np 500 x 2000
 
 
 minor bugs: 
@@ -32,4 +30,9 @@ minor bugs:
 
 2. lagi przy useeffect, duza ilosc odswiezania komponentow
 
-??????????? chyba czasami nie wyswietlaja sie wiadomosci ??????????
+3. odswiazanie dopiero po zmianie kanalu po upload avatar
+
+
+
+
+oagarnac notifications

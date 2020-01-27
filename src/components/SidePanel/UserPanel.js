@@ -6,7 +6,10 @@ import {
   Dropdown,
   Image,
   Modal,
-  Button
+  Button,
+  Message,
+  Dimmer,
+  Loader
 } from "semantic-ui-react";
 import firebase from "../Firebase";
 import OnDrop from "./OnDrop";
@@ -26,6 +29,9 @@ const UserPanel = props => {
   const { currentUser, currentChannel, isPrivateChannel } = props;
   const [uploadedCroppedImaged, setUploadedCroppedImaged] = useState(null);
   const [metaData] = useState({ contentType: "image/jpeg" });
+  const [loader, setLoader] = useState(false);
+  const [messageBox, setMessageBox] = useState(false);
+  const [avatarChanged, setAvatarChanged] = useState(false);
 
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [messagesRef] = useState(firebase.database().ref("messages"));
@@ -49,6 +55,11 @@ const UserPanel = props => {
     }
     return new File([u8arr], filename, { type: mime });
   }
+
+  const setLoading = () => {
+    setLoader(true);
+    setAvatarChanged(true);
+  };
 
   const saveAvatar = image => {
     setNewAvatar(image);
@@ -93,13 +104,16 @@ const UserPanel = props => {
       .update({ avatar: uploadedCroppedImaged })
       .then(() => {
         console.log("User avatar updated");
+        setLoader(false);
+        setMessageBox(true);
+        setAvatarChanged(false);
       })
       .catch(err => {
         console.log(err);
       });
   };
 
-  /////////////////////////////UPDATING AVATAR IN CHANNEL DETAILS AND AVATAR IN PRIVATE MESSAGES///////////////////
+  /////////////////////////////UPDATING AVATAR IN CHANNEL DETAILS AND MESSAGES///////////////////
   useEffect(() => {
     if (currentChannel) {
       loadAllCurrentChannels();
@@ -113,8 +127,10 @@ const UserPanel = props => {
 
   const loadAllCurrentChannels = () => {
     if (!isPrivateChannel) {
-      channelsRef.on("child_added", snapshot => {
-        updateAvatarListener(snapshot.key);
+      // channelsRef.on("child_added", snapshot => {
+      //   updateAvatarListener(snapshot.key);
+      messagesRef.child(currentChannel.id).once("value", snapshot => {
+        setMessagesToUpdate(snapshot.val());
       });
     } else if (isPrivateChannel) {
       privateMessagesRef.child(currentChannel.id).once("value", snapshot => {
@@ -123,50 +139,43 @@ const UserPanel = props => {
     }
   };
 
-  const updateAvatarListener = channelId => {
-    if (
-      channelId === currentChannel.id &&
-      messagesToUpdate &&
-      messagesToUpdate.length !== 0
-    ) {
-      messagesRef
-        .child(channelId)
-        .once("value", snapshot => {
-          Object.entries(snapshot.val()).map(([messageId, message], i) => {
-            if (message.currentUser.id === currentUser.uid) {
-              if (message.content) {
-                const newUserAvatar = {
-                  currentUser: {
-                    avatar: currentUser.photoURL,
-                    id: currentUser.uid,
-                    name: currentUser.displayName
-                  }
-                };
+  // const updateAvatarListener = channelId => {
+  //   if (
+  //     channelId === currentChannel.id &&
+  //     messagesToUpdate &&
+  //     messagesToUpdate.length !== 0
+  //   ) {
+  //     messagesRef
+  //       .child(channelId)
+  //       .once("value", snapshot => {
+  //         Object.entries(snapshot.val()).map(([messageId, message], i) => {
+  //           if (message.currentUser.id === currentUser.uid) {
+  //             if (message.content) {
+  //               const newUserAvatar = {
+  //                 currentUser: {
+  //                   avatar: currentUser.photoURL,
+  //                   id: currentUser.uid,
+  //                   name: currentUser.displayName
+  //                 }
+  //               };
 
-                if (isPrivateChannel) {
-                  privateMessagesRef
-                    .child(currentChannel.id)
-                    .child(messageId)
-                    .update(newUserAvatar);
-                } else if (!isPrivateChannel) {
-                  messagesRef
-                    .child(currentChannel.id)
-                    .child(messageId)
-                    .update(newUserAvatar);
-                }
-              }
-            }
-          });
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    }
-  };
+  //               messagesRef
+  //                 .child(currentChannel.id)
+  //                 .child(messageId)
+  //                 .update(newUserAvatar);
+  //             }
+  //           }
+  //         });
+  //       })
+  //       .catch(err => {
+  //         console.log(err);
+  //       });
+  //   }
+  // };
 
   useEffect(() => {
     if (messagesToUpdate && messagesToUpdate.length !== 0) {
-      // updatingMessages();
+      updatingMessages();
     }
   }, [messagesToUpdate]);
 
@@ -233,8 +242,15 @@ const UserPanel = props => {
       text: <span onClick={handleSignout}>Sign Out</span>
     }
   ];
+  const closeMessage = () => {
+    setMessageBox(false);
+  };
 
-  return (
+  return loader ? (
+    <Dimmer active>
+      <Loader active />
+    </Dimmer>
+  ) : (
     <Grid style={userStyle}>
       <Grid.Column>
         <Grid.Row style={gridRowStyle}>
@@ -267,11 +283,25 @@ const UserPanel = props => {
           </Header>
         </Grid.Row>
 
+        {messageBox ? (
+          <Message positive style={{ marginBottom: "10px" }}>
+            <Button floated="right" onClick={closeMessage}>
+              X
+            </Button>
+            <Message.Header>Avatar has been changed</Message.Header>
+          </Message>
+        ) : (
+          ""
+        )}
         <Modal basic onClose={closeModal} open={modal}>
           <Modal.Header>Change Avatar</Modal.Header>
           <Modal.Content>
             {" "}
-            <OnDrop currentUser={currentUser} saveAvatar={saveAvatar}></OnDrop>
+            <OnDrop
+              setLoading={setLoading}
+              currentUser={currentUser}
+              saveAvatar={saveAvatar}
+            ></OnDrop>
           </Modal.Content>
 
           <Modal.Actions>

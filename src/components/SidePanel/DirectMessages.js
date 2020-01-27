@@ -20,26 +20,36 @@ const DirectMessages = props => {
   const [presenceRef] = useState(firebase.database().ref("presence"));
 
   useEffect(() => {
-    if (currentUser) {
+    onlineUsersListener();
+    props.setUsersList(usersOnline);
+    userConnectedListener(
+      currentUser.uid,
+      currentUser.displayName,
+      currentUser.photoURL
+    );
+
+    const interval = setInterval(() => {
       onlineUsersListener();
 
-      addListeners(
+      userConnectedListener(
         currentUser.uid,
         currentUser.displayName,
         currentUser.photoURL
       );
-    }
-    return () => {
-      connectedRef.off();
-      presenceRef.off();
-    };
-  }, [usersOnline]);
 
+      return () => {
+        connectedRef.off();
+        presenceRef.off();
+      };
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   useEffect(() => {
     props.setUsersList(usersOnline);
   }, [usersOnline]);
-
-  const addListeners = (
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  const userConnectedListener = (
     currentUserUid,
     currrentUserName,
     currentUserPhotoURL
@@ -47,14 +57,14 @@ const DirectMessages = props => {
     connectedRef.on("value", snapshot => {
       if (snapshot.val() === true) {
         const userInfoOnline = {
-          uid: currentUserUid,
+          id: currentUserUid,
           name: currrentUserName,
           status: true,
           photoURL: currentUserPhotoURL
         };
 
         const userInfoOffline = {
-          uid: currentUserUid,
+          id: currentUserUid,
           name: currrentUserName,
           status: false,
           photoURL: currentUserPhotoURL
@@ -89,7 +99,8 @@ const DirectMessages = props => {
   };
 
   const changeChannel = user => {
-    const channelId = getChannelId(user.uid);
+    const channelId = getChannelId(user.id);
+
     const channelData = {
       id: channelId,
       name: user.name,
@@ -103,9 +114,10 @@ const DirectMessages = props => {
 
   const getChannelId = userId => {
     const currentUserId = currentUser.uid;
+
     return userId < currentUserId
-      ? `${userId}/${currentUser.uid}`
-      : `${currentUser.uid}/${userId}`;
+      ? `${userId}/${currentUserId}`
+      : `${currentUserId}/${userId}`;
   };
 
   //SEARCH BAR

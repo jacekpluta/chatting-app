@@ -1,8 +1,16 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  Loader,
+  Dimmer
+} from "react";
 import { Image as SemanticImage, Grid, Button } from "semantic-ui-react";
 import { useDropzone } from "react-dropzone";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
+import Resizer from "react-image-file-resizer";
 
 const baseStyle = {
   flex: 1,
@@ -34,15 +42,14 @@ const rejectStyle = {
 
 export default function OnDrop(props) {
   const [files, setFiles] = useState([]);
+  const [blob, setBlob] = useState(null);
+  const [blobResized, setBlobResized] = useState(null);
 
-  const { saveAvatar } = props;
+  const { saveAvatar, setLoading } = props;
   const imageRef = useRef();
 
   const [crop, setCrop] = useState({
-    x: 20,
-    y: 10,
-    width: 30,
-    height: 10
+    aspect: 1 / 1
   });
 
   const {
@@ -54,6 +61,8 @@ export default function OnDrop(props) {
     isDragAccept,
     isDragReject
   } = useDropzone({
+    resizeWidth: "100px",
+    resizeHeight: "100px",
     accept: "image/jpeg, image/png",
     onDrop: acceptedFiles => {
       setFiles(
@@ -65,6 +74,31 @@ export default function OnDrop(props) {
       );
     }
   });
+
+  useEffect(() => {
+    if (files[0]) {
+      fetch(files[0].preview)
+        .then(res => res.blob())
+        .then(res => setBlob(res));
+    }
+  }, [files[0]]);
+
+  useEffect(() => {
+    if (blob) {
+      Resizer.imageFileResizer(
+        blob,
+        300,
+        300,
+        "JPEG",
+        100,
+        0,
+        uri => {
+          setBlobResized(uri);
+        },
+        "blob"
+      );
+    }
+  }, [blob]);
 
   useEffect(
     () => () => {
@@ -118,6 +152,7 @@ export default function OnDrop(props) {
     const fileExtension = extractImageFileExtensionFromBase64(originalImage);
     const imageData64 = imageRef.current.toDataURL("image/" + fileExtension);
     saveAvatar(imageData64);
+    setLoading();
   };
 
   function extractImageFileExtensionFromBase64(base64Data) {
@@ -177,17 +212,26 @@ export default function OnDrop(props) {
               *.jpeg and *.png images will be accepted)
             </p>
           </div>
+          <Button
+            style={
+              files[0]
+                ? { textAlign: "center", display: "block" }
+                : { display: "none" }
+            }
+            onClick={handleAvatarChange}
+          >
+            Change avatar
+          </Button>
           <aside>
-            <p style={{ textAlign: "center" }}>Crop preview</p>
+            <p style={{ textAlign: "center", fontSize: "24px" }}>
+              Crop preview
+            </p>
 
             <SemanticImage>
-              <canvas ref={imageRef}></canvas>
-              <Button
-                style={files[0] ? { display: "block" } : { display: "none" }}
-                onClick={handleAvatarChange}
-              >
-                Change avatar
-              </Button>
+              <canvas
+                style={{ width: "200px", haight: "200px", textAlign: "center" }}
+                ref={imageRef}
+              ></canvas>
             </SemanticImage>
           </aside>
           <aside>

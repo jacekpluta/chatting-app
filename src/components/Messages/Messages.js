@@ -2,6 +2,8 @@ import MessagesForm from "./MessagesForm";
 import MessagesHeader from "./MessagesHeader";
 import TypingLoader from "./TypingLoader";
 
+import { Loader } from "semantic-ui-react";
+
 import { Segment, Comment } from "semantic-ui-react";
 import firebase from "../Firebase";
 import React, { useState, useEffect, useRef } from "react";
@@ -299,12 +301,12 @@ const Messages = props => {
 
   //LISTEN FOR MESSAGES
   const addMessageListeners = () => {
-    let loadedMessages = [];
+    let messages = [];
     const ref = getMessagesRef();
 
     ref.child(currentChannel.id).on("child_added", snapshot => {
-      loadedMessages.push(snapshot.val());
-
+      messages.push(snapshot.val());
+      const loadedMessages = messages.slice(Math.max(messages.length - 40, 1));
       setAllChannelMessages({ loadedMessages });
       setNoMessages(false);
     });
@@ -323,7 +325,7 @@ const Messages = props => {
   const loadData = () => {
     messagesRef
       .child(currentChannel.id)
-      .limitToLast(200)
+      //.limitToLast(5)
       .once("value", snapshot => {})
       .then(snapshot => {
         if (snapshot) {
@@ -370,6 +372,14 @@ const Messages = props => {
   useEffect(() => {
     scrollToBottom();
   }, [userTyping]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      scrollToBottom();
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [messageImageLoading]);
+
   ////////////////////////////////////////////////////////////
 
   return (
@@ -436,6 +446,7 @@ const Messages = props => {
           <div ref={messagesEndRef} />
         </Comment.Group>
       </Segment>
+
       <MessagesForm
         setMessageImageLoadingTrue={setMessageImageLoadingTrue}
         setMessageImageLoadingFalse={setMessageImageLoadingFalse}

@@ -65,7 +65,7 @@ function Channels(props) {
 
     return () => {
       channelsRef.off();
-      clearNotifications();
+
       allChannels.forEach(channel => {
         messagesRef.child(channel.id).off();
       });
