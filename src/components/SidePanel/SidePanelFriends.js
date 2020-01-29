@@ -1,57 +1,60 @@
 import React, { useState } from "react";
-import { Header, Icon, Divider } from "semantic-ui-react";
-import Channels from "./Channels";
-import Starred from "./Starred";
 
-export default function SidePanelChannels(props) {
+import UserPanel from "./UserPanel";
+import DirectMessages from "./DirectMessages";
+import Friends from "./Friends";
+import { Header, Icon } from "semantic-ui-react";
+
+export default function SidePanelFriends(props) {
   const {
     currentUser,
     currentChannel,
     isPrivateChannel,
-    userPosts,
+    usersList,
+
     hideSidbar
   } = props;
 
-  const [favouriteActive, setFavouriteActive] = useState(false);
+  const [friendsMarkActive, setfriendsMarkActive] = useState(false);
 
-  const favouriteActiveChange = () => {
-    setFavouriteActive(true);
+  const friendsMarkActiveChange = () => {
+    setfriendsMarkActive(true);
   };
 
-  const favouriteNotActiveChange = () => {
-    setFavouriteActive(false);
+  const friendsNotMarkActiveChange = () => {
+    setfriendsMarkActive(false);
   };
 
   return (
     <React.Fragment>
-      <Header
-        inverted
-        as="h2"
-        style={{ paddingTop: "1em", paddingLeft: "2em", color: "#FFD700" }}
-      >
-        <Icon name="exchange" />
+      <UserPanel
+        currentChannel={currentChannel}
+        currentUser={currentUser}
+        isPrivateChannel={isPrivateChannel}
+      ></UserPanel>
 
-        <Header.Content>Channels</Header.Content>
+      <Header inverted as="h2" style={{ color: "#39FF14" }}>
+        <Icon name="user" />
+
+        <Header.Content>Friends</Header.Content>
       </Header>
 
-      <Divider />
-      <Channels
-        userPosts={userPosts}
+      <Friends
         currentChannel={currentChannel}
-        isPrivateChannel={isPrivateChannel}
         currentUser={currentUser}
+        usersList={usersList}
+        isPrivateChannel={isPrivateChannel}
         hideSidbar={hideSidbar}
-        favouriteNotActiveChange={favouriteNotActiveChange}
-        favouriteActive={favouriteActive}
-      />
-      <Starred
+        friendsMarkActive={friendsMarkActive}
+        friendsMarkActiveChange={friendsMarkActiveChange}
+      ></Friends>
+
+      <DirectMessages
         hideSidbar={hideSidbar}
         currentUser={currentUser}
-        currentChannel={currentChannel}
-        isPrivateChannel={isPrivateChannel}
-        favouriteActiveChange={favouriteActiveChange}
-        favouriteActive={favouriteActive}
-      />
+        friendsMarkActive={friendsMarkActive}
+        friendsNotMarkActiveChange={friendsNotMarkActiveChange}
+      ></DirectMessages>
     </React.Fragment>
   );
 }

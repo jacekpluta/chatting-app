@@ -322,7 +322,7 @@ function Channels(props) {
     setSearchResult(searchResults);
     setTimeout(() => {
       setSearchLoading(false);
-    }, 1000);
+    }, 300);
   };
 
   return (

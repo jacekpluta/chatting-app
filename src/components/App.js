@@ -10,8 +10,8 @@ import {
   Segment
 } from "semantic-ui-react";
 import Messages from "./Messages/Messages";
-import SidePanel from "./SidePanel/SidePanelChannels";
-import SidePanelChannels from "./SidePanel/SidePanelFriends";
+import SidePanelFriends from "./SidePanel/SidePanelFriends";
+import SidePanelChannels from "./SidePanel/SidePanelChannels";
 import { connect } from "react-redux";
 
 const leftSidebarStyle = {
@@ -55,8 +55,8 @@ const App = props => {
 
   return (
     <div>
-      {/* SCREEN WIDTH UNDER 768 */}
-      <Responsive as={Segment} maxWidth={768}>
+      {/* SCREEN WIDTH UNDER 1000 */}
+      <Responsive as={Segment} maxWidth={1000}>
         <Grid
           columns="2"
           className="app"
@@ -74,7 +74,7 @@ const App = props => {
               <Divider />
               <Button
                 size={"small"}
-                color={"google"}
+                color={"facebook"}
                 icon={"align justify"}
                 onClick={() => setVisible(true)}
               ></Button>
@@ -87,8 +87,7 @@ const App = props => {
               style={leftSidebarStyle}
               onHide={() => setVisible(false)}
             >
-              {" "}
-              <SidePanel
+              <SidePanelFriends
                 currentUser={currentUser}
                 key={currentUser && currentUser.id}
                 currentChannel={currentChannel}
@@ -100,9 +99,17 @@ const App = props => {
                 favouriteNotActiveChange={favouriteNotActiveChange}
                 favouriteActive={favouriteActive}
               />
+              <SidePanelChannels
+                currentUser={currentUser}
+                key={currentUser && currentUser.id}
+                currentChannel={currentChannel}
+                isPrivateChannel={isPrivateChannel}
+                userPosts={userPosts}
+                hideSidbar={hideSidbar}
+              />
             </Sidebar>
           </Grid.Column>
-          <Grid.Column width={15} style={{ marginLeft: "50px" }}>
+          <Grid.Column width={15}>
             <Messages
               currentChannel={currentChannel}
               key={currentChannel && currentChannel.id}
@@ -117,7 +124,7 @@ const App = props => {
       </Responsive>
 
       {/* SCREEN WIDTH OVER 768 */}
-      <Responsive as={"menu"} minWidth={768} maxWidth={1150}>
+      <Responsive as={"menu"} minWidth={1000}>
         <Grid
           columns="3"
           className="app"
@@ -133,7 +140,7 @@ const App = props => {
               visible={allwaysVisible}
               style={leftSidebarStyle}
             >
-              <SidePanel
+              <SidePanelFriends
                 currentUser={currentUser}
                 key={currentUser && currentUser.id}
                 currentChannel={currentChannel}
@@ -141,18 +148,13 @@ const App = props => {
                 usersList={usersList}
                 userPosts={userPosts}
                 hideSidbar={hideSidbar}
-              />
-              <SidePanelChannels
-                currentUser={currentUser}
-                key={currentUser && currentUser.id}
-                currentChannel={currentChannel}
-                isPrivateChannel={isPrivateChannel}
-                userPosts={userPosts}
-                hideSidbar={hideSidbar}
+                favouriteActiveChange={favouriteActiveChange}
+                favouriteNotActiveChange={favouriteNotActiveChange}
+                favouriteActive={favouriteActive}
               />
             </Sidebar>
           </Grid.Column>
-          <Grid.Column width={8} style={{ marginLeft: "50px" }}>
+          <Grid.Column width={8} style={{ marginLeft: "-20px" }}>
             <Messages
               currentChannel={currentChannel}
               key={currentChannel && currentChannel.id}
@@ -170,63 +172,10 @@ const App = props => {
               direction={"right"}
               inverted
               vertical
-              width={"thin"}
               visible={allwaysVisible}
               style={rightSidebarStyle}
-            ></Sidebar>
-          </Grid.Column>
-        </Grid>
-      </Responsive>
-
-      {/* SCREEN WIDTH OVER 1150 */}
-      <Responsive as={"menu"} minWidth={1150}>
-        <Grid
-          columns="3"
-          className="app"
-          style={{ background: "white" }} //background: "#F0F7F4" }}
-        >
-          <Grid.Column width={4}>
-            <Sidebar
-              as={Menu}
-              animation={"push"}
-              direction={"left"}
-              inverted
-              vertical
-              visible={allwaysVisible}
-              style={leftSidebarStyle}
             >
-              <SidePanel
-                currentUser={currentUser}
-                key={currentUser && currentUser.id}
-                currentChannel={currentChannel}
-                isPrivateChannel={isPrivateChannel}
-                usersList={usersList}
-                userPosts={userPosts}
-                hideSidbar={hideSidbar}
-              />
-            </Sidebar>
-          </Grid.Column>
-          <Grid.Column width={8}>
-            <Messages
-              currentChannel={currentChannel}
-              key={currentChannel && currentChannel.id}
-              currentUser={currentUser}
-              isPrivateChannel={isPrivateChannel}
-              userTyping={userTyping}
-              usersList={usersList}
-              userPosts={userPosts}
-            />
-          </Grid.Column>
-          <Grid.Column width={4}>
-            <Sidebar
-              as={Menu}
-              animation={"push"}
-              direction={"right"}
-              inverted
-              vertical
-              visible={allwaysVisible}
-              style={leftSidebarStyle}
-            >
+              {" "}
               <SidePanelChannels
                 currentUser={currentUser}
                 key={currentUser && currentUser.id}

@@ -280,7 +280,7 @@ const Messages = props => {
     setSearchResult(searchResults);
     setTimeout(() => {
       setSearchLoading(false);
-    }, 1000);
+    }, 300);
   };
 
   //GET CURRENT MESSAGE REF
@@ -378,7 +378,7 @@ const Messages = props => {
   useEffect(() => {
     const timer = setTimeout(() => {
       scrollToBottom();
-    }, 1000);
+    }, 500);
     return () => clearTimeout(timer);
   }, [messageImageLoading]);
 
