@@ -1,23 +1,14 @@
 html,
 body,
 .app {
-  height: 100vh;
-  padding: 1em;
+  height: 80vh;
+  padding-top: 1em;
 }
 
 .messages {
   height: 60vh;
   overflow-y: scroll;
 }
-
-/* .messageForm {
-  position: fixed !important;
-  bottom: 1em;
-  margin-left: 300px !important;
-  left: 0;
-  right: 1em;
-  z-index: 100; 
-} */
 
 .myMessage {
   border-left: 2px solid red;
@@ -34,8 +25,4 @@ body,
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.sidePanel {
-  overflow-y: scroll;
 }

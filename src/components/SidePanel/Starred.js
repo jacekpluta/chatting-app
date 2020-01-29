@@ -5,10 +5,18 @@ import { setCurrentChannel, setPrivateChannel } from "../../actions";
 import firebase from "../Firebase";
 
 const Starred = props => {
+  const [activeChannelId, setActiveChannelId] = useState(null);
   const [starredChannels, setStarredChannels] = useState([]);
   const [channelToRemove, setChannelToRemove] = useState(null);
   const [usersRef] = useState(firebase.database().ref("users"));
-  const { currentUser, currentChannel } = props;
+  const {
+    currentUser,
+    currentChannel,
+    hideSidbar,
+    isPrivateChannel,
+    favouriteActiveChange,
+    favouriteActive
+  } = props;
 
   useEffect(() => {
     if (currentUser) {
@@ -61,14 +69,24 @@ const Starred = props => {
   const changeChannel = channel => {
     props.setCurrentChannel(channel);
     props.setPrivateChannel(false);
+    setActiveChannelId(channel.id);
+    hideSidbar();
+    favouriteActiveChange();
   };
 
+  useEffect(() => {
+    if (isPrivateChannel) {
+      setActiveChannelId(null);
+    }
+  }, [isPrivateChannel]);
+  console.log(favouriteActive);
   const displayChannels = starredChannels => {
     return starredChannels.map(channel => (
       <Menu.Item
         key={channel.id}
         onClick={() => changeChannel(channel)}
         name={channel.name}
+        active={favouriteActive && activeChannelId === channel.id}
       >
         <span style={{ color: "	#FFD700" }}>
           <Icon name="stack exchange"></Icon> {channel.name}

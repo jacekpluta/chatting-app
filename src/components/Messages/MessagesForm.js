@@ -176,6 +176,7 @@ const MessagesForm = props => {
           setInput("");
           setError("");
           setIsTyping(false);
+          setInputFocus();
         })
         .catch(error => {
           console.log(error);
@@ -336,7 +337,7 @@ const MessagesForm = props => {
           <Button
             disabled={props.messageImageLoading}
             onClick={openModal}
-            color="teal"
+            color="green"
             content="Upload Media"
             labelPosition="right"
             icon="upload"

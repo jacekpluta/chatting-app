@@ -11,6 +11,7 @@ import { setUserPosts, setCurrentChannel } from "../../actions";
 import SkeletonMessages from "./SkeletonMessages";
 
 import Message from "./Message";
+
 const Messages = props => {
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [privateMessagesRef] = useState(

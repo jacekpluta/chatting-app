@@ -52,14 +52,14 @@ export default function MessagesHeader(props) {
           )}
           {isPrivateChannel && friendAdded && (
             <Icon
-              name={"address card"}
+              name={"user times"}
               onClick={unfriendPerson}
-              color="green"
+              color="red"
             ></Icon>
           )}
           {isPrivateChannel && !friendAdded && (
             <Icon
-              name={"address card outline"}
+              name={"user plus"}
               onClick={handleAddFriend}
               color="green"
             ></Icon>

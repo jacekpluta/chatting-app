@@ -32,7 +32,13 @@ function Channels(props) {
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [messagesRef] = useState(firebase.database().ref("messages"));
 
-  const { currentUser, isPrivateChannel, userPosts } = props;
+  const {
+    currentUser,
+    isPrivateChannel,
+    hideSidbar,
+    favouriteNotActiveChange,
+    favouriteActive
+  } = props;
 
   const handleCloseModal = () => {
     setModal(false);
@@ -223,11 +229,13 @@ function Channels(props) {
   };
 
   const changeChannel = channel => {
+    hideSidbar();
     setActiveChannelId(channel.id);
     props.setCurrentChannel(channel);
     props.setPrivateChannel(false);
     setChannelChanged(channel);
     clearNotifications();
+    favouriteNotActiveChange();
   };
 
   const clearNotifications = () => {
@@ -258,13 +266,13 @@ function Channels(props) {
             key={channel.id}
             onClick={() => changeChannel(channel)}
             name={channel.name}
-            active={activeChannelId === channel.id}
+            active={!favouriteActive && activeChannelId === channel.id}
           >
             {channel.id !== activeChannelId &&
               getNotificationCount(channel) && (
                 <Label color="red">{getNotificationCount(channel)}</Label>
               )}
-            <span style={{ color: "white" }}> # {channel.name}</span>
+            <span style={{ color: "#FFD700" }}> # {channel.name}</span>
           </Menu.Item>
         ));
     }
@@ -277,7 +285,7 @@ function Channels(props) {
           key={channel.id}
           onClick={() => changeChannel(channel)}
           name={channel.name}
-          active={activeChannelId === channel.id}
+          active={!favouriteActive && activeChannelId === channel.id}
         >
           <span style={{ color: "	#FFD700" }}># {channel.name}</span>
         </Menu.Item>
@@ -339,16 +347,16 @@ function Channels(props) {
       </Menu.Item>
 
       {displaySearchedChannels()}
-
+      <Divider clearing />
       <Menu.Item>
-        <span style={{ color: "white" }}>
+        <span style={{ color: "#FFD700" }}>
           <Icon name="exchange"></Icon> CHANNELS {"  "}(
           {allChannels !== undefined && allChannels.length})
         </span>
 
         <Icon
           onClick={handleOpenModal}
-          style={{ color: "white" }}
+          style={{ color: "#FFD700" }}
           name="add"
         ></Icon>
       </Menu.Item>

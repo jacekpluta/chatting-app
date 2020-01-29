@@ -9,7 +9,14 @@ const Friends = props => {
   const [friendToRemove, setFriendToRemove] = useState(null);
   const [activeChannelId, setActiveChannelId] = useState(null);
   const [usersRef] = useState(firebase.database().ref("users"));
-  const { currentUser, isPrivateChannel, usersList } = props;
+  const {
+    currentUser,
+    isPrivateChannel,
+    usersList,
+    hideSidbar,
+    friendsMarkActive,
+    friendsMarkActiveChange
+  } = props;
 
   useEffect(() => {
     if (!isPrivateChannel) {
@@ -70,7 +77,7 @@ const Friends = props => {
       : `${currentUser.uid}/${userId}`;
   };
 
-  const changePrivateChannel = friendChannel => {
+  const changeChannel = friendChannel => {
     const channelId = getChannelId(friendChannel.id);
 
     const privateChannelData = {
@@ -83,6 +90,8 @@ const Friends = props => {
     setActiveChannelId(friendChannel.id);
     props.setCurrentChannel(privateChannelData);
     props.setPrivateChannel(true);
+    hideSidbar();
+    friendsMarkActiveChange();
   };
 
   const displayFriendChannels = () => {
@@ -96,9 +105,9 @@ const Friends = props => {
         .map(friendChannel => (
           <Menu.Item
             key={friendChannel.id}
-            onClick={() => changePrivateChannel(friendChannel)}
+            onClick={() => changeChannel(friendChannel)}
             name={friendChannel.name}
-            active={activeChannelId === friendChannel.id}
+            active={friendsMarkActive && activeChannelId === friendChannel.id}
           >
             <Icon
               name="circle"

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import firebase from "./../Firebase";
-import { Menu, Icon, Image, Input, Header, Divider } from "semantic-ui-react";
+import { Menu, Icon, Image, Input, Divider } from "semantic-ui-react";
 import { connect } from "react-redux";
 import {
   setCurrentChannel,
@@ -9,12 +9,18 @@ import {
 } from "../../actions";
 
 const DirectMessages = props => {
-  const { currentUser } = props;
+  const {
+    currentUser,
+    hideSidbar,
+    friendsMarkActive,
+    friendsNotMarkActiveChange
+  } = props;
 
   const [usersOnline, setUsersOnline] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
+  const [activeChannelId, setActiveChannelId] = useState(false);
 
   const [connectedRef] = useState(firebase.database().ref(".info/connected"));
   const [presenceRef] = useState(firebase.database().ref("presence"));
@@ -107,9 +113,11 @@ const DirectMessages = props => {
       status: user.status,
       photoURL: user.photoURL
     };
-
+    setActiveChannelId(channelId);
     props.setCurrentChannel(channelData);
     props.setPrivateChannel(true);
+    hideSidbar();
+    friendsNotMarkActiveChange();
   };
 
   const getChannelId = userId => {
@@ -155,13 +163,13 @@ const DirectMessages = props => {
   return (
     <div>
       <React.Fragment>
-        <Divider clearing />
         <Menu.Item>
           <span style={{ color: "#39FF14" }}>
             SEARCH USERS ({searchResult !== undefined && searchResult.length}){" "}
             <Icon name="mail"></Icon>
           </span>
-
+        </Menu.Item>
+        <Menu.Item>
           <Input
             onChange={handleSearchChange}
             size="mini"
@@ -174,10 +182,12 @@ const DirectMessages = props => {
         {searchResult
           ? searchResult.map(user => (
               <Menu.Item
-                key={user.uid}
+                key={user.id}
                 style={{ opacity: 0.7 }}
                 onClick={() => changeChannel(user)}
+                active={activeChannelId === user.id}
               >
+                {console.log(user.id)}
                 <Icon
                   name="circle"
                   color={user && user.status ? "green" : "red"}
@@ -196,6 +206,7 @@ const DirectMessages = props => {
               </Menu.Item>
             ))
           : ""}
+        <Divider clearing />
       </React.Fragment>
     </div>
   );

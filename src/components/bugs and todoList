@@ -23,6 +23,10 @@ BUGS:
 
 4. zrobic blokade jesli ktos chce utworzyc kanal o takiej samej nazwie
 
+5. add to friend w innym miejscu
+
+6. powinien wyskakiwac error jest ilosc znakow zbyt mala rejestracja
+
 
 MINOR BUGS: 
 1. change updateFriendsStatusListeners (slaba petla)

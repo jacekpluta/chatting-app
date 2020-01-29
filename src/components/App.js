@@ -10,12 +10,20 @@ import {
   Segment
 } from "semantic-ui-react";
 import Messages from "./Messages/Messages";
-import SidePanel from "./SidePanel/SidePanel";
+import SidePanel from "./SidePanel/SidePanelChannels";
+import SidePanelChannels from "./SidePanel/SidePanelFriends";
 import { connect } from "react-redux";
 
-const menuStyle = {
-  background: "#0080FF",
-  fontSize: "1.2 rem"
+const leftSidebarStyle = {
+  background: "#0080FF"
+};
+
+const smallSidebarStyle = {
+  background: "#0080FF"
+};
+
+const rightSidebarStyle = {
+  background: "#0080FF"
 };
 
 const App = props => {
@@ -30,29 +38,44 @@ const App = props => {
 
   const [visible, setVisible] = useState(false);
 
+  const [allwaysVisible] = useState(true);
+  const [favouriteActive, setFavouriteActive] = useState(false);
+
+  const favouriteActiveChange = () => {
+    setFavouriteActive(true);
+  };
+
+  const favouriteNotActiveChange = () => {
+    setFavouriteActive(false);
+  };
+
+  const hideSidbar = () => {
+    setVisible(false);
+  };
+
   return (
     <div>
-      <Grid
-        columns="2"
-        className="app"
-        style={{ background: "white" }} //background: "#F0F7F4" }}
-      >
-        <Responsive as={Segment} maxWidth={768}>
-          <Grid.Column width={7}>
+      {/* SCREEN WIDTH UNDER 768 */}
+      <Responsive as={Segment} maxWidth={768}>
+        <Grid
+          columns="2"
+          className="app"
+          style={{ background: "white" }} //background: "#F0F7F4" }}
+        >
+          <Grid.Column width={1}>
             <Sidebar
               as={Menu}
               icon="labeled"
               vertical
               visible={!visible}
               width="very thin"
-              className="sidePanel"
+              style={smallSidebarStyle}
             >
               <Divider />
               <Button
                 size={"small"}
-                color={"blue"}
+                color={"google"}
                 icon={"align justify"}
-                floated={"left"}
                 onClick={() => setVisible(true)}
               ></Button>
             </Sidebar>
@@ -61,8 +84,7 @@ const App = props => {
               vertical
               visible={visible}
               width="wide"
-              style={menuStyle}
-              className="sidePanel"
+              style={leftSidebarStyle}
               onHide={() => setVisible(false)}
             >
               {" "}
@@ -73,10 +95,14 @@ const App = props => {
                 isPrivateChannel={isPrivateChannel}
                 usersList={usersList}
                 userPosts={userPosts}
+                hideSidbar={hideSidbar}
+                favouriteActiveChange={favouriteActiveChange}
+                favouriteNotActiveChange={favouriteNotActiveChange}
+                favouriteActive={favouriteActive}
               />
             </Sidebar>
           </Grid.Column>
-          <Grid.Column width={9} style={{ marginLeft: "50px" }}>
+          <Grid.Column width={15} style={{ marginLeft: "50px" }}>
             <Messages
               currentChannel={currentChannel}
               key={currentChannel && currentChannel.id}
@@ -85,23 +111,27 @@ const App = props => {
               userTyping={userTyping}
               usersList={usersList}
               userPosts={userPosts}
-              currentUser={currentUser}
             />
           </Grid.Column>
-        </Responsive>
+        </Grid>
+      </Responsive>
 
-        <Responsive as={"menu"} minWidth={768}>
-          <Grid.Column width={3}>
+      {/* SCREEN WIDTH OVER 768 */}
+      <Responsive as={"menu"} minWidth={768} maxWidth={1150}>
+        <Grid
+          columns="3"
+          className="app"
+          style={{ background: "white" }} //background: "#F0F7F4" }}
+        >
+          <Grid.Column width={4}>
             <Sidebar
               as={Menu}
               animation={"push"}
               direction={"left"}
               inverted
               vertical
-              visible={true}
-              width="wide"
-              style={menuStyle}
-              className="sidePanel"
+              visible={allwaysVisible}
+              style={leftSidebarStyle}
             >
               <SidePanel
                 currentUser={currentUser}
@@ -110,10 +140,19 @@ const App = props => {
                 isPrivateChannel={isPrivateChannel}
                 usersList={usersList}
                 userPosts={userPosts}
+                hideSidbar={hideSidbar}
+              />
+              <SidePanelChannels
+                currentUser={currentUser}
+                key={currentUser && currentUser.id}
+                currentChannel={currentChannel}
+                isPrivateChannel={isPrivateChannel}
+                userPosts={userPosts}
+                hideSidbar={hideSidbar}
               />
             </Sidebar>
           </Grid.Column>
-          <Grid.Column width={13} style={{ marginLeft: "350px" }}>
+          <Grid.Column width={8} style={{ marginLeft: "50px" }}>
             <Messages
               currentChannel={currentChannel}
               key={currentChannel && currentChannel.id}
@@ -122,11 +161,84 @@ const App = props => {
               userTyping={userTyping}
               usersList={usersList}
               userPosts={userPosts}
-              currentUser={currentUser}
             />
           </Grid.Column>
-        </Responsive>
-      </Grid>
+          <Grid.Column width={4}>
+            <Sidebar
+              as={Menu}
+              animation={"push"}
+              direction={"right"}
+              inverted
+              vertical
+              width={"thin"}
+              visible={allwaysVisible}
+              style={rightSidebarStyle}
+            ></Sidebar>
+          </Grid.Column>
+        </Grid>
+      </Responsive>
+
+      {/* SCREEN WIDTH OVER 1150 */}
+      <Responsive as={"menu"} minWidth={1150}>
+        <Grid
+          columns="3"
+          className="app"
+          style={{ background: "white" }} //background: "#F0F7F4" }}
+        >
+          <Grid.Column width={4}>
+            <Sidebar
+              as={Menu}
+              animation={"push"}
+              direction={"left"}
+              inverted
+              vertical
+              visible={allwaysVisible}
+              style={leftSidebarStyle}
+            >
+              <SidePanel
+                currentUser={currentUser}
+                key={currentUser && currentUser.id}
+                currentChannel={currentChannel}
+                isPrivateChannel={isPrivateChannel}
+                usersList={usersList}
+                userPosts={userPosts}
+                hideSidbar={hideSidbar}
+              />
+            </Sidebar>
+          </Grid.Column>
+          <Grid.Column width={8}>
+            <Messages
+              currentChannel={currentChannel}
+              key={currentChannel && currentChannel.id}
+              currentUser={currentUser}
+              isPrivateChannel={isPrivateChannel}
+              userTyping={userTyping}
+              usersList={usersList}
+              userPosts={userPosts}
+            />
+          </Grid.Column>
+          <Grid.Column width={4}>
+            <Sidebar
+              as={Menu}
+              animation={"push"}
+              direction={"right"}
+              inverted
+              vertical
+              visible={allwaysVisible}
+              style={leftSidebarStyle}
+            >
+              <SidePanelChannels
+                currentUser={currentUser}
+                key={currentUser && currentUser.id}
+                currentChannel={currentChannel}
+                isPrivateChannel={isPrivateChannel}
+                userPosts={userPosts}
+                hideSidbar={hideSidbar}
+              />
+            </Sidebar>
+          </Grid.Column>
+        </Grid>
+      </Responsive>
     </div>
   );
 };
