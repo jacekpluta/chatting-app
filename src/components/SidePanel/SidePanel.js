@@ -1,5 +1,5 @@
 import React from "react";
-import { Menu } from "semantic-ui-react";
+
 import UserPanel from "./UserPanel";
 import Channels from "./Channels";
 import DirectMessages from "./DirectMessages";
@@ -7,7 +7,7 @@ import Starred from "./Starred";
 import Friends from "./Friends";
 
 const menuStyle = {
-  background: "#636D21",
+  background: "#0080FF",
   fontSize: "1.2 rem"
 };
 
@@ -19,41 +19,54 @@ export default function SidePanel(props) {
     usersList,
     userPosts
   } = props;
+
   return (
     <React.Fragment>
-      <Menu
+      {/* <Menu
         size="large"
         inverted
         fixed="left"
         vertical
         style={menuStyle}
         className="sidePanel"
-      >
-        <UserPanel
-          currentChannel={currentChannel}
-          currentUser={currentUser}
-          isPrivateChannel={isPrivateChannel}
-        ></UserPanel>
+      > */}
+      {/* <Button floated={"right"} onClick={() => setVisible(true)}></Button> */}
+      {/* <Sidebar
+        as={Menu}
+        animation={"push"}
+        direction={"left"}
+        inverted
+        vertical
+        visible={visible}
+        width="wide"
+        style={menuStyle}
+        className="sidePanel"
+        onHide={() => setVisible(false)}
+      > */}
+      <UserPanel
+        currentChannel={currentChannel}
+        currentUser={currentUser}
+        isPrivateChannel={isPrivateChannel}
+      ></UserPanel>
 
-        <Friends
-          currentChannel={currentChannel}
-          currentUser={currentUser}
-          usersList={usersList}
-          isPrivateChannel={isPrivateChannel}
-        ></Friends>
+      <Friends
+        currentChannel={currentChannel}
+        currentUser={currentUser}
+        usersList={usersList}
+        isPrivateChannel={isPrivateChannel}
+      ></Friends>
+      <Starred currentUser={currentUser} currentChannel={currentChannel} />
+      <DirectMessages
+        currentUser={currentUser}
+        usersList={usersList}
+      ></DirectMessages>
 
-        <DirectMessages
-          currentUser={currentUser}
-          usersList={usersList}
-        ></DirectMessages>
-        <Starred currentUser={currentUser} currentChannel={currentChannel} />
-        <Channels
-          userPosts={userPosts}
-          currentChannel={currentChannel}
-          isPrivateChannel={isPrivateChannel}
-          currentUser={currentUser}
-        />
-      </Menu>
+      <Channels
+        userPosts={userPosts}
+        currentChannel={currentChannel}
+        isPrivateChannel={isPrivateChannel}
+        currentUser={currentUser}
+      />
     </React.Fragment>
   );
 }

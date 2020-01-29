@@ -1,4 +1,4 @@
-import { Segment, Input, Button } from "semantic-ui-react";
+import { Segment, Input, Button, Loader } from "semantic-ui-react";
 import React, { useState, useEffect, useRef } from "react";
 import firebase from "../Firebase";
 import mime from "mime-types";
@@ -39,7 +39,12 @@ const MessagesForm = props => {
 
   const [inputRef, setInputFocus] = useFocus();
 
-  const { currentChannel, currentUser, getMessagesRef } = props;
+  const {
+    currentChannel,
+    currentUser,
+    getMessagesRef,
+    messageImageLoading
+  } = props;
 
   const handleChange = event => {
     if (event.target.value) {
@@ -293,6 +298,7 @@ const MessagesForm = props => {
             title="Pick your emoji"
             emoji={"point_up"}
             onSelect={handleAddEmoji}
+            style={{ position: "absolute", bottom: "20px" }}
           ></Picker>
         ) : (
           ""
@@ -304,19 +310,25 @@ const MessagesForm = props => {
           fluid
           name="message"
           style={{ marginBottom: "0.7 em" }}
-          label={<Button icon={"add"} onClick={handleEmojiPicker}></Button>}
+          label={
+            <Button
+              size={"big"}
+              icon={"smile outline"}
+              onClick={handleEmojiPicker}
+            ></Button>
+          }
           placeholder="Write your message"
           onChange={handleChange}
           className={error.includes("message") ? "error" : ""}
           ref={inputRef}
           onKeyDown={handlePressEnterToSend}
         />
-
+        {messageImageLoading ? <Loader active></Loader> : ""}
         <Button.Group icon widths="2">
           <Button
-            disabled={loading}
+            disabled={loading || messageImageLoading}
             onClick={sendMessage}
-            color="orange"
+            color="blue"
             content="Add Reply"
             labelPosition="left"
             icon="edit"

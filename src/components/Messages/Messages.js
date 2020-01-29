@@ -2,8 +2,6 @@ import MessagesForm from "./MessagesForm";
 import MessagesHeader from "./MessagesHeader";
 import TypingLoader from "./TypingLoader";
 
-import { Loader } from "semantic-ui-react";
-
 import { Segment, Comment } from "semantic-ui-react";
 import firebase from "../Firebase";
 import React, { useState, useEffect, useRef } from "react";
@@ -39,7 +37,8 @@ const Messages = props => {
     currentUser,
     isPrivateChannel,
     userTyping,
-    usersList
+    usersList,
+    userPosts
   } = props;
 
   const setMessageImageLoadingTrue = () => {
@@ -96,7 +95,7 @@ const Messages = props => {
   //LISTENERS
   const addListeners = () => {
     addMessageListeners();
-    loadData();
+    loadAllChannelMessages();
     addUserStarsListeners(currentChannel.id, currentUser.uid);
     addUserFriendsListeners(currentChannel.id, currentUser.uid);
   };
@@ -301,12 +300,14 @@ const Messages = props => {
 
   //LISTEN FOR MESSAGES
   const addMessageListeners = () => {
-    let messages = [];
+    let loadedMessages = [];
     const ref = getMessagesRef();
 
     ref.child(currentChannel.id).on("child_added", snapshot => {
-      messages.push(snapshot.val());
-      const loadedMessages = messages.slice(Math.max(messages.length - 40, 1));
+      loadedMessages.push(snapshot.val());
+      loadedMessages = loadedMessages.slice(
+        Math.max(loadedMessages.length - 40, 0)
+      );
       setAllChannelMessages({ loadedMessages });
       setNoMessages(false);
     });
@@ -322,7 +323,7 @@ const Messages = props => {
   };
 
   //LOADS MESSAGES ONCE ON CHANNEL START
-  const loadData = () => {
+  const loadAllChannelMessages = () => {
     messagesRef
       .child(currentChannel.id)
       //.limitToLast(5)
@@ -376,7 +377,7 @@ const Messages = props => {
   useEffect(() => {
     const timer = setTimeout(() => {
       scrollToBottom();
-    }, 1500);
+    }, 1000);
     return () => clearTimeout(timer);
   }, [messageImageLoading]);
 
@@ -395,6 +396,9 @@ const Messages = props => {
         friendAdded={friendAdded}
         handleAddFriend={handleAddFriend}
         unfriendPerson={unfriendPerson}
+        userPosts={userPosts}
+        currentUser={currentUser}
+        currentChannel={currentChannel}
       ></MessagesHeader>
 
       <Segment>

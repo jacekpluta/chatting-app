@@ -15,7 +15,7 @@ import firebase from "../Firebase";
 import OnDrop from "./OnDrop";
 
 const userStyle = {
-  background: "#636D21"
+  background: "#0080FF"
 };
 
 const gridRowStyle = {
@@ -256,8 +256,9 @@ const UserPanel = props => {
         <Grid.Row style={gridRowStyle}>
           {/* App Header */}
           <Header inverted floated="left" as="h2">
-            <Icon name="code" />
-            <Header.Content>DevChat</Header.Content>
+            <Icon name="male" />
+            <Icon name="female" />
+            <Header.Content>MyChat</Header.Content>
           </Header>
           {/* User Dropdown  */}
 

@@ -1,8 +1,7 @@
 TO DO:
-
 1. dzwiek przy powiadomieniach
 
-2. count all current online users in channel
+2. Lista userow w obecnym kanale
 
 4. blokowanie i ignorowanie uzytkownikow
 
@@ -12,27 +11,27 @@ TO DO:
 
 7. Wyswietlanie wiadomosci ze zostales dodany do znajomych
 
+8. zmienic setinterwal na normalny useeffect podczas odswiezania userow
+
+
 BUGS:
 1. notifications nie pokazuja sie, dopiero po zmienia kanalu zaczynaja sei pokazac
 
 2. jak kto wchodzi na kanal, lub jak ktos zaczyna pisac, lub wysyla wiadomosc, ISTYPING znika
 
-3. responsywnosc na mobilkach
+3. avatar cropping nie dziala przy niestandardowej wielkosci np 500 x 2000
 
-4. nieintuicyjne UI, poprawic UI
-
-5. avatar cropping nie dziala przy niestandardowej wielkosci np 500 x 2000
+4. zrobic blokade jesli ktos chce utworzyc kanal o takiej samej nazwie
 
 
-minor bugs: 
-
+MINOR BUGS: 
 1. change updateFriendsStatusListeners (slaba petla)
 
 2. lagi przy useeffect, duza ilosc odswiezania komponentow
 
 3. odswiazanie dopiero po zmianie kanalu po upload avatar
 
+4. wpisywanie do szukania niektórych znaków wywala bład "= \"
 
+5. oagarnac notifications
 
-
-oagarnac notifications

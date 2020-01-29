@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Comment, Image } from "semantic-ui-react";
 import moment from "moment";
-import { Loader } from "semantic-ui-react";
 
 export default function Message(props) {
-  const { message, currentUser, messageImageLoading } = props;
+  const { message, currentUser } = props;
   const [isMyMessage, setIsMyMessage] = useState(false);
 
   useEffect(() => {
@@ -26,28 +25,18 @@ export default function Message(props) {
 
   const timeFromNow = timeStamp => moment(timeStamp).fromNow();
 
-  if (messageImageLoading) {
-    return (
-      <Loader
-        size="medium"
-        active={messageImageLoading}
-        content="Loading"
-      ></Loader>
-    );
-  } else {
-    return (
-      <Comment className="message">
-        <Comment.Avatar src={message.currentUser.avatar} />
-        <Comment.Content className={isMyMessage ? "myMessage" : ""}>
-          <Comment.Author as="a">{message.currentUser.name}</Comment.Author>
-          <Comment.Metadata>{timeFromNow(message.timeStamp)}</Comment.Metadata>:
-          {isImage() ? (
-            <Image src={message.image} className="messageImage"></Image>
-          ) : (
-            <Comment.Text>{message.content}</Comment.Text>
-          )}
-        </Comment.Content>
-      </Comment>
-    );
-  }
+  return (
+    <Comment className="message">
+      <Comment.Avatar src={message.currentUser.avatar} />
+      <Comment.Content className={isMyMessage ? "myMessage" : ""}>
+        <Comment.Author as="a">{message.currentUser.name}</Comment.Author>
+        <Comment.Metadata>{timeFromNow(message.timeStamp)}</Comment.Metadata>:
+        {isImage() ? (
+          <Image src={message.image} className="messageImage"></Image>
+        ) : (
+          <Comment.Text>{message.content}</Comment.Text>
+        )}
+      </Comment.Content>
+    </Comment>
+  );
 }

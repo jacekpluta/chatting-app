@@ -36,7 +36,7 @@ const MetaPanel = props => {
   if (isPrivateChannel) return null;
 
   return (
-    <Segment loading={!currentChannel}>
+    <Segment loading={!currentChannel} style={{ width: "300px" }}>
       <Header as="h3" attached="top">
         {"About #"} {currentChannel && currentChannel.name}
       </Header>

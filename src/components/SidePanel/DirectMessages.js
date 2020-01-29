@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import firebase from "./../Firebase";
-import { Menu, Icon, Image, Input } from "semantic-ui-react";
+import { Menu, Icon, Image, Input, Header, Divider } from "semantic-ui-react";
 import { connect } from "react-redux";
 import {
   setCurrentChannel,
@@ -154,19 +154,21 @@ const DirectMessages = props => {
 
   return (
     <div>
-      <Menu.Menu className="menu">
+      <React.Fragment>
+        <Divider clearing />
         <Menu.Item>
-          <span>
+          <span style={{ color: "#39FF14" }}>
+            SEARCH USERS ({searchResult !== undefined && searchResult.length}){" "}
             <Icon name="mail"></Icon>
           </span>
-          SEARCH USERS ({searchResult !== undefined && searchResult.length})
+
           <Input
             onChange={handleSearchChange}
             size="mini"
             icon="search"
             name="searchTerm"
             loading={searchLoading}
-            placeholder="Search users"
+            placeholder="SEARCH USERS"
           ></Input>
         </Menu.Item>
         {searchResult
@@ -190,11 +192,11 @@ const DirectMessages = props => {
                 ) : (
                   ""
                 )}
-                <span>{user.name}</span>
+                <span style={{ color: "#39FF14" }}>{user.name}</span>
               </Menu.Item>
             ))
           : ""}
-      </Menu.Menu>
+      </React.Fragment>
     </div>
   );
 };

@@ -70,22 +70,24 @@ const Starred = props => {
         onClick={() => changeChannel(channel)}
         name={channel.name}
       >
-        # {channel.name}
+        <span style={{ color: "	#FFD700" }}>
+          <Icon name="stack exchange"></Icon> {channel.name}
+        </span>
       </Menu.Item>
     ));
   };
 
   return (
-    <Menu.Menu className="menu">
+    <React.Fragment>
       <Menu.Item>
-        <span>
+        <span style={{ color: "	#FFD700" }}>
           <Icon name="star"></Icon> FAV CHANNELS ({starredChannels.length})
         </span>
         {starredChannels.lenght}
       </Menu.Item>
 
       {displayChannels(starredChannels)}
-    </Menu.Menu>
+    </React.Fragment>
   );
 };
 

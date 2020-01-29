@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Menu, Icon, Image } from "semantic-ui-react";
+import { Menu, Icon, Image, Divider } from "semantic-ui-react";
 import { connect } from "react-redux";
 import { setCurrentChannel, setPrivateChannel } from "../../actions";
 import firebase from "../Firebase";
@@ -114,24 +114,24 @@ const Friends = props => {
             ) : (
               ""
             )}
-
-            {friendChannel.name}
+            <span style={{ color: "#39FF14" }}> {friendChannel.name}</span>
           </Menu.Item>
         ));
     }
   };
 
   return (
-    <Menu.Menu className="menu">
+    <React.Fragment>
       <Menu.Item>
-        <span>
+        <span style={{ color: "#39FF14" }}>
           <Icon name="star"></Icon> FRIENDS ({friendsChannels.length})
         </span>
         {friendsChannels.lenght}
       </Menu.Item>
 
       {displayFriendChannels()}
-    </Menu.Menu>
+      <Divider clearing />
+    </React.Fragment>
   );
 };
 

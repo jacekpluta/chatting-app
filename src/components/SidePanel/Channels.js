@@ -7,7 +7,8 @@ import {
   Form,
   Input,
   Message,
-  Label
+  Label,
+  Divider
 } from "semantic-ui-react";
 import firebase from "../Firebase";
 import { connect } from "react-redux";
@@ -263,7 +264,7 @@ function Channels(props) {
               getNotificationCount(channel) && (
                 <Label color="red">{getNotificationCount(channel)}</Label>
               )}
-            # {channel.name}
+            <span style={{ color: "white" }}> # {channel.name}</span>
           </Menu.Item>
         ));
     }
@@ -278,7 +279,7 @@ function Channels(props) {
           name={channel.name}
           active={activeChannelId === channel.id}
         >
-          # {channel.name}
+          <span style={{ color: "	#FFD700" }}># {channel.name}</span>
         </Menu.Item>
       ));
     }
@@ -318,34 +319,40 @@ function Channels(props) {
 
   return (
     <React.Fragment>
-      <Menu.Menu className="menu">
-        <Menu.Item>
-          <span>
-            <Icon name="exchange"></Icon> CHANNELS
-          </span>
-          {"  "}({allChannels !== undefined && allChannels.length})
-          <Icon onClick={handleOpenModal} name="add"></Icon>
-        </Menu.Item>
-        {displayChannels()}
-        <Menu.Item>
-          <span>
-            <Icon name="search"></Icon> SEARCH CHANNELS
-          </span>
-        </Menu.Item>
+      <Divider clearing />
 
-        <Menu.Item>
-          <Input
-            onChange={handleSearchChange}
-            size="mini"
-            icon="search"
-            name="searchTerm"
-            loading={searchLoading}
-            placeholder="Search channels"
-          ></Input>
-        </Menu.Item>
+      <Menu.Item>
+        <span style={{ color: "	#FFD700" }}>
+          <Icon name="search"></Icon> SEARCH CHANNELS
+        </span>
+      </Menu.Item>
 
-        {displaySearchedChannels()}
-      </Menu.Menu>
+      <Menu.Item>
+        <Input
+          onChange={handleSearchChange}
+          size="mini"
+          icon="search"
+          name="searchTerm"
+          loading={searchLoading}
+          placeholder="SEARCH CHANNELS"
+        ></Input>
+      </Menu.Item>
+
+      {displaySearchedChannels()}
+
+      <Menu.Item>
+        <span style={{ color: "white" }}>
+          <Icon name="exchange"></Icon> CHANNELS {"  "}(
+          {allChannels !== undefined && allChannels.length})
+        </span>
+
+        <Icon
+          onClick={handleOpenModal}
+          style={{ color: "white" }}
+          name="add"
+        ></Icon>
+      </Menu.Item>
+      {displayChannels()}
 
       <Modal open={modal} onClose={handleCloseModal} basic size="small">
         <Modal.Header>Add chanel</Modal.Header>
@@ -396,6 +403,7 @@ function Channels(props) {
           </Button>
         </Modal.Actions>
       </Modal>
+      <Divider clearing />
     </React.Fragment>
   );
 }

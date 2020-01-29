@@ -1,6 +1,7 @@
 import React from "react";
 
-import { Header, Segment, Input, Icon } from "semantic-ui-react";
+import { Header, Segment, Input, Icon, Popup, Button } from "semantic-ui-react";
+import MetaPanel from "../MetaPanel/MetaPanel";
 
 export default function MessagesHeader(props) {
   const {
@@ -13,7 +14,10 @@ export default function MessagesHeader(props) {
     unstarChannel,
     handleAddFriend,
     friendAdded,
-    unfriendPerson
+    unfriendPerson,
+    currentChannel,
+    userPosts,
+    currentUser
   } = props;
 
   return (
@@ -30,6 +34,21 @@ export default function MessagesHeader(props) {
               onClick={handleStarred}
               color="yellow"
             ></Icon>
+          )}{" "}
+          {!isPrivateChannel && (
+            <Popup
+              flowing
+              hoverable
+              trigger={<Button size="mini" icon="question" />}
+            >
+              <MetaPanel
+                key={currentChannel && currentChannel.id}
+                currentChannel={currentChannel}
+                isPrivateChannel={isPrivateChannel}
+                userPosts={userPosts}
+                currentUser={currentUser}
+              ></MetaPanel>
+            </Popup>
           )}
           {isPrivateChannel && friendAdded && (
             <Icon
@@ -46,7 +65,6 @@ export default function MessagesHeader(props) {
             ></Icon>
           )}
         </span>
-        <Header.Subheader></Header.Subheader>
       </Header>
       <Header floated="right">
         <Input

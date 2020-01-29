@@ -2,31 +2,26 @@ html,
 body,
 .app {
   height: 100vh;
-  background: #eee;
   padding: 1em;
 }
 
 .messages {
-  height: 50vh;
+  height: 60vh;
   overflow-y: scroll;
 }
 
-.messageForm {
+/* .messageForm {
   position: fixed !important;
   bottom: 1em;
   margin-left: 300px !important;
   left: 0;
   right: 1em;
-  z-index: 100;
-}
+  z-index: 100; 
+} */
 
 .myMessage {
-  border-left: 2px solid orange;
+  border-left: 2px solid red;
   padding-left: 8px;
-}
-
-.messageImage {
-  padding-right: 3%;
 }
 
 .menu {
