@@ -15,6 +15,7 @@ TO DO:
 
 9. klikniecie w uzytkownika na kanale powinno powodowac przejscie do rozmowy z nim
 
+
 BUGS:
 1. notifications nie pokazuja sie, dopiero po zmienia kanalu zaczynaja sei pokazac
 
@@ -24,10 +25,9 @@ BUGS:
 
 4. zrobic blokade jesli ktos chce utworzyc kanal o takiej samej nazwie
 
-5. add to friend w innym miejscu
+5. powinien wyskakiwac error jest ilosc znakow zbyt mala rejestracja
 
-6. powinien wyskakiwac error jest ilosc znakow zbyt mala rejestracja
-
+6. Wolniejsze chowanie sie sidepanelu
 
 MINOR BUGS: 
 1. change updateFriendsStatusListeners (slaba petla)

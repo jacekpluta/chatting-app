@@ -88,7 +88,7 @@ const Starred = props => {
         name={channel.name}
         active={favouriteActive && activeChannelId === channel.id}
       >
-        <span style={{ color: "	#FFD700" }}>
+        <span style={{ color: "	#fbbd08" }}>
           <Icon name="stack exchange"></Icon> {channel.name}
         </span>
       </Menu.Item>
@@ -98,7 +98,7 @@ const Starred = props => {
   return (
     <React.Fragment>
       <Menu.Item>
-        <span style={{ color: "	#FFD700" }}>
+        <span style={{ color: "	#fbbd08" }}>
           <Icon name="star"></Icon> FAV CHANNELS ({starredChannels.length})
         </span>
         {starredChannels.lenght}

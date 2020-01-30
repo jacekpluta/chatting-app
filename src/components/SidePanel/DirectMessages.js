@@ -165,9 +165,10 @@ const DirectMessages = props => {
     <div>
       <React.Fragment>
         <Menu.Item>
-          <span style={{ color: "#39FF14" }}>
-            SEARCH USERS ({searchResult !== undefined && searchResult.length}){" "}
-            <Icon name="mail"></Icon>
+          <span style={{ color: "#21ba45" }}>
+            <Icon name="search "></Icon>
+            SEARCH USERS ({searchResult !== undefined &&
+              searchResult.length}){" "}
           </span>
         </Menu.Item>
         <Menu.Item>
@@ -203,7 +204,7 @@ const DirectMessages = props => {
                 ) : (
                   ""
                 )}
-                <span style={{ color: "#39FF14" }}>{user.name}</span>
+                <span style={{ color: "#21ba45" }}>{user.name}</span>
               </Menu.Item>
             ))
           : ""}

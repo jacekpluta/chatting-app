@@ -37,8 +37,6 @@ class Register extends Component {
       this.setState({ error: error });
       return false;
     } else if (this.isPasswordValid()) {
-      error = "Password is invalid";
-      this.setState({ error: error });
       return false;
     } else {
       this.setState({ error: "" });
@@ -62,10 +60,12 @@ class Register extends Component {
       this.state.password.length < 6 ||
       this.state.passwordConfirmation.length < 6
     ) {
+      this.setState({ error: "Password must be at least 6 characters" });
       return true;
     } else if (
       this.state.password.length !== this.state.passwordConfirmation.length
     ) {
+      this.setState({ error: "Passwords length don't match" });
       return true;
     } else {
       return false;

@@ -62,7 +62,7 @@ const App = props => {
           className="app"
           style={{ background: "white" }} //background: "#F0F7F4" }}
         >
-          <Grid.Column width={1}>
+          <Grid.Column width={3}>
             <Sidebar
               as={Menu}
               icon="labeled"
@@ -109,7 +109,7 @@ const App = props => {
               />
             </Sidebar>
           </Grid.Column>
-          <Grid.Column width={15}>
+          <Grid.Column width={12}>
             <Messages
               currentChannel={currentChannel}
               key={currentChannel && currentChannel.id}

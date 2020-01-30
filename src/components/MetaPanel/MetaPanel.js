@@ -36,9 +36,10 @@ const MetaPanel = props => {
   if (isPrivateChannel) return null;
 
   return (
-    <Segment loading={!currentChannel} style={{ width: "300px" }}>
+    <Segment loading={!currentChannel} style={{ width: "250px" }}>
       <Header as="h3" attached="top">
-        {"About #"} {currentChannel && currentChannel.name}
+        {"About "} {"#"}
+        {currentChannel && currentChannel.name}
       </Header>
       <Accordion styled attached="true">
         <Accordion.Title

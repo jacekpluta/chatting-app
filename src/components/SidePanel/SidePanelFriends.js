@@ -33,7 +33,7 @@ export default function SidePanelFriends(props) {
         isPrivateChannel={isPrivateChannel}
       ></UserPanel>
 
-      <Header inverted as="h2" style={{ color: "#39FF14" }}>
+      <Header inverted as="h2" style={{ color: "#21ba45" }}>
         <Icon name="user" />
 
         <Header.Content>Friends</Header.Content>

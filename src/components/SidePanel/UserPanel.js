@@ -255,14 +255,19 @@ const UserPanel = props => {
       <Grid.Column>
         <Grid.Row style={gridRowStyle}>
           {/* App Header */}
-          <Header color={"yellow"} inverted as="h2">
+          <Header
+            color={"yellow"}
+            inverted
+            as="h2"
+            style={{ paddingTop: "10px" }}
+          >
             <Icon color={"yellow"} name="female" />
             <Icon color={"green"} name="male" />
 
-            <Header.Content>My</Header.Content>
-          </Header>
-          <Header color={"green"} inverted as="h2">
-            <Header.Content>Chat</Header.Content>
+            <Header.Content>
+              <span style={{ color: "#fbbd08" }}>My</span>
+              <span style={{ color: "#21ba45" }}>Chat</span>
+            </Header.Content>
           </Header>
 
           {/* User Dropdown  */}

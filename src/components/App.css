@@ -2,11 +2,10 @@ html,
 body,
 .app {
   height: 80vh;
-  padding-top: 1em;
 }
 
 .messages {
-  height: 60vh;
+  height: 50vh;
   overflow-y: scroll;
 }
 
@@ -25,4 +24,8 @@ body,
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.messageForm {
+  margin-top: 1em !important;
 }
