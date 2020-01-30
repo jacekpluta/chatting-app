@@ -51,9 +51,9 @@ export default function MessagesHeader(props) {
                 hoverable
                 trigger={
                   <Button
-                    size="medium"
+                    size="mini"
                     icon="question"
-                    style={{ paddingTop: "15px" }}
+                    style={{ paddingTop: "15px", paddingLeft: "-15px" }}
                   />
                 }
               >
@@ -92,7 +92,7 @@ export default function MessagesHeader(props) {
             floated="right"
             loading={searchLoading}
             placeholder="Search messages"
-            style={{ width: "250px" }}
+            style={{ width: "190px" }}
           ></Input>
         </Header.Content>
       </Header>

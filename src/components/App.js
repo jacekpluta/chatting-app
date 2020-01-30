@@ -75,7 +75,7 @@ const App = props => {
               <Button
                 size={"small"}
                 color={"facebook"}
-                icon={"align justify"}
+                icon={"angle double right "}
                 onClick={() => setVisible(true)}
               ></Button>
             </Sidebar>
@@ -83,7 +83,6 @@ const App = props => {
               as={Menu}
               vertical
               visible={visible}
-              width="wide"
               style={leftSidebarStyle}
               onHide={() => setVisible(false)}
             >

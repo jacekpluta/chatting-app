@@ -24,8 +24,12 @@ export default function SidePanelChannels(props) {
 
   return (
     <React.Fragment>
-      <Header inverted as="h2" style={{ paddingTop: "30px", color: "#fbbd08" }}>
-        <Icon name="exchange" />
+      <Header
+        inverted
+        as="h2"
+        style={{ paddingLeft: "10px", paddingTop: "30px", color: "#ffbf00" }}
+      >
+        <Icon name="comments" />
 
         <Header.Content>Channels</Header.Content>
       </Header>

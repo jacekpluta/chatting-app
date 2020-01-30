@@ -261,12 +261,12 @@ const UserPanel = props => {
             as="h2"
             style={{ paddingTop: "10px" }}
           >
-            <Icon color={"yellow"} name="female" />
-            <Icon color={"green"} name="male" />
+            <Icon style={{ color: "#ffbf00" }} name="female" />
+            <Icon style={{ color: "#39ff14" }} name="male" />
 
             <Header.Content>
-              <span style={{ color: "#fbbd08" }}>My</span>
-              <span style={{ color: "#21ba45" }}>Chat</span>
+              <span style={{ color: "#ffbf00" }}>My</span>
+              <span style={{ color: "#39ff14" }}>Chat</span>
             </Header.Content>
           </Header>
 

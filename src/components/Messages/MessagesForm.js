@@ -43,7 +43,10 @@ const MessagesForm = props => {
     currentChannel,
     currentUser,
     getMessagesRef,
-    messageImageLoading
+    messageImageLoading,
+    messageSendScroll,
+    setMessageImageLoadingFalse,
+    setMessageImageLoadingTrue
   } = props;
 
   const handleChange = event => {
@@ -177,6 +180,7 @@ const MessagesForm = props => {
           setError("");
           setIsTyping(false);
           setInputFocus();
+          messageSendScroll();
         })
         .catch(error => {
           console.log(error);
@@ -226,7 +230,7 @@ const MessagesForm = props => {
     const messRef = getMessagesRef();
     const filePath = `${getPath()}/${uuid()}.jpg`;
 
-    props.setMessageImageLoadingTrue();
+    setMessageImageLoadingTrue();
 
     storageRef
       .child(filePath)
@@ -237,7 +241,7 @@ const MessagesForm = props => {
         });
       })
       .then(() => {
-        props.setMessageImageLoadingFalse();
+        setMessageImageLoadingFalse();
       })
       .catch(error => {
         console.log(error);
@@ -330,7 +334,7 @@ const MessagesForm = props => {
             disabled={loading || messageImageLoading}
             onClick={sendMessage}
             color="blue"
-            content="Add Reply"
+            content="Send Message"
             labelPosition="left"
             icon="edit"
           ></Button>
@@ -338,7 +342,7 @@ const MessagesForm = props => {
             disabled={props.messageImageLoading}
             onClick={openModal}
             color="green"
-            content="Upload Media"
+            content="Upload Image"
             labelPosition="right"
             icon="upload"
           ></Button>

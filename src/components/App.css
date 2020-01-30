@@ -1,11 +1,11 @@
 html,
 body,
 .app {
-  height: 80vh;
+  height: 70vh;
 }
 
 .messages {
-  height: 50vh;
+  height: 45vh;
   overflow-y: scroll;
 }
 

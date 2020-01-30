@@ -165,7 +165,7 @@ const DirectMessages = props => {
     <div>
       <React.Fragment>
         <Menu.Item>
-          <span style={{ color: "#21ba45" }}>
+          <span style={{ color: "#39ff14" }}>
             <Icon name="search "></Icon>
             SEARCH USERS ({searchResult !== undefined &&
               searchResult.length}){" "}
@@ -189,7 +189,6 @@ const DirectMessages = props => {
                 onClick={() => changeChannel(user)}
                 active={activeChannelId === user.id}
               >
-                {console.log(user.id)}
                 <Icon
                   name="circle"
                   color={user && user.status ? "green" : "red"}
@@ -204,7 +203,7 @@ const DirectMessages = props => {
                 ) : (
                   ""
                 )}
-                <span style={{ color: "#21ba45" }}>{user.name}</span>
+                <span style={{ color: "#39ff14" }}>{user.name}</span>
               </Menu.Item>
             ))
           : ""}

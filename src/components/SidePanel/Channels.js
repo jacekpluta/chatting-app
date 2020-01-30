@@ -272,7 +272,7 @@ function Channels(props) {
               getNotificationCount(channel) && (
                 <Label color="red">{getNotificationCount(channel)}</Label>
               )}
-            <span style={{ color: "#fbbd08" }}> # {channel.name}</span>
+            <span style={{ color: "#ffbf00" }}> # {channel.name}</span>
           </Menu.Item>
         ));
     }
@@ -287,7 +287,7 @@ function Channels(props) {
           name={channel.name}
           active={!favouriteActive && activeChannelId === channel.id}
         >
-          <span style={{ color: "	#fbbd08" }}># {channel.name}</span>
+          <span style={{ color: "	#ffbf00" }}># {channel.name}</span>
         </Menu.Item>
       ));
     }
@@ -330,7 +330,7 @@ function Channels(props) {
       <Divider clearing />
 
       <Menu.Item>
-        <span style={{ color: "	#fbbd08" }}>
+        <span style={{ color: "	#ffbf00" }}>
           <Icon name="search"></Icon> SEARCH CHANNELS
         </span>
       </Menu.Item>
@@ -349,14 +349,14 @@ function Channels(props) {
       {displaySearchedChannels()}
       <Divider clearing />
       <Menu.Item>
-        <span style={{ color: "#fbbd08" }}>
-          <Icon name="exchange"></Icon> CHANNELS {"  "}(
+        <span style={{ color: "#ffbf00" }}>
+          <Icon name="comments"></Icon> CHANNELS {"  "}(
           {allChannels !== undefined && allChannels.length})
         </span>
 
         <Icon
           onClick={handleOpenModal}
-          style={{ color: "#fbbd08" }}
+          style={{ color: "#ffbf00" }}
           name="add"
         ></Icon>
       </Menu.Item>

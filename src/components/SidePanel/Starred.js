@@ -79,7 +79,7 @@ const Starred = props => {
       setActiveChannelId(null);
     }
   }, [isPrivateChannel]);
-  console.log(favouriteActive);
+
   const displayChannels = starredChannels => {
     return starredChannels.map(channel => (
       <Menu.Item
@@ -88,8 +88,8 @@ const Starred = props => {
         name={channel.name}
         active={favouriteActive && activeChannelId === channel.id}
       >
-        <span style={{ color: "	#fbbd08" }}>
-          <Icon name="stack exchange"></Icon> {channel.name}
+        <span style={{ color: "	#ffbf00" }}>
+          <Icon name="comment alternate outline"></Icon> {channel.name}
         </span>
       </Menu.Item>
     ));
@@ -98,7 +98,7 @@ const Starred = props => {
   return (
     <React.Fragment>
       <Menu.Item>
-        <span style={{ color: "	#fbbd08" }}>
+        <span style={{ color: "	#ffbf00" }}>
           <Icon name="star"></Icon> FAV CHANNELS ({starredChannels.length})
         </span>
         {starredChannels.lenght}

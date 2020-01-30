@@ -32,6 +32,7 @@ const Messages = props => {
   const [channelStarred, setChannelStarred] = useState(false);
   const [noMessages, setNoMessages] = useState(false);
   const [friendAdded, setFriendAdded] = useState(false);
+  const [messageSend, setMessageSend] = useState(false);
 
   const {
     currentChannel,
@@ -362,18 +363,14 @@ const Messages = props => {
     messagesEndRef.current.scrollIntoView({ behavior: "auto" }); //smooth
   };
 
-  useEffect(() => {
-    if (messagesLoaded === true) {
-      const timer = setTimeout(() => {
-        scrollToBottom();
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [messagesLoaded]);
+  const messageSendScroll = () => {
+    setMessageSend(true);
+  };
 
   useEffect(() => {
     scrollToBottom();
-  }, [userTyping]);
+    setMessageSend(false);
+  }, [userTyping, messagesLoaded, messageSend]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -460,6 +457,7 @@ const Messages = props => {
         currentUser={currentUser}
         messageImageLoading={messageImageLoading}
         getMessagesRef={getMessagesRef}
+        messageSendScroll={messageSendScroll}
       ></MessagesForm>
     </React.Fragment>
   );

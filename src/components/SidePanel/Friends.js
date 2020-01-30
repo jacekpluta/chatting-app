@@ -123,7 +123,7 @@ const Friends = props => {
             ) : (
               ""
             )}
-            <span style={{ color: "#21ba45" }}> {friendChannel.name}</span>
+            <span style={{ color: "#39ff14" }}> {friendChannel.name}</span>
           </Menu.Item>
         ));
     }
@@ -132,8 +132,8 @@ const Friends = props => {
   return (
     <React.Fragment>
       <Menu.Item>
-        <span style={{ color: "#21ba45" }}>
-          <Icon name="star"></Icon> FRIENDS ({friendsChannels.length})
+        <span style={{ color: "#39ff14" }}>
+          <Icon name="address book"></Icon> FRIENDS ({friendsChannels.length})
         </span>
         {friendsChannels.lenght}
       </Menu.Item>
