@@ -11,7 +11,7 @@ import {
   Dimmer,
   Loader
 } from "semantic-ui-react";
-import firebase from "../Firebase";
+import firebase from "../../Firebase";
 import OnDrop from "./OnDrop";
 
 const userStyle = {
@@ -139,40 +139,6 @@ const UserPanel = props => {
     }
   };
 
-  // const updateAvatarListener = channelId => {
-  //   if (
-  //     channelId === currentChannel.id &&
-  //     messagesToUpdate &&
-  //     messagesToUpdate.length !== 0
-  //   ) {
-  //     messagesRef
-  //       .child(channelId)
-  //       .once("value", snapshot => {
-  //         Object.entries(snapshot.val()).map(([messageId, message], i) => {
-  //           if (message.currentUser.id === currentUser.uid) {
-  //             if (message.content) {
-  //               const newUserAvatar = {
-  //                 currentUser: {
-  //                   avatar: currentUser.photoURL,
-  //                   id: currentUser.uid,
-  //                   name: currentUser.displayName
-  //                 }
-  //               };
-
-  //               messagesRef
-  //                 .child(currentChannel.id)
-  //                 .child(messageId)
-  //                 .update(newUserAvatar);
-  //             }
-  //           }
-  //         });
-  //       })
-  //       .catch(err => {
-  //         console.log(err);
-  //       });
-  //   }
-  // };
-
   useEffect(() => {
     if (messagesToUpdate && messagesToUpdate.length !== 0) {
       updatingMessages();
@@ -182,7 +148,7 @@ const UserPanel = props => {
   const updatingMessages = () => {
     Object.entries(messagesToUpdate).map(([messageId, message], i) => {
       if (message.currentUser.id === currentUser.uid) {
-        if (message.content) {
+        if (message.content || message.image) {
           const newUserAvatar = {
             currentUser: {
               avatar: currentUser.photoURL,
@@ -304,7 +270,7 @@ const UserPanel = props => {
         ) : (
           ""
         )}
-        <Modal basic onClose={closeModal} open={modal}>
+        <Modal onClose={closeModal} open={modal}>
           <Modal.Header>Change Avatar</Modal.Header>
           <Modal.Content>
             {" "}
@@ -316,7 +282,7 @@ const UserPanel = props => {
           </Modal.Content>
 
           <Modal.Actions>
-            <Button color="red" inverted onClick={closeModal}>
+            <Button color="red" onClick={closeModal}>
               <Icon name="cancel" /> Cancel
             </Button>
           </Modal.Actions>

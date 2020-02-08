@@ -10,7 +10,7 @@ export default function ModalFile(props) {
     sendFile
   } = props;
   return (
-    <Modal open={modal} onClose={closeModal} basic>
+    <Modal open={modal} onClose={closeModal}>
       <Modal.Header>Select image file</Modal.Header>
       <Modal.Content>
         <Input
@@ -34,7 +34,6 @@ export default function ModalFile(props) {
           disabled={loading}
           className={loading ? "checkmark" : ""}
           color="green"
-          inverted
           onClick={sendFile}
         >
           <Icon name="checkmark"> Send</Icon>
@@ -43,7 +42,6 @@ export default function ModalFile(props) {
           disabled={loading}
           onClick={closeModal}
           className={"cancel"}
-          inverted
           color="red"
         >
           <Icon name="checkmark"> Cancel</Icon>

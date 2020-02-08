@@ -86,11 +86,50 @@ const usersList_reducer = (state = initialUsersListState, action) => {
   }
 };
 
+const initialActiveChannelIdState = {
+  activeChannelId: null
+};
+
+const activeChannelId_reducer = (
+  state = initialActiveChannelIdState,
+  action
+) => {
+  switch (action.type) {
+    case actionTypes.SET_ACTIVE_CHANNEL_ID:
+      return {
+        ...state,
+        activeChannelId: action.payload.activeChannelId
+      };
+
+    default:
+      return state;
+  }
+};
+
+const initialUsersInChannelState = {
+  usersInChannel: null
+};
+
+const usersInChannel_reducer = (state = initialUsersInChannelState, action) => {
+  switch (action.type) {
+    case actionTypes.SET_USERS_IN_CHANNEL:
+      return {
+        ...state,
+        usersInChannel: action.payload.usersInChannel
+      };
+
+    default:
+      return state;
+  }
+};
+
 const rootReducer = combineReducers({
   user: user_reducer,
   channel: channel_reducer,
   userTyping: userTyping_reducer,
-  usersList: usersList_reducer
+  usersList: usersList_reducer,
+  activeChannelId: activeChannelId_reducer,
+  usersInChannel: usersInChannel_reducer
 });
 
 export default rootReducer;

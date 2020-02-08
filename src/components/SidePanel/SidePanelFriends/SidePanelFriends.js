@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import UserPanel from "./UserPanel";
+import UserPanel from "../SidePanelUser/UserPanel";
 import DirectMessages from "./DirectMessages";
 import Friends from "./Friends";
 import { Header, Icon } from "semantic-ui-react";
@@ -11,7 +11,7 @@ export default function SidePanelFriends(props) {
     currentChannel,
     isPrivateChannel,
     usersList,
-
+    privateActiveChannelId,
     hideSidbar
   } = props;
 
@@ -51,6 +51,7 @@ export default function SidePanelFriends(props) {
         hideSidbar={hideSidbar}
         friendsMarkActive={friendsMarkActive}
         friendsMarkActiveChange={friendsMarkActiveChange}
+        privateActiveChannelId={privateActiveChannelId}
       ></Friends>
 
       <DirectMessages
@@ -58,6 +59,7 @@ export default function SidePanelFriends(props) {
         currentUser={currentUser}
         friendsMarkActive={friendsMarkActive}
         friendsNotMarkActiveChange={friendsNotMarkActiveChange}
+        privateActiveChannelId={privateActiveChannelId}
       ></DirectMessages>
     </React.Fragment>
   );

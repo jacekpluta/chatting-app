@@ -6,13 +6,21 @@ import {
   Icon,
   Image,
   List,
-  ListContent
+  ListContent,
+  Button
 } from "semantic-ui-react";
 import { connect } from "react-redux";
+import { setCurrentChannel } from "../../../actions";
 
 const MetaPanel = props => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const { isPrivateChannel, currentChannel, userPosts } = props;
+  const {
+    isPrivateChannel,
+    currentChannel,
+    userPosts,
+    currentUser,
+    handleOpenModal
+  } = props;
 
   const setActive = (event, titleProps) => {
     const { index } = titleProps;
@@ -86,9 +94,38 @@ const MetaPanel = props => {
             {currentChannel && currentChannel.createdBy.name}
           </Header>
         </Accordion.Content>
+
+        {!isPrivateChannel &&
+          currentChannel &&
+          currentChannel.createdBy.uid === currentUser.uid && (
+            <React.Fragment>
+              <Accordion.Title
+                active={activeIndex === 3}
+                index={3}
+                onClick={setActive}
+              >
+                <Icon name="dropdown" />
+                <Icon name="x" />
+                Delete channel?
+              </Accordion.Title>
+              <Accordion.Content active={activeIndex === 3}>
+                <Header as="h3">
+                  <Button
+                    name={"x"}
+                    onClick={() => {
+                      handleOpenModal(true);
+                    }}
+                    color="red"
+                  >
+                    Delete Channel
+                  </Button>
+                </Header>
+              </Accordion.Content>
+            </React.Fragment>
+          )}
       </Accordion>
     </Segment>
   );
 };
 
-export default connect(null)(MetaPanel);
+export default connect(null, { setCurrentChannel })(MetaPanel);

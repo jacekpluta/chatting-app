@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Menu, Icon, Image, Divider } from "semantic-ui-react";
 import { connect } from "react-redux";
-import { setCurrentChannel, setPrivateChannel } from "../../actions";
-import firebase from "../Firebase";
+import {
+  setCurrentChannel,
+  setPrivateChannel,
+  setActiveChannelId
+} from "../../../actions";
+import firebase from "../../Firebase";
 
 const Friends = props => {
   const [friendsChannels, setFriendsChannels] = useState([]);
   const [friendToRemove, setFriendToRemove] = useState(null);
-  const [activeChannelId, setActiveChannelId] = useState(null);
+
   const [usersRef] = useState(firebase.database().ref("users"));
   const {
     currentUser,
@@ -15,12 +19,13 @@ const Friends = props => {
     usersList,
     hideSidbar,
     friendsMarkActive,
-    friendsMarkActiveChange
+    friendsMarkActiveChange,
+    privateActiveChannelId
   } = props;
 
   useEffect(() => {
     if (!isPrivateChannel) {
-      setActiveChannelId(null);
+      props.setActiveChannelId(null);
     }
   }, [isPrivateChannel]);
 
@@ -87,7 +92,7 @@ const Friends = props => {
       photoURL: friendChannel.photoURL
     };
 
-    setActiveChannelId(friendChannel.id);
+    props.setActiveChannelId(friendChannel.id);
     props.setCurrentChannel(privateChannelData);
     props.setPrivateChannel(true);
     hideSidbar();
@@ -96,18 +101,20 @@ const Friends = props => {
 
   const displayFriendChannels = () => {
     if (usersList && friendsChannels) {
-      let result = usersList.filter(o1 =>
+      let friendsList = usersList.filter(o1 =>
         friendsChannels.some(o2 => o1.id === o2.id)
       );
 
-      return result
+      return friendsList
         .sort((a, b) => (a.name > b.name ? 1 : -1))
         .map(friendChannel => (
           <Menu.Item
             key={friendChannel.id}
             onClick={() => changeChannel(friendChannel)}
             name={friendChannel.name}
-            active={friendsMarkActive && activeChannelId === friendChannel.id}
+            active={
+              friendsMarkActive && privateActiveChannelId === friendChannel.id
+            }
           >
             <Icon
               name="circle"
@@ -144,4 +151,8 @@ const Friends = props => {
   );
 };
 
-export default connect(null, { setCurrentChannel, setPrivateChannel })(Friends);
+export default connect(null, {
+  setCurrentChannel,
+  setPrivateChannel,
+  setActiveChannelId
+})(Friends);

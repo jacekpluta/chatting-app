@@ -1,59 +1,66 @@
 import React, { useState, useEffect } from "react";
-import firebase from "./../Firebase";
+import firebase from "../../Firebase";
 import { Menu, Icon, Image, Input, Divider } from "semantic-ui-react";
 import { connect } from "react-redux";
 import {
   setCurrentChannel,
   setPrivateChannel,
-  setUsersList
-} from "../../actions";
+  setUsersList,
+  setActiveChannelId
+} from "../../../actions";
 
 const DirectMessages = props => {
   const {
     currentUser,
     hideSidbar,
-    friendsMarkActive,
-    friendsNotMarkActiveChange
+    privateActiveChannelId,
+    friendsMarkActive
   } = props;
 
   const [usersOnline, setUsersOnline] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
-  const [activeChannelId, setActiveChannelId] = useState(false);
 
   const [connectedRef] = useState(firebase.database().ref(".info/connected"));
   const [presenceRef] = useState(firebase.database().ref("presence"));
 
   useEffect(() => {
     onlineUsersListener();
-    props.setUsersList(usersOnline);
     userConnectedListener(
       currentUser.uid,
       currentUser.displayName,
       currentUser.photoURL
     );
 
-    const interval = setInterval(() => {
-      onlineUsersListener();
+    // const interval = setInterval(() => {
+    //   onlineUsersListener();
+    //   userConnectedListener(
+    //     currentUser.uid,
+    //     currentUser.displayName,
+    //     currentUser.photoURL
+    //   );
 
-      userConnectedListener(
-        currentUser.uid,
-        currentUser.displayName,
-        currentUser.photoURL
-      );
-
-      return () => {
-        connectedRef.off();
-        presenceRef.off();
-      };
-    }, 5000);
-    return () => clearInterval(interval);
+    //   return () => {
+    //     connectedRef.off();
+    //     presenceRef.off();
+    //   };
+    // }, 5000);
+    // return () => clearInterval(interval);
   }, []);
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   useEffect(() => {
+    // const seen = new Set();
+    // const filteredArr = usersOnline.filter(el => {
+    //   const duplicate = seen.has(el.id);
+    //   seen.add(el.id);
+    //   return !duplicate;
+    // });
+
+    // console.log(filteredArr);
     props.setUsersList(usersOnline);
   }, [usersOnline]);
+
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const userConnectedListener = (
     currentUserUid,
@@ -81,28 +88,54 @@ const DirectMessages = props => {
         presenceRef
           .child(currentUserUid)
           .onDisconnect()
-          .set(userInfoOffline);
+          .update(userInfoOffline);
       }
     });
   };
+  const [userStatusToChange, setUserStatusToChange] = useState(null);
 
   const onlineUsersListener = () => {
-    let currentUsers = [];
-
     presenceRef.on("child_added", snapshot => {
       if (currentUser.uid !== snapshot.key) {
-        currentUsers.push(snapshot.val());
-        setUsersOnline(currentUsers);
+        setUsersOnline(friendedChannels => [
+          ...friendedChannels,
+          snapshot.val()
+        ]);
       }
     });
 
-    presenceRef.on("child_removed", snapshot => {
+    presenceRef.on("child_changed", snapshot => {
       if (currentUser.uid !== snapshot.key) {
-        currentUsers.push(snapshot.val());
-        setUsersOnline(currentUsers);
+        setUserStatusToChange(snapshot.key);
       }
     });
   };
+
+  useEffect(() => {
+    if (userStatusToChange) {
+      const filteredUsers = usersOnline.filter(userOnline => {
+        if (userOnline && userOnline.id !== userStatusToChange) {
+          return userOnline;
+        }
+        if (userOnline && userOnline.id === userStatusToChange) {
+          presenceRef
+            .child(userStatusToChange)
+            .once("value")
+            .then(data => {
+              if (data.val() !== null) {
+                setUsersOnline(friendedChannels => [
+                  ...friendedChannels,
+                  data.val()
+                ]);
+              }
+            });
+        }
+      });
+
+      setUsersOnline(filteredUsers);
+      setUserStatusToChange(null);
+    }
+  }, [userStatusToChange]);
 
   const changeChannel = user => {
     const channelId = getChannelId(user.id);
@@ -113,11 +146,11 @@ const DirectMessages = props => {
       status: user.status,
       photoURL: user.photoURL
     };
-    setActiveChannelId(channelId);
+
+    props.setActiveChannelId(user.id);
     props.setCurrentChannel(channelData);
     props.setPrivateChannel(true);
     hideSidbar();
-    friendsNotMarkActiveChange();
   };
 
   const getChannelId = userId => {
@@ -166,7 +199,7 @@ const DirectMessages = props => {
       <React.Fragment>
         <Menu.Item>
           <span style={{ color: "#39ff14" }}>
-            <Icon name="search "></Icon>
+            <Icon name="search"></Icon>
             SEARCH USERS ({searchResult !== undefined &&
               searchResult.length}){" "}
           </span>
@@ -187,7 +220,7 @@ const DirectMessages = props => {
                 key={user.id}
                 style={{ opacity: 0.7 }}
                 onClick={() => changeChannel(user)}
-                active={activeChannelId === user.id}
+                active={friendsMarkActive && privateActiveChannelId === user.id}
               >
                 <Icon
                   name="circle"
@@ -216,5 +249,6 @@ const DirectMessages = props => {
 export default connect(null, {
   setCurrentChannel,
   setPrivateChannel,
-  setUsersList
+  setUsersList,
+  setActiveChannelId
 })(DirectMessages);

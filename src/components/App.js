@@ -10,8 +10,8 @@ import {
   Segment
 } from "semantic-ui-react";
 import Messages from "./Messages/Messages";
-import SidePanelFriends from "./SidePanel/SidePanelFriends";
-import SidePanelChannels from "./SidePanel/SidePanelChannels";
+import SidePanelFriends from "./SidePanel/SidePanelFriends/SidePanelFriends";
+import SidePanelChannels from "./SidePanel/SidePanelChannels/SidePanelChannels";
 import { connect } from "react-redux";
 
 const leftSidebarStyle = {
@@ -33,7 +33,9 @@ const App = props => {
     isPrivateChannel,
     userPosts,
     userTyping,
-    usersList
+    usersList,
+    privateActiveChannelId,
+    usersInChannel
   } = props;
 
   const [visible, setVisible] = useState(false);
@@ -75,7 +77,7 @@ const App = props => {
               <Button
                 size={"small"}
                 color={"facebook"}
-                icon={"angle double right "}
+                icon={"angle double right"}
                 onClick={() => setVisible(true)}
               ></Button>
             </Sidebar>
@@ -85,6 +87,7 @@ const App = props => {
               visible={visible}
               style={leftSidebarStyle}
               onHide={() => setVisible(false)}
+              animation={"push"}
             >
               <SidePanelFriends
                 currentUser={currentUser}
@@ -97,6 +100,7 @@ const App = props => {
                 favouriteActiveChange={favouriteActiveChange}
                 favouriteNotActiveChange={favouriteNotActiveChange}
                 favouriteActive={favouriteActive}
+                privateActiveChannelId={privateActiveChannelId}
               />
               <SidePanelChannels
                 currentUser={currentUser}
@@ -117,6 +121,7 @@ const App = props => {
               userTyping={userTyping}
               usersList={usersList}
               userPosts={userPosts}
+              usersInChannel={usersInChannel}
             />
           </Grid.Column>
         </Grid>
@@ -132,7 +137,6 @@ const App = props => {
           <Grid.Column width={4}>
             <Sidebar
               as={Menu}
-              animation={"push"}
               direction={"left"}
               inverted
               vertical
@@ -150,6 +154,7 @@ const App = props => {
                 favouriteActiveChange={favouriteActiveChange}
                 favouriteNotActiveChange={favouriteNotActiveChange}
                 favouriteActive={favouriteActive}
+                privateActiveChannelId={privateActiveChannelId}
               />
             </Sidebar>
           </Grid.Column>
@@ -162,6 +167,7 @@ const App = props => {
               userTyping={userTyping}
               usersList={usersList}
               userPosts={userPosts}
+              usersInChannel={usersInChannel}
             />
           </Grid.Column>
           <Grid.Column width={4}>
@@ -197,6 +203,8 @@ const mapStateToProps = state => ({
   isPrivateChannel: state.channel.isPrivateChannel,
   userPosts: state.channel.userPosts,
   userTyping: state.userTyping.userTyping,
-  usersList: state.usersList.usersList
+  usersList: state.usersList.usersList,
+  privateActiveChannelId: state.activeChannelId.activeChannelId,
+  usersInChannel: state.usersInChannel.usersInChannel
 });
 export default connect(mapStateToProps)(App);

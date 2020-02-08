@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Menu, Icon } from "semantic-ui-react";
 import { connect } from "react-redux";
-import { setCurrentChannel, setPrivateChannel } from "../../actions";
-import firebase from "../Firebase";
+import { setCurrentChannel, setPrivateChannel } from "../../../actions";
+import firebase from "../../Firebase";
 
 const Starred = props => {
   const [activeChannelId, setActiveChannelId] = useState(null);

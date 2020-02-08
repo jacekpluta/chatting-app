@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import {
   Header,
@@ -7,11 +7,20 @@ import {
   Icon,
   Popup,
   Button,
-  Divider
+  List,
+  Image
 } from "semantic-ui-react";
-import MetaPanel from "../MetaPanel/MetaPanel";
+import MetaPanel from "../SidePanel/MetaPanel/MetaPanel";
+import DeleteChannelModal from "../SidePanel/MetaPanel/DeleteChannelModal";
+import { connect } from "react-redux";
+import firebase from "../Firebase";
+import {
+  setCurrentChannel,
+  setActiveChannelId,
+  setPrivateChannel
+} from "../../actions";
 
-export default function MessagesHeader(props) {
+const MessagesHeader = props => {
   const {
     displayChannelName,
     handleSearchChange,
@@ -25,8 +34,104 @@ export default function MessagesHeader(props) {
     unfriendPerson,
     currentChannel,
     userPosts,
-    currentUser
+    currentUser,
+    usersInChannel
   } = props;
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [channelsRef] = useState(firebase.database().ref("channels"));
+
+  const handleDisablePopup = () => {
+    setPopupOpen(false);
+  };
+
+  const handleEnablePopup = () => {
+    setPopupOpen(true);
+  };
+
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+    handleDisablePopup();
+  };
+
+  const handleDeleteChannel = () => {
+    setLoading(true);
+    const mainChannel = {
+      id: "mainChannel",
+      name: "main channel",
+      details: "This is main channel",
+      createdBy: {
+        uid: "111",
+        name: "Admin",
+        avatar: ""
+      }
+    };
+
+    channelsRef
+      .child(currentChannel.id)
+      .remove(err => {
+        if (err !== null) {
+          console.log(err);
+        }
+      })
+      .then(() => {
+        props.setCurrentChannel(mainChannel);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
+  const getChannelId = userId => {
+    const currentUserId = currentUser.uid;
+    return userId < currentUserId
+      ? `${userId}/${currentUser.uid}`
+      : `${currentUser.uid}/${userId}`;
+  };
+
+  const changeChannel = user => {
+    const channelId = getChannelId(user.id);
+
+    const privateChannelData = {
+      id: channelId,
+      name: user.name,
+      photoURL: user.avatar
+    };
+
+    props.setActiveChannelId(user.id);
+    props.setCurrentChannel(privateChannelData);
+    props.setPrivateChannel(true);
+  };
+
+  const displayUsersInChannel = () =>
+    usersInChannel
+      .sort((a, b) => (a.name > b.name ? 1 : -1))
+      .map(user => (
+        <List>
+          <List.Item
+            key={user.uid}
+            name={user.name}
+            onClick={() => changeChannel(user)}
+            // active={!favouriteActive && activeChannelId === channel.id}
+          >
+            <Image avatar src={user.avatar} />
+            <List.Content>
+              <List.Header as="a">
+                {" "}
+                <span style={{ color: "#ffbf00" }}> # {user.name}</span>
+              </List.Header>
+              <List.Description>In channel</List.Description>
+            </List.Content>
+          </List.Item>
+        </List>
+      ));
 
   return (
     <Segment clearing>
@@ -47,6 +152,9 @@ export default function MessagesHeader(props) {
             )}{" "}
             {!isPrivateChannel && (
               <Popup
+                onOpen={handleEnablePopup}
+                onClose={handleDisablePopup}
+                open={popupOpen}
                 flowing
                 hoverable
                 trigger={
@@ -63,9 +171,29 @@ export default function MessagesHeader(props) {
                   isPrivateChannel={isPrivateChannel}
                   userPosts={userPosts}
                   currentUser={currentUser}
+                  handleDisablePopup={handleDisablePopup}
+                  handleOpenModal={handleOpenModal}
+                  loading={loading}
                 ></MetaPanel>
               </Popup>
             )}
+            {!isPrivateChannel &&
+              currentChannel &&
+              currentChannel.id !== "mainChannel" && (
+                <Popup
+                  flowing
+                  hoverable
+                  trigger={
+                    <Button
+                      size="mini"
+                      icon="user"
+                      style={{ paddingTop: "15px", paddingLeft: "-15px" }}
+                    />
+                  }
+                >
+                  {usersInChannel ? displayUsersInChannel() : ""}
+                </Popup>
+              )}
             {isPrivateChannel && friendAdded && (
               <Icon
                 name={"user times"}
@@ -96,6 +224,18 @@ export default function MessagesHeader(props) {
           ></Input>
         </Header.Content>
       </Header>
+      <DeleteChannelModal
+        handleDeleteChannel={handleDeleteChannel}
+        handleCloseModal={handleCloseModal}
+        openModal={openModal}
+        loading={loading}
+      />
     </Segment>
   );
-}
+};
+
+export default connect(null, {
+  setCurrentChannel,
+  setActiveChannelId,
+  setPrivateChannel
+})(MessagesHeader);

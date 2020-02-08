@@ -30,7 +30,7 @@ const Messages = props => {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
   const [channelStarred, setChannelStarred] = useState(false);
-  const [noMessages, setNoMessages] = useState(false);
+  const [noMessages, setNoMessages] = useState(true);
   const [friendAdded, setFriendAdded] = useState(false);
   const [messageSend, setMessageSend] = useState(false);
 
@@ -40,7 +40,8 @@ const Messages = props => {
     isPrivateChannel,
     userTyping,
     usersList,
-    userPosts
+    userPosts,
+    usersInChannel
   } = props;
 
   const setMessageImageLoadingTrue = () => {
@@ -55,12 +56,6 @@ const Messages = props => {
   useEffect(() => {
     if (currentChannel && currentUser) {
       addListeners();
-
-      return () => {
-        const ref = getMessagesRef();
-        ref.child(currentChannel.id).off("child_added");
-        messagesRef.off();
-      };
     }
   }, []);
 
@@ -315,29 +310,13 @@ const Messages = props => {
     });
   };
 
-  ////CHECKS IF MESSAGES WERE LOADED IN CURRENT CHANNEL
-  const wereMessagesLoaded = () => {
-    if (!messagesLoaded) {
-      setNoMessages(true);
-    } else {
-      setNoMessages(false);
-    }
-  };
-
   //LOADS MESSAGES ONCE ON CHANNEL START
   const loadAllChannelMessages = () => {
     messagesRef
       .child(currentChannel.id)
       //.limitToLast(5)
       .once("value", snapshot => {})
-      .then(snapshot => {
-        if (snapshot) {
-          if (snapshot.val()) {
-          } else {
-            wereMessagesLoaded();
-          }
-        }
-      })
+
       .then(() => {
         setMessagesLoaded(true);
       });
@@ -397,12 +376,13 @@ const Messages = props => {
         userPosts={userPosts}
         currentUser={currentUser}
         currentChannel={currentChannel}
+        usersInChannel={usersInChannel}
       ></MessagesHeader>
 
       <Segment>
         <Comment.Group className="messages">
           {/*shows messages skeleton on messages loading then checks if there is a messages in channel and displays "no messages" or shows all messages*/}
-          {allChannelMessages.loadedMessages &&
+          {/* {allChannelMessages.loadedMessages &&
           searchTerm === "" &&
           messagesLoaded
             ? renderMessages()
@@ -416,7 +396,14 @@ const Messages = props => {
                         ? renderMessages()
                         : [searchTerm === "" ? <SkeletonMessages /> : ""]
                     ]
-              ]}
+              ]} */}
+          {!noMessages && messagesLoaded && searchTerm === ""
+            ? renderMessages()
+            : ""}
+          {!messagesLoaded && searchTerm === "" ? <SkeletonMessages /> : ""}
+          {allChannelMessages.loadedMessages === undefined && messagesLoaded
+            ? "No messages"
+            : ""}
           {/*displays user name + usertypeing animation*/}{" "}
           {userTyping &&
           userTyping.isTyping &&

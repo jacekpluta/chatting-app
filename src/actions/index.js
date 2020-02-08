@@ -59,3 +59,21 @@ export const setUsersList = usersList => {
     }
   };
 };
+
+export const setActiveChannelId = activeChannelId => {
+  return {
+    type: actionTypes.SET_ACTIVE_CHANNEL_ID,
+    payload: {
+      activeChannelId
+    }
+  };
+};
+
+export const setUsersInChannel = usersInChannel => {
+  return {
+    type: actionTypes.SET_USERS_IN_CHANNEL,
+    payload: {
+      usersInChannel
+    }
+  };
+};

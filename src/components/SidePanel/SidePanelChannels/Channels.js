@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Menu,
   Icon,
@@ -10,9 +10,14 @@ import {
   Label,
   Divider
 } from "semantic-ui-react";
-import firebase from "../Firebase";
+import firebase from "../../Firebase";
 import { connect } from "react-redux";
-import { setCurrentChannel, setPrivateChannel } from "../../actions";
+import {
+  setCurrentChannel,
+  setPrivateChannel,
+  setUsersInChannel
+} from "../../../actions";
+import usePrevious from "../../CustomHooks/usePrevious";
 
 function Channels(props) {
   const [allChannels, setAllChannels] = useState([]);
@@ -26,11 +31,16 @@ function Channels(props) {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
   const [loading] = useState(false);
-  const [channelChanged, setChannelChanged] = useState(null);
+  const [currentChannel, setCurrentChannel] = useState(null);
+  const [channelToRemove, setChannelToRemove] = useState(null);
 
+  // const [userToRemove, setUserToRemove] = useState(null);
   const [notifications, setNotifications] = useState([]);
+
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [messagesRef] = useState(firebase.database().ref("messages"));
+
+  const prevChannelId = usePrevious(activeChannelId);
 
   const {
     currentUser,
@@ -68,6 +78,12 @@ function Channels(props) {
   }, []);
 
   useEffect(() => {
+    if (activeChannelId !== "Main channel") {
+      currentChannelUsersListener();
+    }
+  }, [currentChannel]);
+
+  useEffect(() => {
     showChannelsListener();
 
     return () => {
@@ -83,7 +99,30 @@ function Channels(props) {
     channelsRef.limitToFirst(200).on("child_added", snapshot => {
       setAllChannels(allChannels => [...allChannels, snapshot.val()]);
     });
+
+    channelsRef.limitToFirst(200).on("child_removed", snapshot => {
+      setChannelToRemove(snapshot.key);
+    });
   };
+
+  useEffect(() => {
+    if (channelToRemove) {
+      const filteredChannel = allChannels.filter(channel => {
+        if (channel && channel.id !== channelToRemove) {
+          return channel;
+        } else {
+          return null;
+        }
+      });
+      setAllChannels(filteredChannel);
+      setChannelToRemove(null);
+
+      return () => {
+        channelsRef.off();
+        messagesRef.child(channelToRemove).off();
+      };
+    }
+  }, [channelToRemove]);
 
   //////////////NOTIFICATIONS/////////////
   useEffect(() => {
@@ -181,8 +220,8 @@ function Channels(props) {
       .update(mainChannel)
       .then(() => {
         props.setCurrentChannel(mainChannel);
-        changeChannel(mainChannel);
-        setChannelChanged(mainChannel);
+
+        setCurrentChannel(mainChannel);
         setActiveChannelId(mainChannel.id);
       })
       .catch(error => {
@@ -222,26 +261,91 @@ function Channels(props) {
 
   const handleSubmit = event => {
     event.preventDefault();
+    let error = "";
+    allChannels.forEach(element => {
+      if (element.name === channelName) {
+        error = "error";
+        setError("Channel name already exists");
+      }
+    });
 
-    if (isFormIsValid()) {
+    if (isFormIsValid() && error === "") {
       handleAddChannel();
     }
   };
+
+  const currentChannelUsersListener = () => {
+    if (activeChannelId) {
+      let channelUsers = [];
+      channelsRef
+        .child(activeChannelId)
+        .child("usersInChannel")
+        .on("child_added", snapshot => {
+          channelUsers.push(snapshot.val());
+
+          props.setUsersInChannel(channelUsers);
+        });
+
+      // channelsRef
+      //   .child(activeChannelId)
+      //   .child("usersInChannel")
+      //   .on("child_removed", snapshot => {
+      //     setUserToRemove(snapshot.key);
+      //   });
+    }
+  };
+
+  // useEffect(() => {
+  //   if (userToRemove) {
+  //     const filteredChannel = usersInChannel.filter(user => {
+
+  //       if (user && user.uid !== userToRemove) {
+  //         return user;
+  //       }
+  //     });
+  //     setUsersInChannel(filteredChannel);
+  //     props.setUsersInChannel(filteredChannel);
+  //     setUserToRemove(null);
+  //   }
+  // }, [userToRemove]);
 
   const changeChannel = channel => {
     hideSidbar();
     setActiveChannelId(channel.id);
     props.setCurrentChannel(channel);
     props.setPrivateChannel(false);
-    setChannelChanged(channel);
+    setCurrentChannel(channel);
     clearNotifications();
     favouriteNotActiveChange();
+
+    if (!isPrivateChannel && prevChannelId !== channel.id) {
+      channelsRef
+        .child(prevChannelId)
+        .child("usersInChannel")
+        .child(currentUser.uid)
+        .remove();
+
+      const user = {
+        uid: currentUser.uid,
+        name: currentUser.displayName,
+        avatar: currentUser.photoURL
+      };
+
+      channelsRef
+        .child(channel.id)
+        .child("usersInChannel")
+        .child(currentUser.uid)
+        .set(user)
+        .catch(error => {
+          console.log(error);
+        });
+    }
   };
 
   const clearNotifications = () => {
     if (currentUser) {
       let index = notifications.findIndex(
-        notification => notification.id === channelChanged.id
+        notification => notification.id === currentChannel.id
       );
 
       if (index !== -1) {
@@ -362,7 +466,7 @@ function Channels(props) {
       </Menu.Item>
       {displayChannels()}
 
-      <Modal open={modal} onClose={handleCloseModal} basic size="small">
+      <Modal open={modal} onClose={handleCloseModal} size="small">
         <Modal.Header>Add chanel</Modal.Header>
 
         <Modal.Content>
@@ -416,6 +520,8 @@ function Channels(props) {
   );
 }
 
-export default connect(null, { setCurrentChannel, setPrivateChannel })(
-  Channels
-);
+export default connect(null, {
+  setCurrentChannel,
+  setPrivateChannel,
+  setUsersInChannel
+})(Channels);

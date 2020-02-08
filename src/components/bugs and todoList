@@ -1,18 +1,12 @@
 TO DO:
 1. dzwiek przy powiadomieniach
 
-2. Lista userow w obecnym kanale
+2. Wyswietlanie wiadomosci ze zostales dodany do znajomych
 
-4. blokowanie i ignorowanie uzytkownikow
+3. Lista userow w obecnym kanale
 
-5. dodac light box na obrazkach
-
-6. usuwanie kanalow
-
-7. Wyswietlanie wiadomosci ze zostales dodany do znajomych
-
-8. klikniecie w uzytkownika na kanale powinno powodowac przejscie do rozmowy z nim
-
+4. NA LOGOUT USUNAC MNIE Z KAZDEGO USERSINCHANNEL
+4. NA PRZEJSCIU DO PRIVATE CHANNELU USUNAC KAZDEGO USERSINCHANNEL
 
 BUGS:
 1. notifications nie pokazuja sie, dopiero po zmienia kanalu zaczynaja sei pokazac
@@ -21,21 +15,14 @@ BUGS:
 
 3. avatar cropping nie dziala przy niestandardowej wielkosci np 500 x 2000
 
-4. zrobic blokade jesli ktos chce utworzyc kanal o takiej samej nazwie
-
-5. Wolniejsze chowanie sie sidepanelu
-
-6. pierwsze wiadomosc wyslana do znajego sie nie wyswietla, dopiero po przeladowaniu sie pokazuja
 
 MINOR BUGS: 
 1. change updateFriendsStatusListeners (slaba petla)
 
-2. lagi przy useeffect, duza ilosc odswiezania komponentow
+2. odswiaza sie dopiero po zmianie kanalu po uploadzie avataru
 
-3. odswiaza sie dopiero po zmianie kanalu po uploadzie avataru
+3. wpisywanie do szukania niektórych znaków wywala bład "= \"
 
-4. wpisywanie do szukania niektórych znaków wywala bład "= \"
+4. oagarnac notifications
 
-5. oagarnac notifications
-
-6. zmienic setinterwal na normalny useeffect podczas odswiezania userow
+5. zmienic setinterwal na normalny useeffect podczas odswiezania userow
