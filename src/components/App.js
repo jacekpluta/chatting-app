@@ -101,6 +101,7 @@ const App = props => {
                 favouriteNotActiveChange={favouriteNotActiveChange}
                 favouriteActive={favouriteActive}
                 privateActiveChannelId={privateActiveChannelId}
+                currentChannel={currentChannel}
               />
               <SidePanelChannels
                 currentUser={currentUser}
@@ -109,6 +110,7 @@ const App = props => {
                 isPrivateChannel={isPrivateChannel}
                 userPosts={userPosts}
                 hideSidbar={hideSidbar}
+                usersInChannel={usersInChannel}
               />
             </Sidebar>
           </Grid.Column>
@@ -155,6 +157,7 @@ const App = props => {
                 favouriteNotActiveChange={favouriteNotActiveChange}
                 favouriteActive={favouriteActive}
                 privateActiveChannelId={privateActiveChannelId}
+                currentChannel={currentChannel}
               />
             </Sidebar>
           </Grid.Column>
@@ -188,6 +191,7 @@ const App = props => {
                 isPrivateChannel={isPrivateChannel}
                 userPosts={userPosts}
                 hideSidbar={hideSidbar}
+                usersInChannel={usersInChannel}
               />
             </Sidebar>
           </Grid.Column>

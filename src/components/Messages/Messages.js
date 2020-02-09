@@ -382,21 +382,6 @@ const Messages = props => {
       <Segment>
         <Comment.Group className="messages">
           {/*shows messages skeleton on messages loading then checks if there is a messages in channel and displays "no messages" or shows all messages*/}
-          {/* {allChannelMessages.loadedMessages &&
-          searchTerm === "" &&
-          messagesLoaded
-            ? renderMessages()
-            : [
-                noMessages
-                  ? "No messages in the channel"
-                  : [
-                      allChannelMessages.loadedMessages &&
-                      searchTerm === "" &&
-                      messagesLoaded
-                        ? renderMessages()
-                        : [searchTerm === "" ? <SkeletonMessages /> : ""]
-                    ]
-              ]} */}
           {!noMessages && messagesLoaded && searchTerm === ""
             ? renderMessages()
             : ""}

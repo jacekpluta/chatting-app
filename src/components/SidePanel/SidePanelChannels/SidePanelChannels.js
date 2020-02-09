@@ -10,7 +10,8 @@ export default function SidePanelChannels(props) {
     isPrivateChannel,
     userPosts,
     hideSidbar,
-    activeChannelId
+    activeChannelId,
+    usersInChannel
   } = props;
 
   const [favouriteActive, setFavouriteActive] = useState(false);
@@ -53,6 +54,7 @@ export default function SidePanelChannels(props) {
         favouriteNotActiveChange={favouriteNotActiveChange}
         favouriteActive={favouriteActive}
         activeChannelId={activeChannelId}
+        usersInChannel={usersInChannel}
       />
     </React.Fragment>
   );

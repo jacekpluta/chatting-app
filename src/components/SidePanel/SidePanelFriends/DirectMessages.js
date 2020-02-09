@@ -14,16 +14,19 @@ const DirectMessages = props => {
     currentUser,
     hideSidbar,
     privateActiveChannelId,
-    friendsMarkActive
+    friendsMarkActive,
+    currentChannel
   } = props;
 
   const [usersOnline, setUsersOnline] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
+  const [userStatusToChange, setUserStatusToChange] = useState(null);
 
   const [connectedRef] = useState(firebase.database().ref(".info/connected"));
   const [presenceRef] = useState(firebase.database().ref("presence"));
+  const [channelsRef] = useState(firebase.database().ref("channels"));
 
   useEffect(() => {
     onlineUsersListener();
@@ -32,36 +35,12 @@ const DirectMessages = props => {
       currentUser.displayName,
       currentUser.photoURL
     );
-
-    // const interval = setInterval(() => {
-    //   onlineUsersListener();
-    //   userConnectedListener(
-    //     currentUser.uid,
-    //     currentUser.displayName,
-    //     currentUser.photoURL
-    //   );
-
-    //   return () => {
-    //     connectedRef.off();
-    //     presenceRef.off();
-    //   };
-    // }, 5000);
-    // return () => clearInterval(interval);
   }, []);
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  useEffect(() => {
-    // const seen = new Set();
-    // const filteredArr = usersOnline.filter(el => {
-    //   const duplicate = seen.has(el.id);
-    //   seen.add(el.id);
-    //   return !duplicate;
-    // });
 
-    // console.log(filteredArr);
+  useEffect(() => {
     props.setUsersList(usersOnline);
   }, [usersOnline]);
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const userConnectedListener = (
     currentUserUid,
     currrentUserName,
@@ -87,12 +66,23 @@ const DirectMessages = props => {
 
         presenceRef
           .child(currentUserUid)
-          .onDisconnect()
+          .onDisconnect(() => {})
           .update(userInfoOffline);
       }
     });
   };
-  const [userStatusToChange, setUserStatusToChange] = useState(null);
+
+  //DELETE CURRENT USER IN USERS IN CHANNEL ON EXIT
+  useEffect(() => {
+    if (currentChannel) {
+      channelsRef
+        .child(currentChannel.id)
+        .child("usersInChannel")
+        .child(currentUser.uid)
+        .onDisconnect()
+        .remove();
+    }
+  }, [currentChannel]);
 
   const onlineUsersListener = () => {
     presenceRef.on("child_added", snapshot => {

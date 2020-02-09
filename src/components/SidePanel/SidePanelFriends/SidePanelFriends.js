@@ -60,6 +60,7 @@ export default function SidePanelFriends(props) {
         friendsMarkActive={friendsMarkActive}
         friendsNotMarkActiveChange={friendsNotMarkActiveChange}
         privateActiveChannelId={privateActiveChannelId}
+        currentChannel={currentChannel}
       ></DirectMessages>
     </React.Fragment>
   );

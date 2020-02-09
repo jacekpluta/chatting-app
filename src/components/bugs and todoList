@@ -1,12 +1,7 @@
 TO DO:
-1. dzwiek przy powiadomieniach
+1. Wyswietlanie wiadomosci ze zostales dodany do znajomych
 
-2. Wyswietlanie wiadomosci ze zostales dodany do znajomych
-
-3. Lista userow w obecnym kanale
-
-4. NA LOGOUT USUNAC MNIE Z KAZDEGO USERSINCHANNEL
-4. NA PRZEJSCIU DO PRIVATE CHANNELU USUNAC KAZDEGO USERSINCHANNEL
+2. Darkmode
 
 BUGS:
 1. notifications nie pokazuja sie, dopiero po zmienia kanalu zaczynaja sei pokazac
@@ -14,6 +9,8 @@ BUGS:
 2. jak kto wchodzi na kanal, lub jak ktos zaczyna pisac, lub wysyla wiadomosc, ISTYPING znika
 
 3. avatar cropping nie dziala przy niestandardowej wielkosci np 500 x 2000
+
+4. naprawic USERS IN CURRENT CHNNALE I NA PRZEJSCIU DO PRIVATE CHANNELU USUNAC KAZDEGO USERSINCHANNEL
 
 
 MINOR BUGS: 
@@ -24,5 +21,3 @@ MINOR BUGS:
 3. wpisywanie do szukania niektórych znaków wywala bład "= \"
 
 4. oagarnac notifications
-
-5. zmienic setinterwal na normalny useeffect podczas odswiezania userow

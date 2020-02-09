@@ -24,9 +24,10 @@ const gridRowStyle = {
 };
 
 const UserPanel = props => {
+  const { currentUser, currentChannel, isPrivateChannel } = props;
+
   const [modal, setModal] = useState(false);
   const [newAvatar, setNewAvatar] = useState(null);
-  const { currentUser, currentChannel, isPrivateChannel } = props;
   const [uploadedCroppedImaged, setUploadedCroppedImaged] = useState(null);
   const [metaData] = useState({ contentType: "image/jpeg" });
   const [loader, setLoader] = useState(false);
@@ -127,8 +128,6 @@ const UserPanel = props => {
 
   const loadAllCurrentChannels = () => {
     if (!isPrivateChannel) {
-      // channelsRef.on("child_added", snapshot => {
-      //   updateAvatarListener(snapshot.key);
       messagesRef.child(currentChannel.id).once("value", snapshot => {
         setMessagesToUpdate(snapshot.val());
       });
@@ -186,7 +185,15 @@ const UserPanel = props => {
     firebase
       .auth()
       .signOut()
-      .then(() => console.log("signed out!"));
+      .then(() => {
+        console.log("signed out!");
+        //remove current user from users in channel on sigout
+        channelsRef
+          .child(currentChannel.id)
+          .child("usersInChannel")
+          .child(currentUser.uid)
+          .remove();
+      });
   };
 
   const dropdownOptions = () => [
@@ -201,11 +208,19 @@ const UserPanel = props => {
     },
     {
       key: "avatar",
-      text: <span onClick={openModal}>Change Avatar</span>
+      text: (
+        <Button fluid onClick={openModal} color="blue">
+          Change Avatar
+        </Button>
+      )
     },
     {
       key: "signout",
-      text: <span onClick={handleSignout}>Sign Out</span>
+      text: (
+        <Button fluid onClick={handleSignout} color="blue">
+          Sign Out
+        </Button>
+      )
     }
   ];
   const closeMessage = () => {
