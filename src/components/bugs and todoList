@@ -1,17 +1,18 @@
 TO DO:
-1. Wyswietlanie wiadomosci ze zostales dodany do znajomych
+1. Wyswietlanie wiadomosci ze zostales dodany do znajomych i czy chcesz dodac znajmego
 
 2. Darkmode
 
+3. Notyfikacje na kanalach prywatnych
+
 BUGS:
-1. notifications nie pokazuja sie, dopiero po zmienia kanalu zaczynaja sei pokazac
+1. dopiero po zmienia kanalu zaczynaja sie pokazac notifikacje
 
 2. jak kto wchodzi na kanal, lub jak ktos zaczyna pisac, lub wysyla wiadomosc, ISTYPING znika
 
 3. avatar cropping nie dziala przy niestandardowej wielkosci np 500 x 2000
 
-4. naprawic USERS IN CURRENT CHNNALE I NA PRZEJSCIU DO PRIVATE CHANNELU USUNAC KAZDEGO USERSINCHANNEL
-
+4. Channel details niwidzialne na telefonie
 
 MINOR BUGS: 
 1. change updateFriendsStatusListeners (slaba petla)

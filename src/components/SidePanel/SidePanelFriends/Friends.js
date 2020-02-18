@@ -75,6 +75,7 @@ const Friends = props => {
     }
   }, [friendToRemove]);
 
+  //GETS PRIVATE CHANNEL ID
   const getChannelId = userId => {
     const currentUserId = currentUser.uid;
     return userId < currentUserId
@@ -82,6 +83,7 @@ const Friends = props => {
       : `${currentUser.uid}/${userId}`;
   };
 
+  //CHANGE PRIVATE CHANNEL
   const changeChannel = friendChannel => {
     const channelId = getChannelId(friendChannel.id);
 

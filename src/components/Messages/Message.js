@@ -89,7 +89,11 @@ const Message = props => {
             slideChangeAnimation="scale-in"
             toggler={toggler}
             customSources={[
-              <img src={message.image} style={style.imageLightbox} />
+              <img
+                src={message.image}
+                alt={"lightbox"}
+                style={style.imageLightbox}
+              />
             ]}
           />
         ) : (

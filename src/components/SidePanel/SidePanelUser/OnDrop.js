@@ -1,11 +1,4 @@
-import React, {
-  useState,
-  useMemo,
-  useEffect,
-  useRef,
-  Loader,
-  Dimmer
-} from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Image as SemanticImage, Grid, Button } from "semantic-ui-react";
 import { useDropzone } from "react-dropzone";
 import ReactCrop from "react-image-crop";
