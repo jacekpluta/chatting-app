@@ -110,6 +110,13 @@ const MessagesHeader = props => {
     props.setPrivateChannel(true);
   };
 
+  const isEmpty = obj => {
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) return false;
+    }
+    return true;
+  };
+
   const displayUsersInChannel = () =>
     usersInChannel
       .sort((a, b) => (a.name > b.name ? 1 : -1))
@@ -192,6 +199,22 @@ const MessagesHeader = props => {
                   }
                 >
                   {usersInChannel ? displayUsersInChannel() : ""}
+                  {isEmpty(usersInChannel) ? (
+                    <List>
+                      <List.Item>
+                        <List.Content>
+                          <List.Header as="a">
+                            {" "}
+                            <span style={{ color: "#ffbf00" }}>
+                              No users in channel
+                            </span>
+                          </List.Header>
+                        </List.Content>
+                      </List.Item>
+                    </List>
+                  ) : (
+                    ""
+                  )}
                 </Popup>
               )}
             {isPrivateChannel && friendAdded && (

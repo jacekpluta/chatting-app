@@ -11,6 +11,9 @@ import firebase from "../../Firebase";
 const Friends = props => {
   const [friendsChannels, setFriendsChannels] = useState([]);
   const [friendToRemove, setFriendToRemove] = useState(null);
+  const [friendPendingToRemove, setFriendPendingToRemove] = useState(null);
+  const [pendingFriends, setPendingFriends] = useState([]);
+  const [friendAdded, setFriendAdded] = useState(false);
 
   const [usersRef] = useState(firebase.database().ref("users"));
   const {
@@ -20,7 +23,8 @@ const Friends = props => {
     hideSidbar,
     friendsMarkActive,
     friendsMarkActiveChange,
-    privateActiveChannelId
+    privateActiveChannelId,
+    currentChannel
   } = props;
 
   useEffect(() => {
@@ -33,6 +37,8 @@ const Friends = props => {
     if (currentUser) {
       addListenersFriendAdded(currentUser.uid);
       addListenersFriendRemoved(currentUser.uid);
+      addListenersPendingFriend(currentUser.uid);
+      addListenersPendingFriendRemoved(currentUser.uid);
     }
 
     return () => {
@@ -40,19 +46,44 @@ const Friends = props => {
     };
   }, []);
 
+  console.log(friendsChannels);
+
   const addListenersFriendAdded = userId => {
+    if (!friendsChannels.includes(userId)) {
+      usersRef
+        .child(userId)
+        .child("friends")
+        .on("child_added", snapshot => {
+          if (currentUser.uid !== snapshot.key) {
+            const friendToAdd = { id: snapshot.key, ...snapshot.val() };
+
+            setFriendsChannels(friendedChannels => [
+              ...friendedChannels,
+              friendToAdd
+            ]);
+          }
+        });
+    }
+  };
+
+  const addListenersPendingFriend = userId => {
     usersRef
       .child(userId)
-      .child("friends")
+      .child("pendingFriends")
       .on("child_added", snapshot => {
-        if (currentUser.uid !== snapshot.key) {
-          const friendToStar = { id: snapshot.key, ...snapshot.val() };
+        setPendingFriends(pendingFriends => [
+          ...pendingFriends,
+          snapshot.val()
+        ]);
+      });
+  };
 
-          setFriendsChannels(friendedChannels => [
-            ...friendedChannels,
-            friendToStar
-          ]);
-        }
+  const addListenersPendingFriendRemoved = userId => {
+    usersRef
+      .child(userId)
+      .child("pendingFriends")
+      .on("child_removed", snapshot => {
+        setFriendPendingToRemove(snapshot.key);
       });
   };
 
@@ -74,6 +105,19 @@ const Friends = props => {
       setFriendToRemove(null);
     }
   }, [friendToRemove]);
+
+  useEffect(() => {
+    if (friendPendingToRemove) {
+      const filteredPendingFriend = pendingFriends.filter(
+        friendPendingChannel => {
+          if (friendPendingChannel.id !== friendPendingToRemove)
+            return friendPendingChannel;
+        }
+      );
+      setPendingFriends(filteredPendingFriend);
+      setFriendPendingToRemove(null);
+    }
+  }, [friendPendingToRemove]);
 
   //GETS PRIVATE CHANNEL ID
   const getChannelId = userId => {
@@ -100,6 +144,48 @@ const Friends = props => {
     hideSidbar();
     friendsMarkActiveChange();
   };
+
+  const handleRemovePending = pendingId => {
+    usersRef
+      .child(`${currentUser.uid}/pendingFriends`)
+      .child(pendingId)
+      .remove(err => {
+        if (err !== null) {
+          console.log(err);
+        }
+      });
+  };
+
+  const handleRemovePendingAddFriend = () => {
+    setFriendAdded(true);
+  };
+
+  useEffect(() => {
+    if (friendAdded) {
+      let selectPrivateChannel = currentChannel.id.replace(currentUser.uid, "");
+      let privateChannel = selectPrivateChannel.replace("/", "");
+
+      setFriendPendingToRemove(privateChannel);
+
+      usersRef.child(`${currentUser.uid}/friends`).update({
+        [privateChannel]: {
+          userId: currentChannel.id,
+          name: currentChannel.name,
+          status: currentChannel.status,
+          photoURL: currentChannel.photoURL
+        }
+      });
+
+      usersRef
+        .child(`${privateChannel}/pendingFriends`)
+        .child(currentUser.uid)
+        .remove(err => {
+          if (err !== null) {
+            console.log(err);
+          }
+        });
+    }
+  }, [friendAdded]);
 
   const displayFriendChannels = () => {
     if (usersList && friendsChannels) {
@@ -138,6 +224,50 @@ const Friends = props => {
     }
   };
 
+  const displayPendingFriends = () => {
+    if (pendingFriends) {
+      return pendingFriends
+        .sort((a, b) => (a.name > b.name ? 1 : -1))
+        .map(pendingFriend => (
+          <Menu.Item
+            key={pendingFriend.user}
+            onClick={() => {
+              changeChannel(pendingFriend);
+            }}
+            name={pendingFriend.name}
+            active={
+              friendsMarkActive && privateActiveChannelId === pendingFriend.id
+            }
+          >
+            <Image
+              src={pendingFriend.photoURL}
+              style={{ width: "10%", height: "10%" }}
+              avatar
+            />
+
+            <span style={{ color: "#39ff14" }}> {pendingFriend.name}</span>
+            <Icon
+              name="check"
+              size="large"
+              color="green"
+              onClick={() => {
+                handleRemovePendingAddFriend();
+              }}
+            ></Icon>
+            {"         "}
+            <Icon
+              name="x"
+              size="large"
+              color="red"
+              onClick={() => {
+                handleRemovePending(pendingFriend.id);
+              }}
+            ></Icon>
+          </Menu.Item>
+        ));
+    }
+  };
+
   return (
     <React.Fragment>
       <Menu.Item>
@@ -148,6 +278,16 @@ const Friends = props => {
       </Menu.Item>
 
       {displayFriendChannels()}
+
+      <Divider clearing />
+      <Menu.Item>
+        <span style={{ color: "#39ff14" }}>
+          <Icon name="exclamation"></Icon> FRIENDS INVITES (
+          {pendingFriends.length})
+        </span>
+        {pendingFriends.lenght}
+      </Menu.Item>
+      {displayPendingFriends()}
       <Divider clearing />
     </React.Fragment>
   );

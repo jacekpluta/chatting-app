@@ -175,10 +175,19 @@ const Messages = props => {
 
       usersRef.child(`${currentUser.uid}/friends`).update({
         [privateChannel]: {
-          channelId: currentChannel.id,
+          userId: currentChannel.id,
           name: currentChannel.name,
           status: currentChannel.status,
           photoURL: currentChannel.photoURL
+        }
+      });
+
+      usersRef.child(`${privateChannel}/pendingFriends`).update({
+        [currentUser.uid]: {
+          id: currentUser.uid,
+          name: currentUser.displayName,
+          photoURL: currentUser.photoURL,
+          status: currentChannel.status
         }
       });
     }
@@ -201,6 +210,15 @@ const Messages = props => {
         }
       });
     setFriendAdded(false);
+
+    usersRef
+      .child(`${privateChannel}/pendingFriends`)
+      .child(currentUser.uid)
+      .remove(err => {
+        if (err !== null) {
+          console.log(err);
+        }
+      });
   };
 
   //LISTEN FOR FRIRENDS
