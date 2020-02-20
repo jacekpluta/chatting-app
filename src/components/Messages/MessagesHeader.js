@@ -188,6 +188,7 @@ const MessagesHeader = props => {
               currentChannel &&
               currentChannel.id !== "mainChannel" && (
                 <Popup
+                  position="bottom center"
                   flowing
                   hoverable
                   trigger={

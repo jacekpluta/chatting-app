@@ -459,7 +459,11 @@ function Channels(props) {
   //SEARCH BAR
   const handleSearchChange = event => {
     setSearchTerm(event.target.value);
+
     setSearchLoading(true);
+    setTimeout(() => {
+      setSearchLoading(false);
+    }, 800);
   };
 
   useEffect(() => {
@@ -483,9 +487,6 @@ function Channels(props) {
     }, []);
 
     setSearchResult(searchResults);
-    setTimeout(() => {
-      setSearchLoading(false);
-    }, 300);
   };
 
   return (

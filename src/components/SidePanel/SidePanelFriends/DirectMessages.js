@@ -155,6 +155,9 @@ const DirectMessages = props => {
   const handleSearchChange = event => {
     setSearchTerm(event.target.value);
     setSearchLoading(true);
+    setTimeout(() => {
+      setSearchLoading(false);
+    }, 800);
   };
 
   useEffect(() => {
@@ -179,9 +182,7 @@ const DirectMessages = props => {
 
     setSearchResult(searchResults);
 
-    setTimeout(() => {
-      setSearchLoading(false);
-    }, 300);
+    //setSearchLoading(false);
   };
 
   return (
