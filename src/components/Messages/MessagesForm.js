@@ -1,4 +1,4 @@
-import { Segment, Input, Button, Loader } from "semantic-ui-react";
+import { Segment, Input, Button, Loader, Label } from "semantic-ui-react";
 import React, { useState, useEffect, useRef } from "react";
 import firebase from "../Firebase";
 import mime from "mime-types";
@@ -271,7 +271,7 @@ const MessagesForm = props => {
       oldMessage = "";
     }
 
-    const newMessage = colonToUnicode(`${oldMessage} ${emoji.colons}`);
+    const newMessage = colonToUnicode(`${oldMessage}${emoji.colons}`);
     setMessage(newMessage);
     setInput(newMessage);
     setEmojiPicker(false);
@@ -307,7 +307,7 @@ const MessagesForm = props => {
           ></Picker>
         ) : (
           ""
-        )}
+        )}{" "}
         <Input
           value={input}
           onInput={e => setInput(e.target.value)}
@@ -315,38 +315,36 @@ const MessagesForm = props => {
           fluid
           name="message"
           style={{ marginBottom: "0.7 em" }}
-          label={
-            <Button
-              size={"big"}
-              icon={"smile outline"}
-              onClick={handleEmojiPicker}
-            ></Button>
-          }
           placeholder="Write your message"
           onChange={handleChange}
           className={error.includes("message") ? "error" : ""}
           ref={inputRef}
           onKeyDown={handlePressEnterToSend}
-        />
-        {messageImageLoading ? <Loader active></Loader> : ""}
-        <Button.Group icon widths="2">
-          <Button
-            disabled={loading || messageImageLoading}
-            onClick={sendMessage}
-            color="blue"
-            content="Send Message"
-            labelPosition="left"
-            icon="edit"
-          ></Button>
+        >
           <Button
             disabled={props.messageImageLoading}
             onClick={openModal}
+            size="mini"
             color="green"
-            content="Upload Image"
-            labelPosition="right"
             icon="upload"
           ></Button>
-        </Button.Group>
+          <Button
+            color="yellow"
+            size="mini"
+            icon="smile outline"
+            onClick={handleEmojiPicker}
+          ></Button>
+
+          <input />
+          <Button
+            disabled={loading || messageImageLoading}
+            onClick={sendMessage}
+            size="mini"
+            color="blue"
+            icon="arrow circle right"
+          ></Button>
+        </Input>
+        {messageImageLoading ? <Loader active></Loader> : ""}
       </Segment>
       <ModalFile
         modal={modal}

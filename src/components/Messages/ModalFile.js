@@ -36,7 +36,7 @@ export default function ModalFile(props) {
           color="green"
           onClick={sendFile}
         >
-          <Icon name="checkmark"> Send</Icon>
+          Send
         </Button>
         <Button
           disabled={loading}
@@ -44,7 +44,7 @@ export default function ModalFile(props) {
           className={"cancel"}
           color="red"
         >
-          <Icon name="checkmark"> Cancel</Icon>
+          Cancel
         </Button>
       </Modal.Actions>
     </Modal>

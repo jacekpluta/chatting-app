@@ -12,7 +12,7 @@ import {
 const DirectMessages = props => {
   const {
     currentUser,
-    hideSidbar,
+    hideSidebar,
     privateActiveChannelId,
     friendsMarkActive,
     currentChannel
@@ -23,6 +23,7 @@ const DirectMessages = props => {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
   const [userStatusToChange, setUserStatusToChange] = useState(null);
+  const [searchResultEmpty, setSearchResultEmpty] = useState(false);
 
   const [connectedRef] = useState(firebase.database().ref(".info/connected"));
   const [presenceRef] = useState(firebase.database().ref("presence"));
@@ -140,7 +141,7 @@ const DirectMessages = props => {
     props.setActiveChannelId(user.id);
     props.setCurrentChannel(channelData);
     props.setPrivateChannel(true);
-    hideSidbar();
+    hideSidebar();
   };
 
   const getChannelId = userId => {
@@ -182,7 +183,11 @@ const DirectMessages = props => {
 
     setSearchResult(searchResults);
 
-    //setSearchLoading(false);
+    if (searchResults.length === 0) {
+      setSearchResultEmpty(true);
+    } else {
+      setSearchResultEmpty(false);
+    }
   };
 
   return (
@@ -231,6 +236,18 @@ const DirectMessages = props => {
               </Menu.Item>
             ))
           : ""}
+
+        {searchResult && searchResultEmpty ? (
+          <Menu.Item style={{ opacity: 0.7 }}>
+            <span style={{ color: "#39ff14" }}>
+              {" "}
+              We couldn't find any user with that name{" "}
+            </span>
+          </Menu.Item>
+        ) : (
+          ""
+        )}
+
         <Divider clearing />
       </React.Fragment>
     </div>

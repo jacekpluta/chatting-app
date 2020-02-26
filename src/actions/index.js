@@ -77,3 +77,21 @@ export const setUsersInChannel = usersInChannel => {
     }
   };
 };
+
+export const setChannelFriended = channelFriended => {
+  return {
+    type: actionTypes.SET_CHANNEL_FRIENDED,
+    payload: {
+      channelFriended
+    }
+  };
+};
+
+export const setDarkMode = darkMode => {
+  return {
+    type: actionTypes.SET_DARK_MODE,
+    payload: {
+      darkMode
+    }
+  };
+};

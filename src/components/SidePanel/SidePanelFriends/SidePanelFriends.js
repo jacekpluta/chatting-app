@@ -12,7 +12,9 @@ export default function SidePanelFriends(props) {
     isPrivateChannel,
     usersList,
     privateActiveChannelId,
-    hideSidbar
+    hideSidebar,
+    darkMode,
+    turnOnTutorial
   } = props;
 
   const [friendsMarkActive, setfriendsMarkActive] = useState(false);
@@ -31,6 +33,8 @@ export default function SidePanelFriends(props) {
         currentChannel={currentChannel}
         currentUser={currentUser}
         isPrivateChannel={isPrivateChannel}
+        darkMode={darkMode}
+        turnOnTutorial={turnOnTutorial}
       ></UserPanel>
 
       <Header
@@ -48,14 +52,14 @@ export default function SidePanelFriends(props) {
         currentUser={currentUser}
         usersList={usersList}
         isPrivateChannel={isPrivateChannel}
-        hideSidbar={hideSidbar}
+        hideSidebar={hideSidebar}
         friendsMarkActive={friendsMarkActive}
         friendsMarkActiveChange={friendsMarkActiveChange}
         privateActiveChannelId={privateActiveChannelId}
       ></Friends>
 
       <DirectMessages
-        hideSidbar={hideSidbar}
+        hideSidebar={hideSidebar}
         currentUser={currentUser}
         friendsMarkActive={friendsMarkActive}
         friendsNotMarkActiveChange={friendsNotMarkActiveChange}

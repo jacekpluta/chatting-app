@@ -92,7 +92,9 @@ class Register extends Component {
               displayName: this.state.username,
               photoURL: `https://www.gravatar.com/avatar/${md5(
                 createdUser.user.email
-              )}?d=identicon`
+              )}?d=identicon`,
+              darkmode: false,
+              tutorial: true
             })
             .then(() => {
               this.saveUser(createdUser).then(() => {
@@ -118,7 +120,9 @@ class Register extends Component {
     return this.state.usersRef.child(createdUser.user.uid).set({
       name: createdUser.user.displayName,
       avatar: createdUser.user.photoURL,
-      email: createdUser.user.email
+      email: createdUser.user.email,
+      darkmode: false,
+      tutorial: true
     });
   };
 

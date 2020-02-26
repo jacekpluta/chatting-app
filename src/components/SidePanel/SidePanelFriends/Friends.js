@@ -6,37 +6,48 @@ import {
   Divider,
   Popup,
   Button,
-  List
+  List,
+  Label
 } from "semantic-ui-react";
 import { connect } from "react-redux";
 import {
   setCurrentChannel,
   setPrivateChannel,
-  setActiveChannelId
+  setActiveChannelId,
+  setChannelFriended
 } from "../../../actions";
 import firebase from "../../Firebase";
+import usePrevious from "../../CustomHooks/usePrevious";
 
 const Friends = props => {
-  const [friendsChannels, setFriendsChannels] = useState([]);
-  const [friendToRemove, setFriendToRemove] = useState(null);
-  const [friendPendingToRemove, setFriendPendingToRemove] = useState(null);
-  const [pendingFriends, setPendingFriends] = useState([]);
-  const [friendAdded, setFriendAdded] = useState(false);
-
-  const [usersRef] = useState(firebase.database().ref("users"));
   const {
     currentUser,
     isPrivateChannel,
     usersList,
-    hideSidbar,
+    hideSidebar,
     friendsMarkActive,
     friendsMarkActiveChange,
     privateActiveChannelId,
     currentChannel
   } = props;
 
+  const [friendsChannels, setFriendsChannels] = useState([]);
+  const [friendToRemove, setFriendToRemove] = useState(false);
+  const [friendPendingToRemove, setFriendPendingToRemove] = useState(null);
+  const [pendingFriends, setPendingFriends] = useState([]);
+  const [friendAdded, setFriendAdded] = useState(false);
+  const [uniqueFriendsPendings, setUniqueFriendsPendings] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const prevChannelId = usePrevious(privateActiveChannelId);
+
+  const [privateMessagesRef] = useState(
+    firebase.database().ref("privateMessages")
+  );
+  const [usersRef] = useState(firebase.database().ref("users"));
+
   useEffect(() => {
     if (!isPrivateChannel) {
+      clearNotifications(prevChannelId);
       props.setActiveChannelId(null);
     }
   }, [isPrivateChannel]);
@@ -50,12 +61,100 @@ const Friends = props => {
     }
 
     return () => {
-      usersRef.off();
+      //   usersRef.off();
     };
   }, []);
 
-  console.log(pendingFriends);
+  //NOTIFICATIONS
+  useEffect(() => {
+    if (currentChannel && isPrivateChannel) {
+      addUsersFriendsListener(currentChannel.id);
+    }
+  }, []);
 
+  const addUsersFriendsListener = channelId => {
+    usersRef
+      .child(currentUser.uid)
+      .child("friends")
+      .on("child_added", function(snap) {
+        if (snap.key !== currentUser.uid) {
+          addNotificationListener(snap.key);
+        }
+      });
+  };
+
+  const addNotificationListener = channelId => {
+    privateMessagesRef.child(getChannelId(channelId)).on("value", snapshot => {
+      handleNotifications(
+        channelId,
+        currentChannel.id,
+        notifications,
+        snapshot
+      );
+    });
+  };
+
+  const handleNotifications = (
+    channelId,
+    currentChannelId,
+    notifications,
+    snap
+  ) => {
+    let lastTotal = 0;
+
+    let index = notifications.findIndex(
+      notification => notification.id === channelId
+    );
+
+    if (index !== -1) {
+      if (channelId !== currentChannelId) {
+        lastTotal = notifications[index].total;
+
+        if (snap.numChildren() - lastTotal > 0) {
+          notifications[index].count = snap.numChildren() - lastTotal;
+        }
+      }
+      notifications[index].lastKnownTotal = snap.numChildren();
+    } else {
+      notifications.push({
+        id: channelId,
+        total: snap.numChildren(),
+        lastKnownTotal: snap.numChildren(),
+        count: 0
+      });
+    }
+    setNotifications(notifications);
+  };
+
+  const getNotificationCount = channel => {
+    let count = 0;
+
+    notifications.forEach(notification => {
+      if (notification.id === channel.id) {
+        count = notification.count;
+      }
+    });
+
+    if (count > 0) return count;
+  };
+
+  //CLEARS NOTIFICATIONS ON CHANNEL CHANGE
+  const clearNotifications = friendChannelId => {
+    if (currentUser) {
+      let index = notifications.findIndex(
+        notification => notification.id === friendChannelId
+      );
+
+      if (index !== -1) {
+        let updatedNotifications = [...notifications];
+        updatedNotifications[index].total = notifications[index].lastKnownTotal;
+        updatedNotifications[index].count = 0;
+        setNotifications(updatedNotifications);
+      }
+    }
+  };
+
+  //
   const addListenersFriendAdded = userId => {
     usersRef
       .child(userId)
@@ -99,6 +198,7 @@ const Friends = props => {
       .child("friends")
       .on("child_removed", snapshot => {
         setFriendToRemove(snapshot.key);
+        props.setChannelFriended(false);
       });
   };
 
@@ -147,7 +247,9 @@ const Friends = props => {
     props.setActiveChannelId(friendChannel.id);
     props.setCurrentChannel(privateChannelData);
     props.setPrivateChannel(true);
-    hideSidbar();
+    hideSidebar();
+
+    clearNotifications(friendChannel.id);
     friendsMarkActiveChange();
   };
 
@@ -170,9 +272,11 @@ const Friends = props => {
         if (err !== null) {
           console.log(err);
         }
+      })
+      .then(() => {
+        setFriendAdded(true);
+        props.setChannelFriended(true);
       });
-
-    setFriendAdded(true);
   };
 
   useEffect(() => {
@@ -190,6 +294,7 @@ const Friends = props => {
           photoURL: currentChannel.photoURL
         }
       });
+      setFriendAdded(false);
     }
   }, [friendAdded]);
 
@@ -224,117 +329,128 @@ const Friends = props => {
             ) : (
               ""
             )}
+            {friendChannel.id !== privateActiveChannelId &&
+              getNotificationCount(friendChannel) && (
+                <Label color="red">{getNotificationCount(friendChannel)}</Label>
+              )}
+
             <span style={{ color: "#39ff14" }}> {friendChannel.name}</span>
           </Menu.Item>
         ));
     }
   };
+  useEffect(() => {
+    uniquePendings();
+  }, [pendingFriends]);
+
+  const uniquePendings = () => {
+    //substracts friends from friend pendings
+    const onlyPendings = pendingFriends.filter(
+      x => !friendsChannels.filter(y => y.id === x.id).length
+    );
+
+    //deletes duplicates
+    const uniquePendings = Array.from(new Set(onlyPendings.map(a => a.id))).map(
+      id => {
+        return onlyPendings.find(a => a.id === id);
+      }
+    );
+    setUniqueFriendsPendings(uniquePendings);
+  };
 
   const displayPendingFriends = () => {
-    if (pendingFriends) {
-      console.log(pendingFriends);
-      console.log(friendsChannels);
-
+    if (uniqueFriendsPendings) {
       //substracts friends from friend pendings
-      let onlyPendings = pendingFriends.filter(
-        x => !friendsChannels.filter(y => y.id === x.id).length
-      );
 
-      const uniquePendings = Array.from(
-        new Set(onlyPendings.map(a => a.id))
-      ).map(id => {
-        return onlyPendings.find(a => a.id === id);
-      });
-
-      return uniquePendings
+      return uniqueFriendsPendings
         .sort((a, b) => (a.name > b.name ? 1 : -1))
         .map(pendingFriend => (
-          <Popup
-            flowing
-            hoverable
-            trigger={
-              <Button color="red" size="mini" style={{ color: "white" }}>
-                <Icon name="exclamation"></Icon> ({pendingFriends.length})
-              </Button>
-            }
-          >
-            {/* <Menu.Item
-              key={pendingFriend.user}
-              onClick={() => {
-                changeChannel(pendingFriend);
-              }}
-              name={pendingFriend.name}
-              // active={
-              //   friendsMarkActive && privateActiveChannelId === pendingFriend.id
-              // }
-            > */}
-            <List>
-              <List.Item>
-                <Image
-                  src={pendingFriend.photoURL}
-                  style={{ width: "10%", height: "10%" }}
-                  avatar
-                />
-                <List.Content>
-                  <List.Header as="a">
-                    {" "}
-                    <h4
-                      key={pendingFriend.user}
+          <List>
+            <List.Item>
+              <Image
+                src={pendingFriend.photoURL}
+                style={{ width: "10%", height: "10%" }}
+                avatar
+              />
+              <List.Content>
+                <List.Header as="a">
+                  {" "}
+                  <h4
+                    key={pendingFriend.user}
+                    onClick={() => {
+                      changeChannel(pendingFriend);
+                    }}
+                    style={{ color: "#39ff14" }}
+                  >
+                    {pendingFriend.name}
+                  </h4>
+                </List.Header>
+                <List.Description>
+                  <h4
+                    onClick={() => {
+                      changeChannel(pendingFriend);
+                    }}
+                  >
+                    <a>
+                      <b>just added you to friends.</b>
+                    </a>{" "}
+                    Do you want to add him too?{"  "}
+                    <Icon
+                      name="check"
+                      size="large"
+                      color="green"
                       onClick={() => {
-                        changeChannel(pendingFriend);
+                        handleRemovePendingAddFriend(pendingFriend.id);
                       }}
-                      style={{ color: "#39ff14" }}
-                    >
-                      {pendingFriend.name}
-                    </h4>
-                  </List.Header>
-                  <List.Description>
-                    <h4
+                    ></Icon>
+                    <Icon
+                      name="x"
+                      size="large"
+                      color="red"
                       onClick={() => {
-                        changeChannel(pendingFriend);
+                        handleRemovePending(pendingFriend.id);
                       }}
-                    >
-                      <a>
-                        <b>just added you to friends.</b>
-                      </a>{" "}
-                      Do you want to add him too?{"  "}
-                      <Icon
-                        name="check"
-                        size="large"
-                        color="green"
-                        onClick={() => {
-                          handleRemovePendingAddFriend(pendingFriend.id);
-                          console.log("lol");
-                        }}
-                      ></Icon>
-                      <Icon
-                        name="x"
-                        size="large"
-                        color="red"
-                        onClick={() => {
-                          handleRemovePending(pendingFriend.id);
-                          console.log("lol");
-                        }}
-                      ></Icon>
-                    </h4>
-                  </List.Description>
-                </List.Content>
-              </List.Item>
-            </List>
-          </Popup>
+                    ></Icon>
+                  </h4>
+                </List.Description>
+              </List.Content>
+            </List.Item>
+          </List>
         ));
+      {
+      }
     }
   };
 
   return (
     <React.Fragment>
       <Menu.Item>
-        <span style={{ color: "#39ff14" }}>
+        <span style={{ color: "#39ff14", paddingBottom: "5px" }}>
           <Icon name="address book"></Icon> FRIENDS ({friendsChannels.length})
           {"   "}
-          {displayPendingFriends()}
         </span>
         {friendsChannels.lenght}
+        {uniqueFriendsPendings.length !== 0 ? (
+          <Popup
+            flowing
+            hoverable
+            trigger={
+              <Button
+                color="orange"
+                size="mini"
+                compact
+                style={{ color: "white" }}
+              >
+                <Icon name="exclamation"></Icon> ({uniqueFriendsPendings.length}
+                )
+              </Button>
+            }
+          >
+            {displayPendingFriends()}
+          </Popup>
+        ) : (
+          ""
+        )}
       </Menu.Item>
 
       {displayFriendChannels()}
@@ -347,5 +463,6 @@ const Friends = props => {
 export default connect(null, {
   setCurrentChannel,
   setPrivateChannel,
-  setActiveChannelId
+  setActiveChannelId,
+  setChannelFriended
 })(Friends);

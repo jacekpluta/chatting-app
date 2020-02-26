@@ -123,13 +123,49 @@ const usersInChannel_reducer = (state = initialUsersInChannelState, action) => {
   }
 };
 
+const initialChannelFriended = {
+  channelFriended: null
+};
+
+const channelFriended_reducer = (state = initialChannelFriended, action) => {
+  switch (action.type) {
+    case actionTypes.SET_CHANNEL_FRIENDED:
+      return {
+        ...state,
+        channelFriended: action.payload.channelFriended
+      };
+
+    default:
+      return state;
+  }
+};
+
+const initialDarkMode = {
+  darkMode: false
+};
+
+const darkMode_reducer = (state = initialDarkMode, action) => {
+  switch (action.type) {
+    case actionTypes.SET_DARK_MODE:
+      return {
+        ...state,
+        darkMode: action.payload.darkMode
+      };
+
+    default:
+      return state;
+  }
+};
+
 const rootReducer = combineReducers({
   user: user_reducer,
   channel: channel_reducer,
   userTyping: userTyping_reducer,
   usersList: usersList_reducer,
   activeChannelId: activeChannelId_reducer,
-  usersInChannel: usersInChannel_reducer
+  usersInChannel: usersInChannel_reducer,
+  channelFriended: channelFriended_reducer,
+  darkMode: darkMode_reducer
 });
 
 export default rootReducer;

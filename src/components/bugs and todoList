@@ -1,22 +1,15 @@
 TO DO:
-1. Darkmode
-
-3. Notyfikacje na kanalach prywatnych
-
-4. logout after 1 hour
+1. Notifications added to database
+2. Tests
+3. Horizontal use on mobile devices
 
 BUGS:
-1. dopiero po zmienia kanalu zaczynaja sie pokazac notifikacje
-
+1. dopiero po zmienia kanalu zaczynaja sie pokazac notifikacje, a w private channels po zmieniae kanalu i tylko po jego zmianie
 2. jak kto wchodzi na kanal, lub jak ktos zaczyna pisac, lub wysyla wiadomosc, ISTYPING znika
-
 3. avatar cropping nie dziala przy niestandardowej wielkosci np 500 x 2000
 
+
 MINOR BUGS: 
-1. change updateFriendsStatusListeners (slaba petla)
-
+1. zmienic updateFriendsStatusListeners (slaba petla)
 2. odswiaza sie dopiero po zmianie kanalu po uploadzie avataru
-
 3. wpisywanie do szukania niektórych znaków wywala bład "= \"
-
-4. oagarnac notifications

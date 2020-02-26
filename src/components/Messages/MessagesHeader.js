@@ -30,12 +30,12 @@ const MessagesHeader = props => {
     channelStarred,
     unstarChannel,
     handleAddFriend,
-    friendAdded,
     unfriendPerson,
     currentChannel,
     userPosts,
     currentUser,
-    usersInChannel
+    usersInChannel,
+    channelFriended
   } = props;
   const [popupOpen, setPopupOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -110,6 +110,7 @@ const MessagesHeader = props => {
     props.setPrivateChannel(true);
   };
 
+  //CHECKS IF THERE ARE USERS IN CURRENT CHANNEL
   const isEmpty = obj => {
     for (let key in obj) {
       if (obj.hasOwnProperty(key)) return false;
@@ -117,6 +118,7 @@ const MessagesHeader = props => {
     return true;
   };
 
+  //DISPLAYS CURRENT USERS IN CHANNEL
   const displayUsersInChannel = () =>
     usersInChannel
       .sort((a, b) => (a.name > b.name ? 1 : -1))
@@ -142,100 +144,83 @@ const MessagesHeader = props => {
 
   return (
     <Segment clearing>
-      <Header fluid="true" as="h2" floated="left" style={{ marginBottom: 0 }}>
-        <Header.Content>
-          {" "}
-          <span>
-            {displayChannelName()}{" "}
-            {!isPrivateChannel && channelStarred && (
-              <Icon name={"star"} onClick={unstarChannel} color="yellow"></Icon>
-            )}
-            {!isPrivateChannel && !channelStarred && (
-              <Icon
-                name={"star outline"}
-                onClick={handleStarred}
-                color="yellow"
-              ></Icon>
-            )}{" "}
-            {!isPrivateChannel && (
-              <Popup
-                onOpen={handleEnablePopup}
-                onClose={handleDisablePopup}
-                open={popupOpen}
-                flowing
-                hoverable
-                trigger={
-                  <Button
-                    size="mini"
-                    icon="question"
-                    style={{ paddingTop: "15px", paddingLeft: "-15px" }}
-                  />
-                }
-              >
-                <MetaPanel
-                  key={currentChannel && currentChannel.id}
-                  currentChannel={currentChannel}
-                  isPrivateChannel={isPrivateChannel}
-                  userPosts={userPosts}
-                  currentUser={currentUser}
-                  handleDisablePopup={handleDisablePopup}
-                  handleOpenModal={handleOpenModal}
-                  loading={loading}
-                ></MetaPanel>
-              </Popup>
-            )}
-            {!isPrivateChannel &&
-              currentChannel &&
-              currentChannel.id !== "mainChannel" && (
-                <Popup
-                  position="bottom center"
-                  flowing
-                  hoverable
-                  trigger={
-                    <Button
-                      size="mini"
-                      icon="user"
-                      style={{ paddingTop: "15px", paddingLeft: "-15px" }}
-                    />
-                  }
-                >
-                  {usersInChannel ? displayUsersInChannel() : ""}
-                  {isEmpty(usersInChannel) ? (
-                    <List>
-                      <List.Item>
-                        <List.Content>
-                          <List.Header as="a">
-                            {" "}
-                            <span style={{ color: "#ffbf00" }}>
-                              No users in channel
-                            </span>
-                          </List.Header>
-                        </List.Content>
-                      </List.Item>
-                    </List>
-                  ) : (
-                    ""
-                  )}
-                </Popup>
+      <Header fluid="true" as="h3" floated="left" className="messagesHeader">
+        <span>
+          {displayChannelName()}{" "}
+          {!isPrivateChannel && channelStarred && (
+            <Icon name={"star"} onClick={unstarChannel} color="yellow"></Icon>
+          )}
+          {!isPrivateChannel && !channelStarred && (
+            <Icon
+              name={"star outline"}
+              onClick={handleStarred}
+              color="yellow"
+            ></Icon>
+          )}
+          {!isPrivateChannel && (
+            <Popup
+              onOpen={handleEnablePopup}
+              onClose={handleDisablePopup}
+              open={popupOpen}
+              position="bottom center"
+              flowing
+              hoverable
+              trigger={<Button size="mini" icon="question" />}
+            >
+              <MetaPanel
+                key={currentChannel && currentChannel.id}
+                currentChannel={currentChannel}
+                isPrivateChannel={isPrivateChannel}
+                userPosts={userPosts}
+                currentUser={currentUser}
+                handleDisablePopup={handleDisablePopup}
+                handleOpenModal={handleOpenModal}
+                loading={loading}
+              ></MetaPanel>
+            </Popup>
+          )}
+          {!isPrivateChannel && currentChannel && (
+            // currentChannel.id !== "mainChannel" &&
+            <Popup
+              position="bottom center"
+              flowing
+              hoverable
+              trigger={<Button size="mini" icon="user" />}
+            >
+              {usersInChannel ? displayUsersInChannel() : ""}
+              {isEmpty(usersInChannel) ? (
+                <List>
+                  <List.Item>
+                    <List.Content>
+                      <List.Header as="a">
+                        {" "}
+                        <span style={{ color: "#ffbf00" }}>
+                          No users in channel
+                        </span>
+                      </List.Header>
+                    </List.Content>
+                  </List.Item>
+                </List>
+              ) : (
+                ""
               )}
-            {isPrivateChannel && friendAdded && (
-              <Icon
-                name={"user times"}
-                onClick={unfriendPerson}
-                color="red"
-              ></Icon>
-            )}
-            {isPrivateChannel && !friendAdded && (
-              <Icon
-                name={"user plus"}
-                onClick={handleAddFriend}
-                color="green"
-              ></Icon>
-            )}
-          </span>
-        </Header.Content>
-        {"    "}
-        <Header.Content>
+            </Popup>
+          )}
+          {isPrivateChannel && channelFriended && (
+            <Icon
+              name={"user times"}
+              onClick={unfriendPerson}
+              color="red"
+            ></Icon>
+          )}
+          {isPrivateChannel && !channelFriended && (
+            <Icon
+              name={"user plus"}
+              onClick={handleAddFriend}
+              color="green"
+            ></Icon>
+          )}
+          {"  "}
           <Input
             onChange={handleSearchChange}
             size="mini"
@@ -246,7 +231,7 @@ const MessagesHeader = props => {
             placeholder="Search messages"
             style={{ width: "190px" }}
           ></Input>
-        </Header.Content>
+        </span>
       </Header>
       <DeleteChannelModal
         handleDeleteChannel={handleDeleteChannel}

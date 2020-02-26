@@ -1,12 +1,16 @@
 html,
 body,
 .app {
-  height: 70vh;
+}
+
+.messagesPanel {
+  height: 100vh;
+  overflow-y: hidden;
 }
 
 .messages {
-  height: 45vh;
   overflow-y: scroll;
+  height: 57vh;
 }
 
 .myMessage {

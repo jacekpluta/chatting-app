@@ -9,7 +9,7 @@ export default function SidePanelChannels(props) {
     currentChannel,
     isPrivateChannel,
     userPosts,
-    hideSidbar,
+    hideSidebar,
     activeChannelId,
     usersInChannel
   } = props;
@@ -38,7 +38,7 @@ export default function SidePanelChannels(props) {
 
       <Divider />
       <Starred
-        hideSidbar={hideSidbar}
+        hideSidebar={hideSidebar}
         currentUser={currentUser}
         currentChannel={currentChannel}
         isPrivateChannel={isPrivateChannel}
@@ -50,7 +50,7 @@ export default function SidePanelChannels(props) {
         currentChannel={currentChannel}
         isPrivateChannel={isPrivateChannel}
         currentUser={currentUser}
-        hideSidbar={hideSidbar}
+        hideSidebar={hideSidebar}
         favouriteNotActiveChange={favouriteNotActiveChange}
         favouriteActive={favouriteActive}
         activeChannelId={activeChannelId}

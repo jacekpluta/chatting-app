@@ -15,7 +15,8 @@ import { connect } from "react-redux";
 import {
   setCurrentChannel,
   setPrivateChannel,
-  setUsersInChannel
+  setUsersInChannel,
+  setChannelFriended
 } from "../../../actions";
 import usePrevious from "../../CustomHooks/usePrevious";
 
@@ -36,6 +37,7 @@ function Channels(props) {
   const [userInChannelToRemove, setUserInChannelToRemove] = useState(null);
   const [usersInCurrentChannel, setUsersInCurrentChannel] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [searchResultEmpty, setSearchResultEmpty] = useState(false);
 
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [messagesRef] = useState(firebase.database().ref("messages"));
@@ -45,7 +47,7 @@ function Channels(props) {
   const {
     currentUser,
     isPrivateChannel,
-    hideSidbar,
+    hideSidebar,
     favouriteNotActiveChange,
     favouriteActive
   } = props;
@@ -61,6 +63,7 @@ function Channels(props) {
   useEffect(() => {
     if (isPrivateChannel) {
       setActiveChannelId(null);
+      clearNotifications(prevChannelId);
 
       if (prevChannelId && prevChannelId.length < 21) {
         channelsRef
@@ -128,7 +131,7 @@ function Channels(props) {
     channelsRef.on("child_added", function(snap) {
       addNotificationListener(snap.key);
     });
-  }, [notifications]);
+  }, []);
 
   const addNotificationListener = channelId => {
     messagesRef.child(channelId).on("value", snapshot => {
@@ -178,6 +181,22 @@ function Channels(props) {
     });
 
     if (count > 0) return count;
+  };
+
+  //CLEARS NOTIFICATIONS
+  const clearNotifications = () => {
+    if (currentUser) {
+      let index = notifications.findIndex(
+        notification => notification.id === currentChannel.id
+      );
+
+      if (index !== -1) {
+        let updatedNotifications = [...notifications];
+        updatedNotifications[index].total = notifications[index].lastKnownTotal;
+        updatedNotifications[index].count = 0;
+        setNotifications(updatedNotifications);
+      }
+    }
   };
 
   //CHECKS IF ADD CHANNEL FORM IS VALID
@@ -361,26 +380,34 @@ function Channels(props) {
       setUserInChannelToRemove(null);
     }
   }, [userInChannelToRemove]);
-
+  console.log(usersInCurrentChannel);
   useEffect(() => {
     if (usersInCurrentChannel) {
-      props.setUsersInChannel(usersInCurrentChannel);
+      const uniqueUsers = Array.from(
+        new Set(usersInCurrentChannel.map(a => a.id))
+      ).map(id => {
+        return usersInCurrentChannel.find(a => a.id === id);
+      });
+
+      props.setUsersInChannel(uniqueUsers);
     }
   }, [usersInCurrentChannel]);
 
   //CHANGE CURRENT CHANNEL
   const changeChannel = channel => {
+    props.setChannelFriended(false);
     setUsersInCurrentChannel([]);
     props.setCurrentChannel(channel);
     props.setPrivateChannel(false);
     setCurrentChannel(channel);
-    hideSidbar();
+    hideSidebar();
 
     setActiveChannelId(channel.id);
 
+    clearNotifications(prevChannelId);
     clearNotifications();
-    favouriteNotActiveChange();
 
+    favouriteNotActiveChange();
     currentUsersInChannel(channel);
     currentChannelUsersListener(channel);
 
@@ -395,22 +422,6 @@ function Channels(props) {
         .child(prevChannelId)
         .child("usersInChannel")
         .off();
-    }
-  };
-
-  //CLEARS NOTIFICATIONS
-  const clearNotifications = () => {
-    if (currentUser) {
-      let index = notifications.findIndex(
-        notification => notification.id === currentChannel.id
-      );
-
-      if (index !== -1) {
-        let updatedNotifications = [...notifications];
-        updatedNotifications[index].total = notifications[index].lastKnownTotal;
-        updatedNotifications[index].count = 0;
-        setNotifications(updatedNotifications);
-      }
     }
   };
 
@@ -456,6 +467,18 @@ function Channels(props) {
     }
   };
 
+  const checkIfSearchedChannelsEmpty = () => {
+    if (searchResultEmpty) {
+      return (
+        <Menu.Item style={{ opacity: 0.7 }}>
+          <span style={{ color: "#ffbf00" }}>
+            We couldn't find any channel with that name
+          </span>
+        </Menu.Item>
+      );
+    }
+  };
+
   //SEARCH BAR
   const handleSearchChange = event => {
     setSearchTerm(event.target.value);
@@ -487,6 +510,12 @@ function Channels(props) {
     }, []);
 
     setSearchResult(searchResults);
+
+    if (searchResults.length === 0) {
+      setSearchResultEmpty(true);
+    } else {
+      setSearchResultEmpty(false);
+    }
   };
 
   return (
@@ -511,6 +540,7 @@ function Channels(props) {
       </Menu.Item>
 
       {displaySearchedChannels()}
+      {checkIfSearchedChannelsEmpty()}
       <Divider clearing />
       <Menu.Item>
         <span style={{ color: "#ffbf00" }}>
@@ -583,5 +613,6 @@ function Channels(props) {
 export default connect(null, {
   setCurrentChannel,
   setPrivateChannel,
-  setUsersInChannel
+  setUsersInChannel,
+  setChannelFriended
 })(Channels);

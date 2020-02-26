@@ -13,9 +13,15 @@ import {
 } from "semantic-ui-react";
 import firebase from "../../Firebase";
 import OnDrop from "./OnDrop";
+import { connect } from "react-redux";
+import { setDarkMode } from "../../../actions";
 
 const userStyle = {
   background: "#0080FF"
+};
+
+const userDarkStyle = {
+  background: "#1f1f1f"
 };
 
 const gridRowStyle = {
@@ -24,7 +30,13 @@ const gridRowStyle = {
 };
 
 const UserPanel = props => {
-  const { currentUser, currentChannel, isPrivateChannel } = props;
+  const {
+    currentUser,
+    currentChannel,
+    isPrivateChannel,
+    darkMode,
+    turnOnTutorial
+  } = props;
 
   const [modal, setModal] = useState(false);
   const [newAvatar, setNewAvatar] = useState(null);
@@ -144,6 +156,23 @@ const UserPanel = props => {
     }
   }, [messagesToUpdate]);
 
+  useEffect(() => {
+    if (currentUser) {
+      usersRef
+        .child(currentUser.uid)
+        .once("value")
+        .then(data => {
+          if (
+            data.val() &&
+            data.val().darkmode &&
+            data.val().darkmode === true
+          ) {
+            props.setDarkMode(true);
+          }
+        });
+    }
+  }, []);
+
   const updatingMessages = () => {
     Object.entries(messagesToUpdate).map(([messageId, message], i) => {
       if (message.currentUser.id === currentUser.uid) {
@@ -181,6 +210,26 @@ const UserPanel = props => {
     setModal(false);
   };
 
+  const handleDarkMode = () => {
+    if (darkMode) {
+      props.setDarkMode(false);
+
+      usersRef
+        .child(currentUser.uid)
+        .child("darkmode")
+        .remove();
+    }
+
+    if (!darkMode) {
+      props.setDarkMode(true);
+
+      usersRef
+        .child(currentUser.uid)
+        .child("darkmode")
+        .set(true);
+    }
+  };
+
   const handleSignout = () => {
     firebase
       .auth()
@@ -215,6 +264,22 @@ const UserPanel = props => {
       )
     },
     {
+      key: "dark",
+      text: (
+        <Button fluid onClick={handleDarkMode} color="blue">
+          {darkMode ? "Disable Dark Mode" : "Enable Dark Mode"}
+        </Button>
+      )
+    },
+    {
+      key: "tutorial",
+      text: (
+        <Button fluid onClick={turnOnTutorial} color="blue">
+          Tutorial
+        </Button>
+      )
+    },
+    {
       key: "signout",
       text: (
         <Button fluid onClick={handleSignout} color="blue">
@@ -232,7 +297,7 @@ const UserPanel = props => {
       <Loader active />
     </Dimmer>
   ) : (
-    <Grid style={userStyle}>
+    <Grid style={darkMode ? userDarkStyle : userStyle}>
       <Grid.Column>
         <Grid.Row style={gridRowStyle}>
           {/* App Header */}
@@ -307,4 +372,6 @@ const UserPanel = props => {
   );
 };
 
-export default UserPanel;
+export default connect(null, {
+  setDarkMode
+})(UserPanel);

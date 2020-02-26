@@ -14,18 +14,6 @@ import SidePanelFriends from "./SidePanel/SidePanelFriends/SidePanelFriends";
 import SidePanelChannels from "./SidePanel/SidePanelChannels/SidePanelChannels";
 import { connect } from "react-redux";
 
-const leftSidebarStyle = {
-  background: "#0080FF"
-};
-
-const smallSidebarStyle = {
-  background: "#0080FF"
-};
-
-const rightSidebarStyle = {
-  background: "#0080FF"
-};
-
 const App = props => {
   const {
     currentUser,
@@ -35,13 +23,23 @@ const App = props => {
     userTyping,
     usersList,
     privateActiveChannelId,
-    usersInChannel
+    usersInChannel,
+    channelFriended,
+    darkMode
   } = props;
 
   const [visible, setVisible] = useState(false);
-
   const [allwaysVisible] = useState(true);
   const [favouriteActive, setFavouriteActive] = useState(false);
+  const [stepsEnabled, setStepsEnabled] = useState(null);
+
+  const sidebarStyle = {
+    background: "#0080FF"
+  };
+
+  const sidebarDarkStyle = {
+    background: "#1f1f1f"
+  };
 
   const favouriteActiveChange = () => {
     setFavouriteActive(true);
@@ -51,8 +49,20 @@ const App = props => {
     setFavouriteActive(false);
   };
 
-  const hideSidbar = () => {
+  const hideSidebar = () => {
     setVisible(false);
+  };
+
+  const showSidebar = () => {
+    setVisible(true);
+  };
+
+  const turnOnTutorial = () => {
+    setStepsEnabled(true);
+  };
+
+  const turnOffTutorial = () => {
+    setStepsEnabled(false);
   };
 
   return (
@@ -62,7 +72,9 @@ const App = props => {
         <Grid
           columns="2"
           className="app"
-          style={{ background: "white" }} //background: "#F0F7F4" }}
+          style={
+            darkMode ? { background: "#3b3b3b" } : { background: "#ffffff" }
+          }
         >
           <Grid.Column width={3}>
             <Sidebar
@@ -71,21 +83,21 @@ const App = props => {
               vertical
               visible={!visible}
               width="very thin"
-              style={smallSidebarStyle}
+              style={darkMode ? { background: "#3f3f3f" } : sidebarStyle}
             >
               <Divider />
               <Button
                 size={"small"}
                 color={"facebook"}
                 icon={"angle double right"}
-                onClick={() => setVisible(true)}
+                onClick={() => showSidebar()}
               ></Button>
             </Sidebar>
             <Sidebar
               as={Menu}
               vertical
               visible={visible}
-              style={leftSidebarStyle}
+              style={darkMode ? sidebarDarkStyle : sidebarStyle}
               onHide={() => setVisible(false)}
               animation={"push"}
             >
@@ -96,12 +108,14 @@ const App = props => {
                 isPrivateChannel={isPrivateChannel}
                 usersList={usersList}
                 userPosts={userPosts}
-                hideSidbar={hideSidbar}
+                hideSidebar={hideSidebar}
                 favouriteActiveChange={favouriteActiveChange}
                 favouriteNotActiveChange={favouriteNotActiveChange}
                 favouriteActive={favouriteActive}
                 privateActiveChannelId={privateActiveChannelId}
                 currentChannel={currentChannel}
+                darkMode={darkMode}
+                turnOnTutorial={turnOnTutorial}
               />
               <SidePanelChannels
                 currentUser={currentUser}
@@ -109,7 +123,7 @@ const App = props => {
                 currentChannel={currentChannel}
                 isPrivateChannel={isPrivateChannel}
                 userPosts={userPosts}
-                hideSidbar={hideSidbar}
+                hideSidebar={hideSidebar}
                 usersInChannel={usersInChannel}
               />
             </Sidebar>
@@ -124,26 +138,33 @@ const App = props => {
               usersList={usersList}
               userPosts={userPosts}
               usersInChannel={usersInChannel}
+              turnOnTutorial={turnOnTutorial}
+              stepsEnabled={stepsEnabled}
+              turnOffTutorial={turnOffTutorial}
+              showSidebar={showSidebar}
             />
           </Grid.Column>
         </Grid>
       </Responsive>
 
-      {/* SCREEN WIDTH OVER 768 */}
-      <Responsive as={"menu"} minWidth={1000}>
+      {/* SCREEN WIDTH OVER 1000 */}
+      <Responsive as={Segment} minWidth={1000}>
         <Grid
           columns="3"
           className="app"
-          style={{ background: "white" }} //background: "#F0F7F4" }}
+          style={
+            darkMode ? { background: "#3b3b3b" } : { background: "#ffffff" }
+          }
         >
           <Grid.Column width={4}>
             <Sidebar
+              className="friendsSegment"
               as={Menu}
               direction={"left"}
               inverted
               vertical
               visible={allwaysVisible}
-              style={leftSidebarStyle}
+              style={darkMode ? sidebarDarkStyle : sidebarStyle}
             >
               <SidePanelFriends
                 currentUser={currentUser}
@@ -152,16 +173,22 @@ const App = props => {
                 isPrivateChannel={isPrivateChannel}
                 usersList={usersList}
                 userPosts={userPosts}
-                hideSidbar={hideSidbar}
+                hideSidebar={hideSidebar}
                 favouriteActiveChange={favouriteActiveChange}
                 favouriteNotActiveChange={favouriteNotActiveChange}
                 favouriteActive={favouriteActive}
                 privateActiveChannelId={privateActiveChannelId}
                 currentChannel={currentChannel}
+                darkMode={darkMode}
+                turnOnTutorial={turnOnTutorial}
               />
             </Sidebar>
           </Grid.Column>
-          <Grid.Column width={8} style={{ marginLeft: "-20px" }}>
+          <Grid.Column
+            className="messagesPanel"
+            width={8}
+            style={{ marginLeft: "-5px" }}
+          >
             <Messages
               currentChannel={currentChannel}
               key={currentChannel && currentChannel.id}
@@ -171,17 +198,23 @@ const App = props => {
               usersList={usersList}
               userPosts={userPosts}
               usersInChannel={usersInChannel}
+              channelFriended={channelFriended}
+              turnOnTutorial={turnOnTutorial}
+              stepsEnabled={stepsEnabled}
+              turnOffTutorial={turnOffTutorial}
+              showSidebar={showSidebar}
             />
           </Grid.Column>
           <Grid.Column width={4}>
             <Sidebar
+              className="channelsSegment"
               as={Menu}
               animation={"push"}
               direction={"right"}
               inverted
               vertical
               visible={allwaysVisible}
-              style={rightSidebarStyle}
+              style={darkMode ? sidebarDarkStyle : sidebarStyle}
             >
               {" "}
               <SidePanelChannels
@@ -190,7 +223,7 @@ const App = props => {
                 currentChannel={currentChannel}
                 isPrivateChannel={isPrivateChannel}
                 userPosts={userPosts}
-                hideSidbar={hideSidbar}
+                hideSidebar={hideSidebar}
                 usersInChannel={usersInChannel}
               />
             </Sidebar>
@@ -209,6 +242,8 @@ const mapStateToProps = state => ({
   userTyping: state.userTyping.userTyping,
   usersList: state.usersList.usersList,
   privateActiveChannelId: state.activeChannelId.activeChannelId,
-  usersInChannel: state.usersInChannel.usersInChannel
+  usersInChannel: state.usersInChannel.usersInChannel,
+  channelFriended: state.channelFriended.channelFriended,
+  darkMode: state.darkMode.darkMode
 });
 export default connect(mapStateToProps)(App);

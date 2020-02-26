@@ -5,11 +5,15 @@ import TypingLoader from "./TypingLoader";
 import { Segment, Comment } from "semantic-ui-react";
 import firebase from "../Firebase";
 import React, { useState, useEffect, useRef } from "react";
+import { Steps } from "intro.js-react";
 
 import { connect } from "react-redux";
-import { setUserPosts, setCurrentChannel } from "../../actions";
+import {
+  setUserPosts,
+  setCurrentChannel,
+  setChannelFriended
+} from "../../actions";
 import SkeletonMessages from "./SkeletonMessages";
-
 import Message from "./Message";
 
 const Messages = props => {
@@ -31,9 +35,41 @@ const Messages = props => {
   const [searchResult, setSearchResult] = useState([]);
   const [channelStarred, setChannelStarred] = useState(false);
   const [noMessages, setNoMessages] = useState(true);
-  const [friendAdded, setFriendAdded] = useState(false);
+  const [searchResultEmpty, setSearchResultEmpty] = useState(false);
+
   const [pendingAdded, setPendingAdded] = useState(false);
   const [messageSend, setMessageSend] = useState(false);
+
+  const [initialStep] = useState(0);
+  const [options] = useState({
+    showStepNumbers: false
+  });
+  const [steps] = useState([
+    {
+      element: ".friendsSegment",
+      intro:
+        "User and friends panel. Here you can change your user avatar, set page to dark mode, logout, display all friends added to your friend list and search users."
+    },
+    {
+      element: ".messagesHeader",
+      intro:
+        "Channel header. Here you can add channels/friends to favourites by clicking star/plus, check details about channel, delete channel that was created by you, display all users and search messages in current channel."
+    },
+    {
+      element: ".messages",
+      intro: "Channel messages."
+    },
+    {
+      element: ".messageForm",
+      intro:
+        "Sending messages. Here you can type and send your message, upload images to the channel and add emotes to your message."
+    },
+    {
+      element: ".channelsSegment",
+      intro:
+        "Public channels panel. Here you can see your all channels added to your favourite list, search public channels and even add a new one by clicking yellow + button."
+    }
+  ]);
 
   const {
     currentChannel,
@@ -42,7 +78,12 @@ const Messages = props => {
     userTyping,
     usersList,
     userPosts,
-    usersInChannel
+    usersInChannel,
+    channelFriended,
+    turnOnTutorial,
+    turnOffTutorial,
+    stepsEnabled,
+    showSidebar
   } = props;
 
   const setMessageImageLoadingTrue = () => {
@@ -170,7 +211,7 @@ const Messages = props => {
 
   //ADD FRIEND
   useEffect(() => {
-    if (friendAdded) {
+    if (channelFriended) {
       let selectPrivateChannel = currentChannel.id.replace(currentUser.uid, "");
       let privateChannel = selectPrivateChannel.replace("/", "");
 
@@ -194,10 +235,10 @@ const Messages = props => {
         });
       }
     }
-  }, [friendAdded]);
+  }, [channelFriended]);
 
   const handleAddFriend = () => {
-    setFriendAdded(true);
+    props.setChannelFriended(true);
     setPendingAdded(true);
   };
 
@@ -215,6 +256,15 @@ const Messages = props => {
       });
 
     usersRef
+      .child(`${privateChannel}/friends`)
+      .child(currentUser.uid)
+      .remove(err => {
+        if (err !== null) {
+          console.log(err);
+        }
+      });
+
+    usersRef
       .child(`${privateChannel}/pendingFriends`)
       .child(currentUser.uid)
       .remove(err => {
@@ -223,7 +273,7 @@ const Messages = props => {
         }
       });
 
-    setFriendAdded(false);
+    props.setChannelFriended(false);
     setPendingAdded(false);
   };
 
@@ -240,7 +290,7 @@ const Messages = props => {
         if (data.val() !== null) {
           const friendIds = Object.keys(data.val());
           const prevAdded = friendIds.includes(privateChannel);
-          setFriendAdded(prevAdded);
+          props.setChannelFriended(prevAdded);
           setFriendsList(allFriendsIds => [...allFriendsIds, friendIds]);
         }
       });
@@ -298,6 +348,12 @@ const Messages = props => {
     }, []);
 
     setSearchResult(searchResults);
+
+    if (searchResults.length === 0) {
+      setSearchResultEmpty(true);
+    } else {
+      setSearchResultEmpty(false);
+    }
     setTimeout(() => {
       setSearchLoading(false);
     }, 300);
@@ -334,13 +390,22 @@ const Messages = props => {
     });
   };
 
+  useEffect(() => {
+    if (currentChannel && currentChannel.id === "mainChannel") {
+      usersRef.child(currentUser.uid).once("value", snapshot => {
+        if (snapshot.val().tutorial) {
+          showSidebar();
+          turnOnTutorial();
+        }
+      });
+    }
+  }, [currentChannel]);
   //LOADS MESSAGES ONCE ON CHANNEL START
   const loadAllChannelMessages = () => {
     messagesRef
       .child(currentChannel.id)
       //.limitToLast(5)
       .once("value", snapshot => {})
-
       .then(() => {
         setMessagesLoaded(true);
       });
@@ -370,6 +435,8 @@ const Messages = props => {
     setMessageSend(true);
   };
 
+  const onExit = () => {};
+
   useEffect(() => {
     scrollToBottom();
     setMessageSend(false);
@@ -384,8 +451,27 @@ const Messages = props => {
 
   ////////////////////////////////////////////////////////////
 
+  useEffect(() => {
+    if (stepsEnabled === false) {
+      usersRef
+        .child(currentUser.uid)
+        .child("tutorial")
+        .remove();
+    }
+  }, [stepsEnabled]);
+
   return (
     <React.Fragment>
+      <Steps
+        enabled={stepsEnabled}
+        steps={steps}
+        initialStep={initialStep}
+        onComplete={() => {
+          turnOffTutorial();
+        }}
+        onExit={onExit}
+        options={options}
+      />
       <MessagesHeader
         handleSearchChange={handleSearchChange}
         displayChannelName={displayChannelName}
@@ -394,13 +480,13 @@ const Messages = props => {
         handleStarred={handleStarred}
         unstarChannel={unstarChannel}
         channelStarred={channelStarred}
-        friendAdded={friendAdded}
         handleAddFriend={handleAddFriend}
         unfriendPerson={unfriendPerson}
         userPosts={userPosts}
         currentUser={currentUser}
         currentChannel={currentChannel}
         usersInChannel={usersInChannel}
+        channelFriended={channelFriended}
       ></MessagesHeader>
 
       <Segment>
@@ -441,6 +527,9 @@ const Messages = props => {
                 );
               })
             : ""}
+          {allChannelMessages.loadedMessages && searchTerm && searchResultEmpty
+            ? "We couldn't find any messages/users with a given phrase"
+            : ""}
           <div ref={messagesEndRef} />
         </Comment.Group>
       </Segment>
@@ -459,4 +548,8 @@ const Messages = props => {
   );
 };
 
-export default connect(null, { setUserPosts, setCurrentChannel })(Messages);
+export default connect(null, {
+  setUserPosts,
+  setCurrentChannel,
+  setChannelFriended
+})(Messages);

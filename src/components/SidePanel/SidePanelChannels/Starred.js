@@ -12,7 +12,7 @@ const Starred = props => {
   const {
     currentUser,
     currentChannel,
-    hideSidbar,
+    hideSidebar,
     isPrivateChannel,
     favouriteActiveChange,
     favouriteActive
@@ -70,7 +70,7 @@ const Starred = props => {
     props.setCurrentChannel(channel);
     props.setPrivateChannel(false);
     setActiveChannelId(channel.id);
-    hideSidbar();
+    hideSidebar();
     favouriteActiveChange();
   };
 
