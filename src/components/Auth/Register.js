@@ -103,6 +103,7 @@ class Register extends Component {
             })
             .then(() => {
               this.setState({ loading: false, error: "" });
+              this.props.userCreated();
             })
             .catch(err => {
               console.log("create user error", err);
@@ -128,6 +129,7 @@ class Register extends Component {
 
   render() {
     const { username, email, password, passwordConfirmation } = this.state;
+
     return (
       <Grid textAlign="center" verticalAlign="middle" className="app">
         <GridColumn style={{ maxWidth: 450 }}>

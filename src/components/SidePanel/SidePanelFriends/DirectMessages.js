@@ -68,7 +68,10 @@ const DirectMessages = props => {
         presenceRef
           .child(currentUserUid)
           .onDisconnect(() => {})
-          .update(userInfoOffline);
+          .update(userInfoOffline)
+          .catch(err => {
+            console.log(err);
+          });
       }
     });
   };
@@ -81,7 +84,11 @@ const DirectMessages = props => {
         .child("usersInChannel")
         .child(currentUser.uid)
         .onDisconnect()
-        .remove();
+        .remove(err => {
+          if (err !== null) {
+            console.log(err);
+          }
+        });
     }
   }, [currentChannel]);
 
@@ -119,6 +126,9 @@ const DirectMessages = props => {
                   data.val()
                 ]);
               }
+            })
+            .catch(err => {
+              console.log(err);
             });
         }
       });

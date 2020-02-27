@@ -286,14 +286,19 @@ const Friends = props => {
 
       setFriendPendingToRemove(privateChannel);
 
-      usersRef.child(`${currentUser.uid}/friends`).update({
-        [privateChannel]: {
-          userId: currentChannel.id,
-          name: currentChannel.name,
-          status: currentChannel.status,
-          photoURL: currentChannel.photoURL
-        }
-      });
+      usersRef
+        .child(`${currentUser.uid}/friends`)
+        .update({
+          [privateChannel]: {
+            userId: currentChannel.id,
+            name: currentChannel.name,
+            status: currentChannel.status,
+            photoURL: currentChannel.photoURL
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
       setFriendAdded(false);
     }
   }, [friendAdded]);

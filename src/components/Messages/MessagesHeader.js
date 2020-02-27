@@ -62,6 +62,7 @@ const MessagesHeader = props => {
 
   const handleDeleteChannel = () => {
     setLoading(true);
+
     const mainChannel = {
       id: "mainChannel",
       name: "main channel",
@@ -82,6 +83,9 @@ const MessagesHeader = props => {
       })
       .then(() => {
         props.setCurrentChannel(mainChannel);
+        props.setActiveChannelId(mainChannel.id);
+        props.setPrivateChannel(false);
+
         setLoading(false);
       })
       .catch(error => {

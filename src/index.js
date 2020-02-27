@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import "semantic-ui-css/semantic.min.css";
 import "intro.js/introjs.css";
@@ -28,6 +28,13 @@ const store = createStore(rootReducer, composeWithDevTools());
 
 const Root = props => {
   const historyPush = props.history.push;
+
+  const [userRegistered, setUserRegistered] = useState(false);
+
+  const userCreated = () => {
+    setUserRegistered(true);
+  };
+
   useEffect(() => {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
@@ -44,9 +51,17 @@ const Root = props => {
     <Spinner />
   ) : (
     <Switch>
-      <Route exact path="/" component={App}></Route>
+      <Route
+        exact
+        path="/"
+        render={props => <App {...props} userRegistered={userRegistered} />}
+      ></Route>
       <Route path="/login" component={Login}></Route>
-      <Route path="/register" component={Register}></Route>
+      <Route
+        path="/register"
+        userCreated={userCreated}
+        render={props => <Register {...props} userCreated={userCreated} />}
+      ></Route>
     </Switch>
   );
 };

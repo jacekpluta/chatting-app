@@ -83,7 +83,8 @@ const Messages = props => {
     turnOnTutorial,
     turnOffTutorial,
     stepsEnabled,
-    showSidebar
+    showSidebar,
+    userRegistered
   } = props;
 
   const setMessageImageLoadingTrue = () => {
@@ -154,7 +155,13 @@ const Messages = props => {
           name: currentChannel.name
         };
 
-        channelsRef.child(currentChannel.id).update(newCurrentChannelInfo);
+        channelsRef
+          .child(currentChannel.id)
+          .update(newCurrentChannelInfo)
+          .catch(err => {
+            console.log(err);
+          });
+
         props.setCurrentChannel(newCurrentChannelInfo);
       }
     }
@@ -163,17 +170,22 @@ const Messages = props => {
   //ADD STARRED CHANNEL
   useEffect(() => {
     if (channelStarred) {
-      usersRef.child(`${currentUser.uid}/starred`).update({
-        [currentChannel.id]: {
-          name: currentChannel.name,
-          details: currentChannel.details,
-          createdBy: {
-            uid: currentChannel.createdBy.uid,
-            name: currentChannel.createdBy.name,
-            avatar: currentChannel.createdBy.avatar
+      usersRef
+        .child(`${currentUser.uid}/starred`)
+        .update({
+          [currentChannel.id]: {
+            name: currentChannel.name,
+            details: currentChannel.details,
+            createdBy: {
+              uid: currentChannel.createdBy.uid,
+              name: currentChannel.createdBy.name,
+              avatar: currentChannel.createdBy.avatar
+            }
           }
-        }
-      });
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   }, [channelStarred]);
 
@@ -206,39 +218,59 @@ const Messages = props => {
           const prevStarred = channelIds.includes(channelId);
           setChannelStarred(prevStarred);
         }
+      })
+      .catch(error => {
+        console.log(error);
       });
   };
 
   //ADD FRIEND
   useEffect(() => {
-    if (channelFriended) {
+    if (
+      channelFriended &&
+      currentChannel &&
+      currentChannel.id &&
+      currentUser &&
+      currentUser.uid
+    ) {
       let selectPrivateChannel = currentChannel.id.replace(currentUser.uid, "");
       let privateChannel = selectPrivateChannel.replace("/", "");
 
-      usersRef.child(`${currentUser.uid}/friends`).update({
+      if (pendingAdded) {
+        usersRef
+          .child(`${privateChannel}/pendingFriends`)
+          .update({
+            [currentUser.uid]: {
+              id: currentUser.uid,
+              name: currentUser.displayName,
+              photoURL: currentUser.photoURL,
+              status: currentChannel.status
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+    }
+  }, [channelFriended]);
+
+  const handleAddFriend = () => {
+    let selectPrivateChannel = currentChannel.id.replace(currentUser.uid, "");
+    let privateChannel = selectPrivateChannel.replace("/", "");
+
+    usersRef
+      .child(`${currentUser.uid}/friends`)
+      .update({
         [privateChannel]: {
           userId: currentChannel.id,
           name: currentChannel.name,
           status: currentChannel.status,
           photoURL: currentChannel.photoURL
         }
+      })
+      .catch(error => {
+        console.log(error);
       });
-
-      if (pendingAdded) {
-        usersRef.child(`${privateChannel}/pendingFriends`).update({
-          [currentUser.uid]: {
-            id: currentUser.uid,
-            name: currentUser.displayName,
-            photoURL: currentUser.photoURL,
-            status: currentChannel.status
-          }
-        });
-      }
-    }
-  }, [channelFriended]);
-
-  const handleAddFriend = () => {
-    props.setChannelFriended(true);
     setPendingAdded(true);
   };
 
@@ -293,6 +325,9 @@ const Messages = props => {
           props.setChannelFriended(prevAdded);
           setFriendsList(allFriendsIds => [...allFriendsIds, friendIds]);
         }
+      })
+      .catch(err => {
+        console.log(err);
       });
   };
 
@@ -309,14 +344,19 @@ const Messages = props => {
             let selectPrivateChannel = element.uid.replace(currentUser.uid, "");
             let privateChannel = selectPrivateChannel.replace("/", "");
 
-            usersRef.child(`${currentUser.uid}/friends`).update({
-              [privateChannel]: {
-                channelId: element.uid,
-                name: element.name,
-                status: element.status,
-                photoURL: element.photoURL
-              }
-            });
+            usersRef
+              .child(`${currentUser.uid}/friends`)
+              .update({
+                [privateChannel]: {
+                  channelId: element.uid,
+                  name: element.name,
+                  status: element.status,
+                  photoURL: element.photoURL
+                }
+              })
+              .catch(error => {
+                console.log(error);
+              });
           }
         });
       }
@@ -391,15 +431,21 @@ const Messages = props => {
   };
 
   useEffect(() => {
-    if (currentChannel && currentChannel.id === "mainChannel") {
-      usersRef.child(currentUser.uid).once("value", snapshot => {
-        if (snapshot.val().tutorial) {
-          showSidebar();
-          turnOnTutorial();
-        }
-      });
+    if (userRegistered) {
+      usersRef
+        .child(currentUser.uid)
+        .once("value", snapshot => {
+          if (snapshot.val().tutorial) {
+            showSidebar();
+            turnOnTutorial();
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
-  }, [currentChannel]);
+  }, [userRegistered]);
+
   //LOADS MESSAGES ONCE ON CHANNEL START
   const loadAllChannelMessages = () => {
     messagesRef
@@ -435,8 +481,6 @@ const Messages = props => {
     setMessageSend(true);
   };
 
-  const onExit = () => {};
-
   useEffect(() => {
     scrollToBottom();
     setMessageSend(false);
@@ -451,12 +495,19 @@ const Messages = props => {
 
   ////////////////////////////////////////////////////////////
 
+  const onExit = () => {
+    if (messagesLoaded) turnOffTutorial();
+  };
+
   useEffect(() => {
     if (stepsEnabled === false) {
       usersRef
         .child(currentUser.uid)
         .child("tutorial")
-        .remove();
+        .remove()
+        .catch(error => {
+          console.log(error);
+        });
     }
   }, [stepsEnabled]);
 
@@ -466,9 +517,6 @@ const Messages = props => {
         enabled={stepsEnabled}
         steps={steps}
         initialStep={initialStep}
-        onComplete={() => {
-          turnOffTutorial();
-        }}
         onExit={onExit}
         options={options}
       />

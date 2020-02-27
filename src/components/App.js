@@ -25,7 +25,8 @@ const App = props => {
     privateActiveChannelId,
     usersInChannel,
     channelFriended,
-    darkMode
+    darkMode,
+    userRegistered
   } = props;
 
   const [visible, setVisible] = useState(false);
@@ -125,6 +126,7 @@ const App = props => {
                 userPosts={userPosts}
                 hideSidebar={hideSidebar}
                 usersInChannel={usersInChannel}
+                userRegistered={userRegistered}
               />
             </Sidebar>
           </Grid.Column>
@@ -142,6 +144,7 @@ const App = props => {
               stepsEnabled={stepsEnabled}
               turnOffTutorial={turnOffTutorial}
               showSidebar={showSidebar}
+              userRegistered={userRegistered}
             />
           </Grid.Column>
         </Grid>
@@ -203,6 +206,7 @@ const App = props => {
               stepsEnabled={stepsEnabled}
               turnOffTutorial={turnOffTutorial}
               showSidebar={showSidebar}
+              userRegistered={userRegistered}
             />
           </Grid.Column>
           <Grid.Column width={4}>

@@ -95,6 +95,9 @@ const UserPanel = props => {
         snap.ref.getDownloadURL().then(downloadURL => {
           setUploadedCroppedImaged(downloadURL);
         });
+      })
+      .catch(err => {
+        console.log(err);
       });
   };
 
@@ -133,6 +136,7 @@ const UserPanel = props => {
 
       return () => {
         channelsRef.child(currentChannel.id).off();
+
         privateMessagesRef.child(currentChannel.id).off();
       };
     }
@@ -140,13 +144,23 @@ const UserPanel = props => {
 
   const loadAllCurrentChannels = () => {
     if (!isPrivateChannel) {
-      messagesRef.child(currentChannel.id).once("value", snapshot => {
-        setMessagesToUpdate(snapshot.val());
-      });
+      messagesRef
+        .child(currentChannel.id)
+        .once("value", snapshot => {
+          setMessagesToUpdate(snapshot.val());
+        })
+        .catch(err => {
+          console.log(err);
+        });
     } else if (isPrivateChannel) {
-      privateMessagesRef.child(currentChannel.id).once("value", snapshot => {
-        setMessagesToUpdate(snapshot.val());
-      });
+      privateMessagesRef
+        .child(currentChannel.id)
+        .once("value", snapshot => {
+          setMessagesToUpdate(snapshot.val());
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   };
 
@@ -169,6 +183,9 @@ const UserPanel = props => {
           ) {
             props.setDarkMode(true);
           }
+        })
+        .catch(err => {
+          console.log(err);
         });
     }
   }, []);
@@ -189,12 +206,18 @@ const UserPanel = props => {
             privateMessagesRef
               .child(currentChannel.id)
               .child(messageId)
-              .update(newUserAvatar);
+              .update(newUserAvatar)
+              .catch(err => {
+                console.log(err);
+              });
           } else if (!isPrivateChannel) {
             messagesRef
               .child(currentChannel.id)
               .child(messageId)
-              .update(newUserAvatar);
+              .update(newUserAvatar)
+              .catch(err => {
+                console.log(err);
+              });
           }
         }
       }
@@ -217,7 +240,11 @@ const UserPanel = props => {
       usersRef
         .child(currentUser.uid)
         .child("darkmode")
-        .remove();
+        .remove(err => {
+          if (err !== null) {
+            console.log(err);
+          }
+        });
     }
 
     if (!darkMode) {
@@ -226,7 +253,10 @@ const UserPanel = props => {
       usersRef
         .child(currentUser.uid)
         .child("darkmode")
-        .set(true);
+        .set(true)
+        .catch(err => {
+          console.log(err);
+        });
     }
   };
 
@@ -241,7 +271,14 @@ const UserPanel = props => {
           .child(currentChannel.id)
           .child("usersInChannel")
           .child(currentUser.uid)
-          .remove();
+          .remove(err => {
+            if (err !== null) {
+              console.log(err);
+            }
+          });
+      })
+      .catch(err => {
+        console.log(err);
       });
   };
 
