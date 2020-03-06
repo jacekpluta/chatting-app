@@ -1,15 +1,13 @@
 TO DO:
 1. Notifications add to database
-2. Tests
-3. Horizontal use on mobile devices
+2. Horizontal use on mobile devices
+3. Tests
 
 BUGS:
 1. dopiero po zmienia kanalu zaczynaja sie pokazac notifikacje, a w private channels po zmieniae kanalu i tylko po jego zmianie
 2. jak kto wchodzi na kanal, lub jak ktos zaczyna pisac, lub wysyla wiadomosc, ISTYPING znika
 3. avatar cropping nie dziala przy niestandardowej wielkosci np 500 x 2000
-4. Login >> Logout >> Login again, error occures
-5. nie zmienia ikonki w headerze po dadniu do znajomych
-6. po usunieciu kanalu przenosi do main channnel i pokazuja sie powiadomienia przy pisaniu
+4. lots of errors after registering and not refreshing the page, trzeba wykorzystac user registred
 
 MINOR BUGS: 
 1. zmienic updateFriendsStatusListeners (slaba petla)

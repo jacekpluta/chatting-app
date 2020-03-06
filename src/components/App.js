@@ -26,7 +26,8 @@ const App = props => {
     usersInChannel,
     channelFriended,
     darkMode,
-    userRegistered
+    userRegistered,
+    activeChannelId
   } = props;
 
   const [visible, setVisible] = useState(false);
@@ -127,6 +128,7 @@ const App = props => {
                 hideSidebar={hideSidebar}
                 usersInChannel={usersInChannel}
                 userRegistered={userRegistered}
+                activeChannelId={activeChannelId}
               />
             </Sidebar>
           </Grid.Column>
@@ -220,7 +222,6 @@ const App = props => {
               visible={allwaysVisible}
               style={darkMode ? sidebarDarkStyle : sidebarStyle}
             >
-              {" "}
               <SidePanelChannels
                 currentUser={currentUser}
                 key={currentUser && currentUser.id}
@@ -229,6 +230,7 @@ const App = props => {
                 userPosts={userPosts}
                 hideSidebar={hideSidebar}
                 usersInChannel={usersInChannel}
+                activeChannelId={activeChannelId}
               />
             </Sidebar>
           </Grid.Column>
@@ -248,6 +250,7 @@ const mapStateToProps = state => ({
   privateActiveChannelId: state.activeChannelId.activeChannelId,
   usersInChannel: state.usersInChannel.usersInChannel,
   channelFriended: state.channelFriended.channelFriended,
-  darkMode: state.darkMode.darkMode
+  darkMode: state.darkMode.darkMode,
+  activeChannelId: state.activeChannelId.activeChannelId
 });
 export default connect(mapStateToProps)(App);

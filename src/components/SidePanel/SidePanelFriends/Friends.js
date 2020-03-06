@@ -61,7 +61,7 @@ const Friends = props => {
     }
 
     return () => {
-      //   usersRef.off();
+      usersRef.off();
     };
   }, []);
 
@@ -284,8 +284,6 @@ const Friends = props => {
       let selectPrivateChannel = currentChannel.id.replace(currentUser.uid, "");
       let privateChannel = selectPrivateChannel.replace("/", "");
 
-      setFriendPendingToRemove(privateChannel);
-
       usersRef
         .child(`${currentUser.uid}/friends`)
         .update({
@@ -296,10 +294,13 @@ const Friends = props => {
             photoURL: currentChannel.photoURL
           }
         })
+        .then(() => {
+          setFriendAdded(false);
+          setFriendPendingToRemove(privateChannel);
+        })
         .catch(err => {
           console.log(err);
         });
-      setFriendAdded(false);
     }
   }, [friendAdded]);
 
@@ -365,8 +366,6 @@ const Friends = props => {
 
   const displayPendingFriends = () => {
     if (uniqueFriendsPendings) {
-      //substracts friends from friend pendings
-
       return uniqueFriendsPendings
         .sort((a, b) => (a.name > b.name ? 1 : -1))
         .map(pendingFriend => (

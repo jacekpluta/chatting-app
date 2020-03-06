@@ -103,6 +103,8 @@ class Register extends Component {
             })
             .then(() => {
               this.setState({ loading: false, error: "" });
+            })
+            .then(() => {
               this.props.userCreated();
             })
             .catch(err => {

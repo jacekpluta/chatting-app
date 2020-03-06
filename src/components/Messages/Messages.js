@@ -271,11 +271,13 @@ const Messages = props => {
       .catch(error => {
         console.log(error);
       });
+
     setPendingAdded(true);
+    props.setChannelFriended(true);
   };
 
   //REMOVE FRIEND
-  const unfriendPerson = () => {
+  const handleUnfriendPerson = () => {
     let mystring = currentChannel.id.replace(currentUser.uid, "");
     let privateChannel = mystring.replace("/", "");
     usersRef
@@ -529,7 +531,7 @@ const Messages = props => {
         unstarChannel={unstarChannel}
         channelStarred={channelStarred}
         handleAddFriend={handleAddFriend}
-        unfriendPerson={unfriendPerson}
+        handleUnfriendPerson={handleUnfriendPerson}
         userPosts={userPosts}
         currentUser={currentUser}
         currentChannel={currentChannel}

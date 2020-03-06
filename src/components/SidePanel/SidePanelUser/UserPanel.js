@@ -260,6 +260,10 @@ const UserPanel = props => {
     }
   };
 
+  const refreshPage = () => {
+    window.location.reload();
+  };
+
   const handleSignout = () => {
     firebase
       .auth()
@@ -276,6 +280,9 @@ const UserPanel = props => {
               console.log(err);
             }
           });
+      })
+      .then(() => {
+        refreshPage();
       })
       .catch(err => {
         console.log(err);

@@ -30,7 +30,7 @@ const MessagesHeader = props => {
     channelStarred,
     unstarChannel,
     handleAddFriend,
-    unfriendPerson,
+    handleUnfriendPerson,
     currentChannel,
     userPosts,
     currentUser,
@@ -82,11 +82,9 @@ const MessagesHeader = props => {
         }
       })
       .then(() => {
+        setLoading(false);
         props.setCurrentChannel(mainChannel);
         props.setActiveChannelId(mainChannel.id);
-        props.setPrivateChannel(false);
-
-        setLoading(false);
       })
       .catch(error => {
         console.log(error);
@@ -192,6 +190,7 @@ const MessagesHeader = props => {
               trigger={<Button size="mini" icon="user" />}
             >
               {usersInChannel ? displayUsersInChannel() : ""}
+
               {isEmpty(usersInChannel) ? (
                 <List>
                   <List.Item>
@@ -213,7 +212,7 @@ const MessagesHeader = props => {
           {isPrivateChannel && channelFriended && (
             <Icon
               name={"user times"}
-              onClick={unfriendPerson}
+              onClick={handleUnfriendPerson}
               color="red"
             ></Icon>
           )}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Menu,
   Icon,
@@ -16,7 +16,8 @@ import {
   setCurrentChannel,
   setPrivateChannel,
   setUsersInChannel,
-  setChannelFriended
+  setChannelFriended,
+  setActiveChannelId
 } from "../../../actions";
 import usePrevious from "../../CustomHooks/usePrevious";
 
@@ -24,7 +25,7 @@ function Channels(props) {
   const [allChannels, setAllChannels] = useState([]);
   const [firstLoad, setFirstLoad] = useState(true);
   const [modal, setModal] = useState(false);
-  const [activeChannelId, setActiveChannelId] = useState(null);
+
   const [channelName, setChannelName] = useState("");
   const [channelDetail, setChannelDetail] = useState("");
   const [error, setError] = useState("");
@@ -32,7 +33,7 @@ function Channels(props) {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
   const [loading] = useState(false);
-  const [currentChannel, setCurrentChannel] = useState(null);
+
   const [channelToRemove, setChannelToRemove] = useState(null);
   const [userInChannelToRemove, setUserInChannelToRemove] = useState(null);
   const [usersInCurrentChannel, setUsersInCurrentChannel] = useState([]);
@@ -42,16 +43,18 @@ function Channels(props) {
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [messagesRef] = useState(firebase.database().ref("messages"));
 
-  const prevChannelId = usePrevious(activeChannelId);
-
   const {
     currentUser,
     isPrivateChannel,
     hideSidebar,
     favouriteNotActiveChange,
     favouriteActive,
-    userRegistered
+    userRegistered,
+    currentChannel,
+    activeChannelId
   } = props;
+
+  const prevChannelId = usePrevious(activeChannelId);
 
   const handleCloseModal = () => {
     setModal(false);
@@ -63,7 +66,7 @@ function Channels(props) {
 
   useEffect(() => {
     if (isPrivateChannel) {
-      setActiveChannelId(null);
+      props.setActiveChannelId(null);
       clearNotifications(prevChannelId);
 
       if (prevChannelId && prevChannelId.length < 21) {
@@ -250,8 +253,7 @@ function Channels(props) {
       .update(mainChannel)
       .then(() => {
         props.setCurrentChannel(mainChannel);
-        setCurrentChannel(mainChannel);
-        setActiveChannelId(mainChannel.id);
+        props.setActiveChannelId(mainChannel.id);
       })
       .catch(error => {
         console.log(error);
@@ -282,8 +284,7 @@ function Channels(props) {
         setChannelDetail("");
         handleCloseModal();
         props.setCurrentChannel(newChannel);
-        setCurrentChannel(newChannel);
-        setActiveChannelId(newChannel.id);
+        props.setActiveChannelId(newChannel.id);
         console.log("channel added");
       })
       .catch(error => {
@@ -418,10 +419,9 @@ function Channels(props) {
     setUsersInCurrentChannel([]);
     props.setCurrentChannel(channel);
     props.setPrivateChannel(false);
-    setCurrentChannel(channel);
     hideSidebar();
 
-    setActiveChannelId(channel.id);
+    props.setActiveChannelId(channel.id);
 
     clearNotifications(prevChannelId);
     clearNotifications();
@@ -633,5 +633,6 @@ export default connect(null, {
   setCurrentChannel,
   setPrivateChannel,
   setUsersInChannel,
-  setChannelFriended
+  setChannelFriended,
+  setActiveChannelId
 })(Channels);
