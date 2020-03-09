@@ -8,6 +8,9 @@ BUGS:
 2. jak kto wchodzi na kanal, lub jak ktos zaczyna pisac, lub wysyla wiadomosc, ISTYPING znika
 3. avatar cropping nie dziala przy niestandardowej wielkosci np 500 x 2000
 4. lots of errors after registering and not refreshing the page, trzeba wykorzystac user registred
+5. user search after changing status they duplicates
+6. public channel and private channel dont delete notifications when jumping between them
+7. po zarejestrowaniu nie widac wiadomosci do 1 uzytkownika w private messages
 
 MINOR BUGS: 
 1. zmienic updateFriendsStatusListeners (slaba petla)

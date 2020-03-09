@@ -576,7 +576,7 @@ function Channels(props) {
       {displayChannels()}
 
       <Modal open={modal} onClose={handleCloseModal} size="small">
-        <Modal.Header>Add chanel</Modal.Header>
+        <Modal.Header>Add channel</Modal.Header>
 
         <Modal.Content>
           <Form onSubmit={handleSubmit}>

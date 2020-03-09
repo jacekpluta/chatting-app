@@ -40,6 +40,8 @@ const Messages = props => {
   const [pendingAdded, setPendingAdded] = useState(false);
   const [messageSend, setMessageSend] = useState(false);
 
+  const [deleteTutorial, setDeleteTutorial] = useState(false);
+
   const [initialStep] = useState(0);
   const [options] = useState({
     showStepNumbers: false
@@ -497,8 +499,14 @@ const Messages = props => {
 
   ////////////////////////////////////////////////////////////
 
+  const refreshPage = () => {
+    window.location.reload();
+  };
+
   const onExit = () => {
-    if (messagesLoaded) turnOffTutorial();
+    if (messagesLoaded) {
+      turnOffTutorial();
+    }
   };
 
   useEffect(() => {

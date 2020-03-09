@@ -72,6 +72,10 @@ class Register extends Component {
     }
   };
 
+  refreshPage = () => {
+    window.location.reload();
+  };
+
   //sets current Form Input row into a state
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
@@ -106,6 +110,7 @@ class Register extends Component {
             })
             .then(() => {
               this.props.userCreated();
+              //   this.refreshPage();
             })
             .catch(err => {
               console.log("create user error", err);

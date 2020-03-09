@@ -19,7 +19,6 @@ const Message = props => {
 
   useEffect(() => {
     isOwnMessage();
-    return () => {};
   });
 
   const isImage = () => {
