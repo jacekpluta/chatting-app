@@ -22,7 +22,6 @@ const App = props => {
     userPosts,
     userTyping,
     usersList,
-    privateActiveChannelId,
     usersInChannel,
     channelFriended,
     darkMode,
@@ -114,7 +113,7 @@ const App = props => {
                 favouriteActiveChange={favouriteActiveChange}
                 favouriteNotActiveChange={favouriteNotActiveChange}
                 favouriteActive={favouriteActive}
-                privateActiveChannelId={privateActiveChannelId}
+                activeChannelId={activeChannelId}
                 currentChannel={currentChannel}
                 darkMode={darkMode}
                 turnOnTutorial={turnOnTutorial}
@@ -182,7 +181,7 @@ const App = props => {
                 favouriteActiveChange={favouriteActiveChange}
                 favouriteNotActiveChange={favouriteNotActiveChange}
                 favouriteActive={favouriteActive}
-                privateActiveChannelId={privateActiveChannelId}
+                activeChannelId={activeChannelId}
                 currentChannel={currentChannel}
                 darkMode={darkMode}
                 turnOnTutorial={turnOnTutorial}
@@ -247,7 +246,6 @@ const mapStateToProps = state => ({
   userPosts: state.channel.userPosts,
   userTyping: state.userTyping.userTyping,
   usersList: state.usersList.usersList,
-  privateActiveChannelId: state.activeChannelId.activeChannelId,
   usersInChannel: state.usersInChannel.usersInChannel,
   channelFriended: state.channelFriended.channelFriended,
   darkMode: state.darkMode.darkMode,

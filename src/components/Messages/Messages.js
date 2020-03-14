@@ -499,10 +499,6 @@ const Messages = props => {
 
   ////////////////////////////////////////////////////////////
 
-  const refreshPage = () => {
-    window.location.reload();
-  };
-
   const onExit = () => {
     if (messagesLoaded) {
       turnOffTutorial();

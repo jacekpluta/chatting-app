@@ -13,7 +13,7 @@ const DirectMessages = props => {
   const {
     currentUser,
     hideSidebar,
-    privateActiveChannelId,
+    activeChannelId,
     friendsMarkActive,
     currentChannel
   } = props;
@@ -226,12 +226,12 @@ const DirectMessages = props => {
                 key={user.id}
                 style={{ opacity: 0.7 }}
                 onClick={() => changeChannel(user)}
-                active={friendsMarkActive && privateActiveChannelId === user.id}
+                active={friendsMarkActive && activeChannelId === user.id}
               >
-                <Icon
+                {/* <Icon
                   name="circle"
                   color={user && user.status ? "green" : "red"}
-                ></Icon>
+                ></Icon> */}
 
                 {user ? (
                   <Image

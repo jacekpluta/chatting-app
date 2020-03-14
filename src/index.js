@@ -45,7 +45,7 @@ const Root = props => {
         props.clearUser();
       }
     });
-  }, [historyPush]);
+  }, [historyPush, userRegistered]);
 
   return props.isLoading ? (
     <Spinner />
@@ -56,10 +56,12 @@ const Root = props => {
         path="/"
         render={props => <App {...props} userRegistered={userRegistered} />}
       ></Route>
-      <Route path="/login" component={Login}></Route>
+      <Route
+        path="/login"
+        render={props => <Login {...props} userRegistered={userRegistered} />}
+      ></Route>
       <Route
         path="/register"
-        userCreated={userCreated}
         render={props => <Register {...props} userCreated={userCreated} />}
       ></Route>
     </Switch>

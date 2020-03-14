@@ -39,6 +39,7 @@ function Channels(props) {
   const [usersInCurrentChannel, setUsersInCurrentChannel] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [searchResultEmpty, setSearchResultEmpty] = useState(false);
+  const [activeId, setActiveId] = useState(null);
 
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [messagesRef] = useState(firebase.database().ref("messages"));
@@ -63,25 +64,6 @@ function Channels(props) {
   const handleOpenModal = () => {
     setModal(true);
   };
-
-  useEffect(() => {
-    if (isPrivateChannel) {
-      props.setActiveChannelId(null);
-      clearNotifications(prevChannelId);
-
-      if (prevChannelId && prevChannelId.length < 21) {
-        channelsRef
-          .child(prevChannelId)
-          .child("usersInChannel")
-          .child(currentUser.uid)
-          .remove(err => {
-            if (err !== null) {
-              console.log(err);
-            }
-          });
-      }
-    }
-  }, [isPrivateChannel]);
 
   const handleChange = event => {
     if (event.target.name === "channelName") {
@@ -198,10 +180,10 @@ function Channels(props) {
   };
 
   //CLEARS NOTIFICATIONS
-  const clearNotifications = () => {
+  const clearNotifications = channelId => {
     if (currentUser) {
       let index = notifications.findIndex(
-        notification => notification.id === currentChannel.id
+        notification => notification.id === channelId
       );
 
       if (index !== -1) {
@@ -212,7 +194,6 @@ function Channels(props) {
       }
     }
   };
-
   //CHECKS IF ADD CHANNEL FORM IS VALID
   const isFormIsValid = () => {
     if (
@@ -254,6 +235,7 @@ function Channels(props) {
       .then(() => {
         props.setCurrentChannel(mainChannel);
         props.setActiveChannelId(mainChannel.id);
+        setActiveId(mainChannel.id);
       })
       .catch(error => {
         console.log(error);
@@ -307,6 +289,23 @@ function Channels(props) {
       handleAddChannel();
     }
   };
+
+  //CURRENT USERS IN PRIVATE CHANNEL
+  useEffect(() => {
+    if (isPrivateChannel) {
+      if (prevChannelId && prevChannelId.length < 21) {
+        channelsRef
+          .child(prevChannelId)
+          .child("usersInChannel")
+          .child(currentUser.uid)
+          .remove(err => {
+            if (err !== null) {
+              console.log(err);
+            }
+          });
+      }
+    }
+  }, [isPrivateChannel]);
 
   //CURRENT USERS IN CHANNEL
   const currentUsersInChannel = channel => {
@@ -413,6 +412,12 @@ function Channels(props) {
     }
   }, [usersInCurrentChannel]);
 
+  useEffect(() => {
+    if (isPrivateChannel) {
+      clearNotifications(prevChannelId);
+    }
+  }, [isPrivateChannel]);
+
   //CHANGE CURRENT CHANNEL
   const changeChannel = channel => {
     props.setChannelFriended(false);
@@ -420,11 +425,11 @@ function Channels(props) {
     props.setCurrentChannel(channel);
     props.setPrivateChannel(false);
     hideSidebar();
-
+    setActiveId(channel.id);
     props.setActiveChannelId(channel.id);
 
+    clearNotifications(channel.id);
     clearNotifications(prevChannelId);
-    clearNotifications();
 
     favouriteNotActiveChange();
     currentUsersInChannel(channel);

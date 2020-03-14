@@ -27,7 +27,7 @@ const Friends = props => {
     hideSidebar,
     friendsMarkActive,
     friendsMarkActiveChange,
-    privateActiveChannelId,
+    activeChannelId,
     currentChannel
   } = props;
 
@@ -38,7 +38,7 @@ const Friends = props => {
   const [friendAdded, setFriendAdded] = useState(false);
   const [uniqueFriendsPendings, setUniqueFriendsPendings] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const prevChannelId = usePrevious(privateActiveChannelId);
+  const prevChannelId = usePrevious(activeChannelId);
 
   const [privateMessagesRef] = useState(
     firebase.database().ref("privateMessages")
@@ -48,7 +48,6 @@ const Friends = props => {
   useEffect(() => {
     if (!isPrivateChannel) {
       clearNotifications(prevChannelId);
-      props.setActiveChannelId(null);
     }
   }, [isPrivateChannel]);
 
@@ -70,9 +69,9 @@ const Friends = props => {
     if (currentChannel && isPrivateChannel) {
       addUsersFriendsListener(currentChannel.id);
     }
-  }, []);
+  }, [currentChannel]);
 
-  const addUsersFriendsListener = channelId => {
+  const addUsersFriendsListener = () => {
     usersRef
       .child(currentUser.uid)
       .child("friends")
@@ -154,7 +153,6 @@ const Friends = props => {
     }
   };
 
-  //
   const addListenersFriendAdded = userId => {
     usersRef
       .child(userId)
@@ -248,7 +246,7 @@ const Friends = props => {
     props.setCurrentChannel(privateChannelData);
     props.setPrivateChannel(true);
     hideSidebar();
-
+    clearNotifications(prevChannelId);
     clearNotifications(friendChannel.id);
     friendsMarkActiveChange();
   };
@@ -317,9 +315,7 @@ const Friends = props => {
             key={friendChannel.id}
             onClick={() => changeChannel(friendChannel)}
             name={friendChannel.name}
-            active={
-              friendsMarkActive && privateActiveChannelId === friendChannel.id
-            }
+            active={friendsMarkActive && activeChannelId === friendChannel.id}
           >
             <Icon
               name="circle"
@@ -335,7 +331,7 @@ const Friends = props => {
             ) : (
               ""
             )}
-            {friendChannel.id !== privateActiveChannelId &&
+            {friendChannel.id !== activeChannelId &&
               getNotificationCount(friendChannel) && (
                 <Label color="red">{getNotificationCount(friendChannel)}</Label>
               )}

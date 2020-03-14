@@ -20,9 +20,17 @@ class Login extends Component {
       email: "",
       password: "",
       error: "",
-      loading: false
+      loading: false,
+      registerSuccess: false
     };
   }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.userRegistered !== prevProps.userRegistered) {
+      this.setState({ registerSuccess: true });
+    }
+  }
+
   //sets current Form Input row into a state
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
@@ -113,6 +121,13 @@ class Login extends Component {
               <h3>Error</h3>
               {this.state.error}
             </Message>
+          )}
+          {this.state.registerSuccess && (
+            <Message
+              success
+              header="Your user registration was successful"
+              content="You may now log-in with the username you have chosen"
+            />
           )}
           <Message>
             Don't have an account? <Link to="/register">Register</Link>

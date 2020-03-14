@@ -54,6 +54,11 @@ class Register extends Component {
     );
   };
 
+  //display if register was a success or not
+  handleStatusMessage = () => {
+    return console.log("Lol");
+  };
+
   //checking if the password is valid or not then returns true or false
   isPasswordValid = () => {
     if (
@@ -72,10 +77,6 @@ class Register extends Component {
     }
   };
 
-  refreshPage = () => {
-    window.location.reload();
-  };
-
   //sets current Form Input row into a state
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
@@ -89,8 +90,10 @@ class Register extends Component {
       firebase
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
+
         .then(createdUser => {
-          console.log(createdUser);
+          this.handleStatusMessage(); //Show success message
+          firebase.auth().signOut();
           createdUser.user
             .updateProfile({
               displayName: this.state.username,
@@ -110,7 +113,6 @@ class Register extends Component {
             })
             .then(() => {
               this.props.userCreated();
-              //   this.refreshPage();
             })
             .catch(err => {
               console.log("create user error", err);

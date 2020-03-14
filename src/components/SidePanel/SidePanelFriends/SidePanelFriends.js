@@ -11,7 +11,7 @@ export default function SidePanelFriends(props) {
     currentChannel,
     isPrivateChannel,
     usersList,
-    privateActiveChannelId,
+    activeChannelId,
     hideSidebar,
     darkMode,
     turnOnTutorial
@@ -55,7 +55,7 @@ export default function SidePanelFriends(props) {
         hideSidebar={hideSidebar}
         friendsMarkActive={friendsMarkActive}
         friendsMarkActiveChange={friendsMarkActiveChange}
-        privateActiveChannelId={privateActiveChannelId}
+        activeChannelId={activeChannelId}
       ></Friends>
 
       <DirectMessages
@@ -63,7 +63,7 @@ export default function SidePanelFriends(props) {
         currentUser={currentUser}
         friendsMarkActive={friendsMarkActive}
         friendsNotMarkActiveChange={friendsNotMarkActiveChange}
-        privateActiveChannelId={privateActiveChannelId}
+        activeChannelId={activeChannelId}
         currentChannel={currentChannel}
       ></DirectMessages>
     </React.Fragment>

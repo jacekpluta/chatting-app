@@ -14,7 +14,7 @@ import {
 import firebase from "../../Firebase";
 import OnDrop from "./OnDrop";
 import { connect } from "react-redux";
-import { setDarkMode } from "../../../actions";
+import { setDarkMode, clearUser } from "../../../actions";
 
 const userStyle = {
   background: "#0080FF"
@@ -270,6 +270,7 @@ const UserPanel = props => {
       .signOut()
       .then(() => {
         console.log("signed out!");
+        props.clearUser();
         //remove current user from users in channel on sigout
         channelsRef
           .child(currentChannel.id)
@@ -417,5 +418,6 @@ const UserPanel = props => {
 };
 
 export default connect(null, {
-  setDarkMode
+  setDarkMode,
+  clearUser
 })(UserPanel);

@@ -4,15 +4,12 @@ TO DO:
 3. Tests
 
 BUGS:
-1. dopiero po zmienia kanalu zaczynaja sie pokazac notifikacje, a w private channels po zmieniae kanalu i tylko po jego zmianie
-2. jak kto wchodzi na kanal, lub jak ktos zaczyna pisac, lub wysyla wiadomosc, ISTYPING znika
-3. avatar cropping nie dziala przy niestandardowej wielkosci np 500 x 2000
-4. lots of errors after registering and not refreshing the page, trzeba wykorzystac user registred
-5. user search after changing status they duplicates
-6. public channel and private channel dont delete notifications when jumping between them
-7. po zarejestrowaniu nie widac wiadomosci do 1 uzytkownika w private messages
+1. only after chhanging public channel public notifications appear, same in private users channels
+2. if someone enters the channel or starts writing is typing icon disapears
+3. avatar cropping doesnt work with not symetrical pictures example 2000 x 500
 
 MINOR BUGS: 
-1. zmienic updateFriendsStatusListeners (slaba petla)
-2. odswiaza sie dopiero po zmianie kanalu po uploadzie avataru
-3. wpisywanie do szukania niektórych znaków wywala bład "= \"
+1. change updateFriendsStatusListeners (really bad loop)
+2. refreshing only oafter change channel after avatar upload
+3. tying some chars into search displays an error
+
