@@ -96,33 +96,60 @@ const MetaPanel = props => {
         </Accordion.Content>
 
         {!isPrivateChannel &&
-          currentChannel &&
-          currentChannel.createdBy.uid === currentUser.uid && (
-            <React.Fragment>
-              <Accordion.Title
-                active={activeIndex === 3}
-                index={3}
-                onClick={setActive}
-              >
-                <Icon name="dropdown" />
-                <Icon name="x" />
-                Delete channel?
-              </Accordion.Title>
-              <Accordion.Content active={activeIndex === 3}>
-                <Header as="h3">
-                  <Button
-                    name={"x"}
-                    onClick={() => {
-                      handleOpenModal(true);
-                    }}
-                    color="red"
-                  >
-                    Delete Channel
-                  </Button>
-                </Header>
-              </Accordion.Content>
-            </React.Fragment>
-          )}
+        currentChannel &&
+        currentChannel.createdBy.uid === currentUser.uid ? (
+          <React.Fragment>
+            <Accordion.Title
+              active={activeIndex === 3}
+              index={3}
+              onClick={setActive}
+            >
+              <Icon name="dropdown" />
+              <Icon name="x" />
+              Delete channel?
+            </Accordion.Title>
+            <Accordion.Content active={activeIndex === 3}>
+              <Header as="h3">
+                <Button
+                  name={"x"}
+                  onClick={() => {
+                    handleOpenModal(true);
+                  }}
+                  color="red"
+                >
+                  Delete Channel
+                </Button>
+              </Header>
+            </Accordion.Content>
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <Accordion.Title
+              active={activeIndex === 3}
+              index={3}
+              onClick={setActive}
+            >
+              <Icon name="dropdown" />
+              <Icon name="x" />
+              Delete channel?
+            </Accordion.Title>
+            <Accordion.Content active={activeIndex === 3}>
+              <Header as="h4">
+                You can only delete channels that you have created
+                <Button
+                  name={"x"}
+                  onClick={() => {
+                    handleOpenModal(true);
+                  }}
+                  color="red"
+                  disabled
+                >
+                  Delete Channel
+                </Button>
+              </Header>
+            </Accordion.Content>
+          </React.Fragment>
+        )}
       </Accordion>
     </Segment>
   );

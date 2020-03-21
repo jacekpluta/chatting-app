@@ -50,26 +50,22 @@ const Messages = props => {
     {
       element: ".friendsSegment",
       intro:
-        "User and friends panel. Here you can change your user avatar, set page to dark mode, logout, display all friends added to your friend list and search users."
+        "Main panel. Here you can logout, change your avatar, switch to dark mode and search all channels and users."
     },
     {
       element: ".messagesHeader",
       intro:
-        "Channel header. Here you can add channels/friends to favourites by clicking star/plus, check details about channel, delete channel that was created by you, display all users and search messages in current channel."
+        "Channel header. Here you can add channels/friends to favourites by clicking star/plus, check details about channel, delete channel that was created by you, display all users and search specific messages in current channel."
     },
     {
       element: ".messages",
-      intro: "Channel messages."
+      intro:
+        "Channel messages. Here you can see all messages in current channel."
     },
     {
       element: ".messageForm",
       intro:
         "Sending messages. Here you can type and send your message, upload images to the channel and add emotes to your message."
-    },
-    {
-      element: ".channelsSegment",
-      intro:
-        "Public channels panel. Here you can see your all channels added to your favourite list, search public channels and even add a new one by clicking yellow + button."
     }
   ]);
 
@@ -397,7 +393,7 @@ const Messages = props => {
     setSearchTerm(event.target.value);
     setSearchLoading(true);
   };
-
+  console.log(searchTerm);
   useEffect(() => {
     if (searchTerm) {
       handleSearchMessages();
@@ -405,21 +401,23 @@ const Messages = props => {
   }, [searchTerm]);
 
   const handleSearchMessages = () => {
-    const channelMessages = [...allChannelMessages.loadedMessages];
-    const regex = new RegExp(searchTerm, "gi");
-    const searchResults = channelMessages.reduce((acc, message) => {
-      if (
-        (message.content && message.content.match(regex)) ||
-        message.currentUser.name.match(regex)
-      ) {
-        acc.push(message);
-      }
-      return acc;
-    }, []);
+    if (allChannelMessages.loadedMessages) {
+      const channelMessages = [...allChannelMessages.loadedMessages];
+      const regex = new RegExp(searchTerm, "gi");
+      var searchResults = channelMessages.reduce((acc, message) => {
+        if (
+          (message.content && message.content.match(regex)) ||
+          message.currentUser.name.match(regex)
+        ) {
+          acc.push(message);
+        }
+        return acc;
+      }, []);
+    }
 
     setSearchResult(searchResults);
 
-    if (searchResults.length === 0) {
+    if (searchResults && searchResults.length === 0) {
       setSearchResultEmpty(true);
     } else {
       setSearchResultEmpty(false);

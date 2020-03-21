@@ -6,7 +6,6 @@ import {
   Input,
   Icon,
   Popup,
-  Button,
   List,
   Image
 } from "semantic-ui-react";
@@ -145,35 +144,53 @@ const MessagesHeader = props => {
       ));
 
   return (
-    <Segment clearing>
-      <Header style={{ paddingTop: "7px" }} fluid="true" as="h3" floated="left">
-        {displayChannelName()}{" "}
-        {!isPrivateChannel && channelStarred && (
-          <Icon name={"star"} onClick={unstarChannel} color="black"></Icon>
-        )}
-        {!isPrivateChannel && !channelStarred && (
-          <Icon
-            name={"star outline"}
-            onClick={handleStarred}
-            color="black"
-          ></Icon>
-        )}
-        {isPrivateChannel && channelFriended && (
-          <Icon
-            name={"user times"}
-            onClick={handleUnfriendPerson}
-            color="red"
-          ></Icon>
-        )}
-        {isPrivateChannel && !channelFriended && (
-          <Icon
-            name={"user plus"}
-            onClick={handleAddFriend}
-            color="green"
-          ></Icon>
-        )}
+    <Segment clearing className="messagesHeader">
+      <Header
+        style={{ paddingTop: "18px", fontWeight: "9000" }}
+        fluid="true"
+        as="h3"
+        floated="left"
+      >
+        <span style={{ fontWeight: "bold" }}>
+          {" "}
+          {displayChannelName()}{" "}
+          {!isPrivateChannel && channelStarred && (
+            <Icon
+              name={"star"}
+              onClick={unstarChannel}
+              className="iconColor"
+            ></Icon>
+          )}
+          {!isPrivateChannel && !channelStarred && (
+            <Icon
+              name={"star outline"}
+              onClick={handleStarred}
+              className="iconColor"
+            ></Icon>
+          )}
+          {isPrivateChannel && channelFriended && (
+            <Icon
+              name={"user times"}
+              onClick={handleUnfriendPerson}
+              color="red"
+            ></Icon>
+          )}
+          {isPrivateChannel && !channelFriended && (
+            <Icon
+              name={"user plus"}
+              onClick={handleAddFriend}
+              color="green"
+            ></Icon>
+          )}
+        </span>
       </Header>
-      <Header fluid="true" as="h3" floated="right" textAlign="center">
+      <Header
+        fluid="true"
+        as="h3"
+        floated="right"
+        textAlign="center"
+        style={{ paddingTop: "6px" }}
+      >
         <span>
           {!isPrivateChannel && (
             <Popup
@@ -183,7 +200,7 @@ const MessagesHeader = props => {
               position="bottom center"
               flowing
               hoverable
-              trigger={<Icon color="grey" name="question circle" />}
+              trigger={<Icon className="iconColor" name="question circle" />}
             >
               <MetaPanel
                 key={currentChannel && currentChannel.id}
@@ -205,7 +222,13 @@ const MessagesHeader = props => {
               style={{ paddingRight: "10px" }}
               flowing
               hoverable
-              trigger={<Icon name="users" color="grey" />}
+              trigger={
+                <Icon
+                  className="iconColor"
+                  name="users"
+                  className="iconColor"
+                />
+              }
             >
               {usersInChannel ? displayUsersInChannel() : ""}
               {isEmpty(usersInChannel) ? (
@@ -229,13 +252,11 @@ const MessagesHeader = props => {
           {"    "}
           <Input
             onChange={handleSearchChange}
+            icon="search"
             name="searchTerm"
             loading={searchLoading}
-            placeholder={`search in ${
-              currentChannel ? currentChannel.name : ""
-            }`}
-            maxLength="1"
-            style={{ width: "180px" }}
+            placeholder={`search ${currentChannel ? currentChannel.name : ""}`}
+            style={{ width: "170px" }}
           ></Input>
         </span>
       </Header>

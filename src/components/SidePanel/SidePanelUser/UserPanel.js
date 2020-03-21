@@ -15,6 +15,7 @@ import firebase from "../../Firebase";
 import OnDrop from "./OnDrop";
 import { connect } from "react-redux";
 import { setDarkMode, clearUser } from "../../../actions";
+import Resizer from "react-image-file-resizer";
 
 const userStyle = {
   background: "#373a6d"
@@ -78,6 +79,20 @@ const UserPanel = props => {
     setNewAvatar(image);
     const fileName = "croppedImage";
     const fileImage = base64StringtoFile(image, fileName);
+
+    // const newImage = Resizer.imageFileResizer(
+    //   fileImage, //is the file of the new image that can now be uploaded...
+    //   10, // is the maxWidth of the  new image
+    //   10, // is the maxHeight of the  new image
+    //   "JPEG",
+    //   100,
+    //   0,
+    //   uri => {
+    //     console.log(uri);
+    //   },
+    //   "base64"
+    // );
+    // console.log(newImage);
     uploadCroppedImage(fileImage);
   };
 

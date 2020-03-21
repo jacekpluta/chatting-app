@@ -81,7 +81,7 @@ const Message = props => {
         ) : (
           <Comment.Author as="a">{message.currentUser.name}</Comment.Author>
         )}
-        <Comment.Metadata>{timeFromNow(message.timeStamp)}</Comment.Metadata>:
+        <Comment.Metadata>{timeFromNow(message.timeStamp)}</Comment.Metadata>
         {isImage() ? (
           <FsLightbox
             initialAnimation="scale-in-long"

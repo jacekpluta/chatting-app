@@ -5,9 +5,8 @@ TO DO:
 
 BUGS:
 1. only after chhanging public channel public notifications appear, same in private users channels
-2. if someone enters the channel or starts writing is typing icon disapears
-3. avatar cropping doesnt work with non square picture, example 2000 x 500
-4. notifications in private channels when only one friend
+2. notifications in private channels when only one friend, notifications in private channels appear only when jumping between private channels
+3. if someone enters the channel or starts writing is typing icon disapears
 
 MINOR BUGS: 
 1. change updateFriendsStatusListeners (really bad loop)

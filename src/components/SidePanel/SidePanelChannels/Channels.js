@@ -506,7 +506,7 @@ function Channels(props) {
           >
             {channel.id !== activeChannelId &&
               getNotificationCount(channel) && (
-                <Label color="red">{getNotificationCount(channel)}</Label>
+                <Label color="orange">{getNotificationCount(channel)}</Label>
               )}
             <span style={{ color: "white" }}> # {channel.name}</span>
           </Menu.Item>

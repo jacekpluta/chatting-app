@@ -38,3 +38,7 @@ body,
 .friendsSegment {
   overflow-x: hidden;
 }
+
+.iconColor {
+  color: #373a6d !important;
+}

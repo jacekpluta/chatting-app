@@ -34,9 +34,8 @@ const rejectStyle = {
 };
 
 export default function OnDrop(props) {
-  const [files, setFiles] = useState([]);
-  const [blob, setBlob] = useState(null);
-  const [blobResized, setBlobResized] = useState(null);
+  const [newImage, setNewImage] = useState(null);
+  const [resizedImage, setResizedImage] = useState(null);
 
   const { saveAvatar, setLoading } = props;
   const imageRef = useRef();
@@ -58,47 +57,36 @@ export default function OnDrop(props) {
     resizeHeight: "100px",
     accept: "image/jpeg, image/png",
     onDrop: acceptedFiles => {
-      setFiles(
-        acceptedFiles.map(file =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file)
-          })
-        )
-      );
-    }
-  });
-
-  useEffect(() => {
-    if (files[0]) {
-      fetch(files[0].preview)
-        .then(res => res.blob())
-        .then(res => setBlob(res));
-    }
-  }, [files]);
-
-  useEffect(() => {
-    if (blob) {
       Resizer.imageFileResizer(
-        blob,
-        300,
-        300,
+        acceptedFiles[0],
+        500,
+        500,
         "JPEG",
         100,
         0,
         uri => {
-          setBlobResized(uri);
+          setNewImage(uri);
         },
-        "blob"
+        "base64"
       );
     }
-  }, [blob]);
+  });
+  console.log(resizedImage);
+  useEffect(() => {
+    if (newImage) {
+      setResizedImage(newImage);
+    }
+    setNewImage(null);
+  }, [newImage]);
 
-  useEffect(
-    () => () => {
-      files.forEach(file => URL.revokeObjectURL(file.preview));
-    },
-    [files]
-  );
+  // useEffect(
+  //   () => () => {
+  //     files.forEach(file => {
+  //       URL.revokeObjectURL(file.preview);
+  //     });
+  //   },
+  //   [files]
+  // );
 
   const style = useMemo(
     () => ({
@@ -136,12 +124,12 @@ export default function OnDrop(props) {
 
   const handleOnCropComplete = (crop, pixelCrop) => {
     const image = imageRef.current;
-    const originalImage = files[0].preview;
+    const originalImage = resizedImage;
     image64toCanvasRef(image, originalImage, crop);
   };
 
   const handleAvatarChange = () => {
-    const originalImage = files[0].preview;
+    const originalImage = resizedImage;
     const fileExtension = extractImageFileExtensionFromBase64(originalImage);
     const imageData64 = imageRef.current.toDataURL("image/" + fileExtension);
     saveAvatar(imageData64);
@@ -178,11 +166,11 @@ export default function OnDrop(props) {
   }
 
   const cropFile = () => {
-    if (files[0]) {
+    if (resizedImage) {
       return (
         <ReactCrop
           crop={crop}
-          src={files[0].preview}
+          src={resizedImage}
           onChange={handleOnCrop}
           onImageLoaded={handleImageLoaded}
           onComplete={handleOnCropComplete}
@@ -196,7 +184,7 @@ export default function OnDrop(props) {
       <Grid.Row centered>
         <section style={style}>
           <div
-            style={files[0] ? { display: "none" } : { display: "block" }}
+            style={resizedImage ? { display: "none" } : { display: "block" }}
             {...getRootProps({ className: "dropzone" })}
           >
             <input {...getInputProps()} />
@@ -207,7 +195,7 @@ export default function OnDrop(props) {
           </div>
           <Button
             style={
-              files[0]
+              resizedImage
                 ? { textAlign: "center", display: "block" }
                 : { display: "none" }
             }
