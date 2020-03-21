@@ -145,12 +145,7 @@ const MessagesHeader = props => {
 
   return (
     <Segment clearing className="messagesHeader">
-      <Header
-        style={{ paddingTop: "18px", fontWeight: "9000" }}
-        fluid="true"
-        as="h3"
-        floated="left"
-      >
+      <Header style={{ paddingTop: "16px" }} fluid as="h3" floated="left">
         <span style={{ fontWeight: "bold" }}>
           {" "}
           {displayChannelName()}{" "}
@@ -185,11 +180,11 @@ const MessagesHeader = props => {
         </span>
       </Header>
       <Header
-        fluid="true"
         as="h3"
         floated="right"
         textAlign="center"
         style={{ paddingTop: "6px" }}
+        fluid
       >
         <span>
           {!isPrivateChannel && (
@@ -216,7 +211,6 @@ const MessagesHeader = props => {
           )}
           {"  "}
           {!isPrivateChannel && currentChannel && (
-            // currentChannel.id !== "mainChannel" &&
             <Popup
               position="bottom center"
               style={{ paddingRight: "10px" }}

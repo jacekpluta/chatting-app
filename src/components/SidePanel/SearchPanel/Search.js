@@ -193,11 +193,15 @@ const Search = props => {
             };
           }
         });
-      setCombinedResults(renamedCombinedResults);
+      const uniqueResults = Array.from(new Set(renamedCombinedResults));
+
+      setCombinedResults(uniqueResults);
     }
   }, [searchResultChannels, searchResultFriends]);
 
   const handleResultSelect = (e, { result }) => setResult(result);
+
+  console.log(result);
 
   useEffect(() => {
     if (result && result.description === "user") {

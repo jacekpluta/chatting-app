@@ -279,25 +279,27 @@ const Messages = props => {
   }, [channelFriended]);
 
   const handleAddFriend = () => {
-    let selectPrivateChannel = currentChannel.id.replace(currentUser.uid, "");
-    let privateChannel = selectPrivateChannel.replace("/", "");
+    if (currentUser && currentUser.uid) {
+      let selectPrivateChannel = currentChannel.id.replace(currentUser.uid, "");
+      let privateChannel = selectPrivateChannel.replace("/", "");
 
-    usersRef
-      .child(`${currentUser.uid}/friends`)
-      .update({
-        [privateChannel]: {
-          userId: currentChannel.id,
-          name: currentChannel.name,
-          status: currentChannel.status,
-          photoURL: currentChannel.photoURL
-        }
-      })
-      .catch(error => {
-        console.log(error);
-      });
+      usersRef
+        .child(`${currentUser.uid}/friends`)
+        .update({
+          [privateChannel]: {
+            userId: currentChannel.id,
+            name: currentChannel.name,
+            status: currentChannel.status,
+            photoURL: currentChannel.photoURL
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
 
-    setPendingAdded(true);
-    props.setChannelFriended(true);
+      setPendingAdded(true);
+      props.setChannelFriended(true);
+    }
   };
 
   //REMOVE FRIEND
@@ -393,7 +395,7 @@ const Messages = props => {
     setSearchTerm(event.target.value);
     setSearchLoading(true);
   };
-  console.log(searchTerm);
+
   useEffect(() => {
     if (searchTerm) {
       handleSearchMessages();
@@ -404,7 +406,7 @@ const Messages = props => {
     if (allChannelMessages.loadedMessages) {
       const channelMessages = [...allChannelMessages.loadedMessages];
       const regex = new RegExp(searchTerm, "gi");
-      var searchResults = channelMessages.reduce((acc, message) => {
+      const searchResults = channelMessages.reduce((acc, message) => {
         if (
           (message.content && message.content.match(regex)) ||
           message.currentUser.name.match(regex)
@@ -413,11 +415,10 @@ const Messages = props => {
         }
         return acc;
       }, []);
+      setSearchResult(searchResults);
     }
 
-    setSearchResult(searchResults);
-
-    if (searchResults && searchResults.length === 0) {
+    if (searchResult && searchResult.length === 0) {
       setSearchResultEmpty(true);
     } else {
       setSearchResultEmpty(false);
