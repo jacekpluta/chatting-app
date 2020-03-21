@@ -157,6 +157,63 @@ const darkMode_reducer = (state = initialDarkMode, action) => {
   }
 };
 
+const initialSearchResultChannels = {
+  searchResultChannels: null
+};
+
+const searchResultChannels_reducer = (
+  state = initialSearchResultChannels,
+  action
+) => {
+  switch (action.type) {
+    case actionTypes.SET_SEARCH_RESULT_CHANNELS:
+      return {
+        ...state,
+        searchResultChannels: action.payload.searchResultChannels
+      };
+
+    default:
+      return state;
+  }
+};
+
+const initialSearchResultFriends = {
+  searchResultFriends: null
+};
+
+const searchResultFriends_reducer = (
+  state = initialSearchResultFriends,
+  action
+) => {
+  switch (action.type) {
+    case actionTypes.SET_SEARCH_RESULT_FRIENDS:
+      return {
+        ...state,
+        searchResultFriends: action.payload.searchResultFriends
+      };
+
+    default:
+      return state;
+  }
+};
+
+const initialFavChannels = {
+  favChannels: null
+};
+
+const favChannels_reducer = (state = initialFavChannels, action) => {
+  switch (action.type) {
+    case actionTypes.SET_FAV_CHANNELS:
+      return {
+        ...state,
+        favChannels: action.payload.favChannels
+      };
+
+    default:
+      return state;
+  }
+};
+
 const rootReducer = combineReducers({
   user: user_reducer,
   channel: channel_reducer,
@@ -165,7 +222,10 @@ const rootReducer = combineReducers({
   activeChannelId: activeChannelId_reducer,
   usersInChannel: usersInChannel_reducer,
   channelFriended: channelFriended_reducer,
-  darkMode: darkMode_reducer
+  darkMode: darkMode_reducer,
+  searchResultChannels: searchResultChannels_reducer,
+  searchResultFriends: searchResultFriends_reducer,
+  favChannels: favChannels_reducer
 });
 
 export default rootReducer;

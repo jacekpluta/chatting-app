@@ -17,7 +17,7 @@ import { connect } from "react-redux";
 import { setDarkMode, clearUser } from "../../../actions";
 
 const userStyle = {
-  background: "#0080FF"
+  background: "#373a6d"
 };
 
 const userDarkStyle = {
@@ -35,7 +35,9 @@ const UserPanel = props => {
     currentChannel,
     isPrivateChannel,
     darkMode,
-    turnOnTutorial
+    turnOnTutorial,
+    hideSidebar,
+    visible
   } = props;
 
   const [modal, setModal] = useState(false);
@@ -44,7 +46,6 @@ const UserPanel = props => {
   const [metaData] = useState({ contentType: "image/jpeg" });
   const [loader, setLoader] = useState(false);
   const [messageBox, setMessageBox] = useState(false);
-  const [avatarChanged, setAvatarChanged] = useState(false);
 
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [messagesRef] = useState(firebase.database().ref("messages"));
@@ -71,7 +72,6 @@ const UserPanel = props => {
 
   const setLoading = () => {
     setLoader(true);
-    setAvatarChanged(true);
   };
 
   const saveAvatar = image => {
@@ -89,7 +89,7 @@ const UserPanel = props => {
 
   const uploadCroppedImage = croppedAvatar => {
     storageRef
-      .child(`avatars/user-${currentUser.uid}`)
+      .child(`avatars/users/${currentUser.uid}`)
       .put(croppedAvatar, metaData)
       .then(snap => {
         snap.ref.getDownloadURL().then(downloadURL => {
@@ -122,7 +122,6 @@ const UserPanel = props => {
         console.log("User avatar updated");
         setLoader(false);
         setMessageBox(true);
-        setAvatarChanged(false);
       })
       .catch(err => {
         console.log(err);
@@ -136,7 +135,6 @@ const UserPanel = props => {
 
       return () => {
         channelsRef.child(currentChannel.id).off();
-
         privateMessagesRef.child(currentChannel.id).off();
       };
     }
@@ -220,6 +218,8 @@ const UserPanel = props => {
               });
           }
         }
+      } else {
+        return null;
       }
     });
   };
@@ -346,24 +346,34 @@ const UserPanel = props => {
       <Grid.Column>
         <Grid.Row style={gridRowStyle}>
           {/* App Header */}
-          <Header
-            color={"yellow"}
-            inverted
-            as="h2"
-            style={{ paddingTop: "10px" }}
-          >
-            <Icon style={{ color: "#ffbf00" }} name="female" />
-            <Icon style={{ color: "#39ff14" }} name="male" />
+          <Header inverted as="h2" style={{ paddingTop: "10px" }}>
+            <Icon style={{ color: "#6FC2D0" }} name="comments" />
 
             <Header.Content>
-              <span style={{ color: "#ffbf00" }}>My</span>
-              <span style={{ color: "#39ff14" }}>Chat</span>
+              MyChat{" "}
+              {visible ? (
+                <Button
+                  size={"small"}
+                  color={"facebook"}
+                  icon={"angle double left"}
+                  onClick={() => hideSidebar()}
+                  style={{ padding: "10px", marginLeft: "35px" }}
+                  floated={"right"}
+                ></Button>
+              ) : (
+                ""
+              )}
             </Header.Content>
           </Header>
 
           {/* User Dropdown  */}
-
-          <Header style={{ paddingTop: "-2.25em" }} as="h4" inverted>
+          <Header
+            style={{
+              paddingTop: "-2.25em"
+            }}
+            as="h4"
+            inverted
+          >
             <Dropdown
               trigger={
                 <span>

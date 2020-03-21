@@ -74,7 +74,7 @@ export default function OnDrop(props) {
         .then(res => res.blob())
         .then(res => setBlob(res));
     }
-  }, [files[0]]);
+  }, [files]);
 
   useEffect(() => {
     if (blob) {

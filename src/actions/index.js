@@ -95,3 +95,30 @@ export const setDarkMode = darkMode => {
     }
   };
 };
+
+export const setSearchResultChannels = searchResultChannels => {
+  return {
+    type: actionTypes.SET_SEARCH_RESULT_CHANNELS,
+    payload: {
+      searchResultChannels
+    }
+  };
+};
+
+export const setSearchResultFriends = searchResultFriends => {
+  return {
+    type: actionTypes.SET_SEARCH_RESULT_FRIENDS,
+    payload: {
+      searchResultFriends
+    }
+  };
+};
+
+export const setFavChannels = favChannels => {
+  return {
+    type: actionTypes.SET_FAV_CHANNELS,
+    payload: {
+      favChannels
+    }
+  };
+};

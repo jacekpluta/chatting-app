@@ -3,7 +3,6 @@ import {
   Menu,
   Icon,
   Image,
-  Divider,
   Popup,
   Button,
   List,
@@ -204,6 +203,9 @@ const Friends = props => {
     if (friendToRemove) {
       const filteredFriend = friendsChannels.filter(friendChannel => {
         if (friendChannel.id !== friendToRemove) return friendChannel;
+        else {
+          return null;
+        }
       });
       setFriendsChannels(filteredFriend);
       setFriendToRemove(null);
@@ -216,6 +218,9 @@ const Friends = props => {
         friendPendingChannel => {
           if (friendPendingChannel.id !== friendPendingToRemove)
             return friendPendingChannel;
+          else {
+            return null;
+          }
         }
       );
       setPendingFriends(filteredPendingFriend);
@@ -336,7 +341,7 @@ const Friends = props => {
                 <Label color="red">{getNotificationCount(friendChannel)}</Label>
               )}
 
-            <span style={{ color: "#39ff14" }}> {friendChannel.name}</span>
+            <span style={{ color: "white" }}> {friendChannel.name}</span>
           </Menu.Item>
         ));
     }
@@ -380,9 +385,9 @@ const Friends = props => {
                     onClick={() => {
                       changeChannel(pendingFriend);
                     }}
-                    style={{ color: "#39ff14" }}
+                    style={{ color: "black" }}
                   >
-                    {pendingFriend.name}
+                    <b> {pendingFriend.name}</b>
                   </h4>
                 </List.Header>
                 <List.Description>
@@ -391,9 +396,7 @@ const Friends = props => {
                       changeChannel(pendingFriend);
                     }}
                   >
-                    <a>
-                      <b>just added you to friends.</b>
-                    </a>{" "}
+                    <b>just added you to friends.</b> {"  "}
                     Do you want to add him too?{"  "}
                     <Icon
                       name="check"
@@ -417,17 +420,14 @@ const Friends = props => {
             </List.Item>
           </List>
         ));
-      {
-      }
     }
   };
 
   return (
     <React.Fragment>
       <Menu.Item>
-        <span style={{ color: "#39ff14", paddingBottom: "5px" }}>
-          <Icon name="address book"></Icon> FRIENDS ({friendsChannels.length})
-          {"   "}
+        <span style={{ color: "white", paddingBottom: "5px" }}>
+          <Icon name="users"></Icon> FRIENDS ({friendsChannels.length}){"   "}
         </span>
         {friendsChannels.lenght}
         {uniqueFriendsPendings.length !== 0 ? (
@@ -454,8 +454,6 @@ const Friends = props => {
       </Menu.Item>
 
       {displayFriendChannels()}
-
-      <Divider clearing />
     </React.Fragment>
   );
 };

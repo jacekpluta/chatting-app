@@ -40,7 +40,7 @@ const Messages = props => {
   const [pendingAdded, setPendingAdded] = useState(false);
   const [messageSend, setMessageSend] = useState(false);
 
-  const [deleteTutorial, setDeleteTutorial] = useState(false);
+  const [listeners, setListeners] = useState([]);
 
   const [initialStep] = useState(0);
   const [options] = useState({
@@ -97,11 +97,33 @@ const Messages = props => {
     setMessageImageLoading(false);
   };
 
+  const removeListeners = listeners => {
+    listeners.forEach(listener => {
+      listener.ref.child(listener.id).off(listener.event);
+    });
+  };
+
+  const addToListeners = (id, ref, event) => {
+    const index = listeners.findIndex(listener => {
+      return (
+        listener.id === id && listener.ref === ref && listener.event === event
+      );
+    });
+
+    if (index === -1) {
+      const newListener = { id, ref, event };
+      setListeners(listeners.concat(newListener));
+    }
+  };
+
   //RUNS AND REMOVES LISTENERS
   useEffect(() => {
-    if (currentChannel && currentUser) {
+    if (currentChannel) {
       addListeners();
     }
+    return () => {
+      removeListeners(listeners);
+    };
   }, []);
 
   //COUNTS ALL USER POSTS IN CURRENT CHANNEL
@@ -189,6 +211,10 @@ const Messages = props => {
           console.log(err);
         });
     }
+
+    return () => {
+      usersRef.off();
+    };
   }, [channelStarred]);
 
   const handleStarred = () => {
@@ -432,6 +458,8 @@ const Messages = props => {
       setAllChannelMessages({ loadedMessages });
       setNoMessages(false);
     });
+
+    addToListeners(currentChannel.id, ref, "child_added");
   };
 
   useEffect(() => {
@@ -439,7 +467,7 @@ const Messages = props => {
       usersRef
         .child(currentUser.uid)
         .once("value", snapshot => {
-          if (snapshot.val().tutorial) {
+          if (snapshot && snapshot.val().tutorial) {
             showSidebar();
             turnOnTutorial();
           }
@@ -597,6 +625,7 @@ const Messages = props => {
         messageImageLoading={messageImageLoading}
         getMessagesRef={getMessagesRef}
         messageSendScroll={messageSendScroll}
+        isPrivateChannel={isPrivateChannel}
       ></MessagesForm>
     </React.Fragment>
   );

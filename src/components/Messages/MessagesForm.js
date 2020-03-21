@@ -1,4 +1,4 @@
-import { Segment, Input, Button, Loader, Label } from "semantic-ui-react";
+import { Segment, Input, Button, Loader } from "semantic-ui-react";
 import React, { useState, useEffect, useRef } from "react";
 import firebase from "../Firebase";
 import mime from "mime-types";
@@ -46,7 +46,8 @@ const MessagesForm = props => {
     messageImageLoading,
     messageSendScroll,
     setMessageImageLoadingFalse,
-    setMessageImageLoadingTrue
+    setMessageImageLoadingTrue,
+    isPrivateChannel
   } = props;
 
   const handleChange = event => {
@@ -54,13 +55,10 @@ const MessagesForm = props => {
       setIsTyping(true);
     } else {
       setIsTyping(false);
+      setMessage(null);
     }
 
-    if (!event.target.value.replace(/\s/g, "").length) {
-      console.log(
-        "string only contains whitespace (ie. spaces, tabs or line breaks)"
-      );
-    } else {
+    if (event.target.value.replace(/\s/g, "").length) {
       setMessage(event.target.value);
     }
   };
@@ -167,7 +165,7 @@ const MessagesForm = props => {
   };
 
   const sendMessage = () => {
-    if (message) {
+    if (message && isTyping) {
       setLoading(true);
       getMessagesRef()
         .child(currentChannel.id)
@@ -218,8 +216,8 @@ const MessagesForm = props => {
   };
 
   const getPath = () => {
-    if (currentUser) {
-      return `chat/private-${currentChannel.id}`;
+    if (isPrivateChannel) {
+      return `chat/private/${currentChannel.id}`;
     } else {
       return `chat/public`;
     }
@@ -261,10 +259,12 @@ const MessagesForm = props => {
 
   const handleEmojiPicker = () => {
     setEmojiPicker(!emojiPicker);
+    setIsTyping(true);
   };
 
   const handleAddEmoji = emoji => {
     let oldMessage = "";
+
     if (message) {
       oldMessage = message;
     } else {
@@ -317,20 +317,20 @@ const MessagesForm = props => {
           style={{ marginBottom: "0.7 em" }}
           placeholder="Write your message"
           onChange={handleChange}
-          className={error.includes("message") ? "error" : ""}
+          //  className={error.includes("message") ? "error" : ""}
           ref={inputRef}
           onKeyDown={handlePressEnterToSend}
         >
           <Button
             disabled={props.messageImageLoading}
             onClick={openModal}
-            size="mini"
-            color="green"
+            size="small"
+            color="grey"
             icon="upload"
           ></Button>
           <Button
-            color="yellow"
-            size="mini"
+            color="grey"
+            size="small"
             icon="smile outline"
             onClick={handleEmojiPicker}
           ></Button>
@@ -339,9 +339,13 @@ const MessagesForm = props => {
           <Button
             disabled={loading || messageImageLoading}
             onClick={sendMessage}
-            size="mini"
-            color="blue"
-            icon="arrow circle right"
+            size="small"
+            color="grey"
+            icon={
+              isTyping
+                ? "arrow alternate circle right "
+                : "arrow alternate circle right outline"
+            }
           ></Button>
         </Input>
         {messageImageLoading ? <Loader active></Loader> : ""}

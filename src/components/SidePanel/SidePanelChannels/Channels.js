@@ -7,8 +7,7 @@ import {
   Form,
   Input,
   Message,
-  Label,
-  Divider
+  Label
 } from "semantic-ui-react";
 import firebase from "../../Firebase";
 import { connect } from "react-redux";
@@ -17,9 +16,11 @@ import {
   setPrivateChannel,
   setUsersInChannel,
   setChannelFriended,
-  setActiveChannelId
+  setActiveChannelId,
+  setSearchResultChannels
 } from "../../../actions";
 import usePrevious from "../../CustomHooks/usePrevious";
+import Starred from "./Starred";
 
 function Channels(props) {
   const [allChannels, setAllChannels] = useState([]);
@@ -29,17 +30,13 @@ function Channels(props) {
   const [channelName, setChannelName] = useState("");
   const [channelDetail, setChannelDetail] = useState("");
   const [error, setError] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [searchResult, setSearchResult] = useState([]);
+
   const [loading] = useState(false);
 
   const [channelToRemove, setChannelToRemove] = useState(null);
   const [userInChannelToRemove, setUserInChannelToRemove] = useState(null);
   const [usersInCurrentChannel, setUsersInCurrentChannel] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const [searchResultEmpty, setSearchResultEmpty] = useState(false);
-  const [activeId, setActiveId] = useState(null);
 
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [messagesRef] = useState(firebase.database().ref("messages"));
@@ -52,7 +49,10 @@ function Channels(props) {
     favouriteActive,
     userRegistered,
     currentChannel,
-    activeChannelId
+    activeChannelId,
+    favouriteActiveChange,
+    searchTerm,
+    favChannels
   } = props;
 
   const prevChannelId = usePrevious(activeChannelId);
@@ -72,12 +72,8 @@ function Channels(props) {
       setChannelDetail(event.target.value);
     }
   };
-
-  //ADD MAIN CHANNEL ON START
   useEffect(() => {
-    addMainChannel();
     showChannelsListener();
-
     return () => {
       channelsRef.off();
       allChannels.forEach(channel => {
@@ -85,23 +81,42 @@ function Channels(props) {
       });
     };
   }, []);
+  //CHANNEL LISTENER
+
+  const showChannelsListener = () => {
+    channelsRef.on(
+      "child_added",
+      snapshot => {
+        setAllChannels(allChannels => [...allChannels, snapshot.val()]);
+      },
+      errorObject => {
+        console.log("The read failed: " + errorObject.code);
+      }
+    );
+
+    channelsRef.on("child_removed", snapshot => {
+      setChannelToRemove(snapshot.key);
+    });
+  };
+
+  //ADD MAIN CHANNEL ON START
+  useEffect(() => {
+    addMainChannel();
+  }, []);
 
   useEffect(() => {
     if (userRegistered) {
       addMainChannel();
-      showChannelsListener();
     }
   }, [userRegistered]);
 
-  const showChannelsListener = () => {
-    channelsRef.limitToFirst(200).on("child_added", snapshot => {
-      setAllChannels(allChannels => [...allChannels, snapshot.val()]);
-    });
-
-    channelsRef.limitToFirst(200).on("child_removed", snapshot => {
-      setChannelToRemove(snapshot.key);
-    });
-  };
+  //const [channelToStarredList, setChannelToStarredList] = useState(false);
+  // const channelToStarredList = () => {
+  //   setChannelToStarredList(true);
+  // };
+  // const channelToNormalList = () => {
+  //   setChannelToStarredList(false);
+  // };
 
   useEffect(() => {
     if (channelToRemove) {
@@ -116,7 +131,7 @@ function Channels(props) {
       setChannelToRemove(null);
 
       return () => {
-        channelsRef.off();
+        channelsRef.child(channelToRemove).off();
         messagesRef.child(channelToRemove).off();
       };
     }
@@ -225,7 +240,8 @@ function Channels(props) {
       createdBy: {
         uid: "111",
         name: "Admin",
-        avatar: ""
+        avatar:
+          "https://firebasestorage.googleapis.com/v0/b/react-chatting-app-4d9cb.appspot.com/o/avatars%2Fadmin.jpg?alt=media&token=bbcb9b2d-d338-4f02-9fa3-0b2b309c0695"
       }
     };
 
@@ -235,7 +251,6 @@ function Channels(props) {
       .then(() => {
         props.setCurrentChannel(mainChannel);
         props.setActiveChannelId(mainChannel.id);
-        setActiveId(mainChannel.id);
       })
       .catch(error => {
         console.log(error);
@@ -267,7 +282,6 @@ function Channels(props) {
         handleCloseModal();
         props.setCurrentChannel(newChannel);
         props.setActiveChannelId(newChannel.id);
-        console.log("channel added");
       })
       .catch(error => {
         console.log(error);
@@ -425,7 +439,7 @@ function Channels(props) {
     props.setCurrentChannel(channel);
     props.setPrivateChannel(false);
     hideSidebar();
-    setActiveId(channel.id);
+
     props.setActiveChannelId(channel.id);
 
     clearNotifications(channel.id);
@@ -449,14 +463,39 @@ function Channels(props) {
     }
   };
 
-  //DISPLAYS  CHANNELS
+  //DISPLAY FAVOURITED CHANNELS
+  const displayFavouritedChannels = () => {
+    if (favChannels) {
+      return favChannels
+        .sort((a, b) => (a.name > b.name ? 1 : -1))
+        .map(channel => (
+          <Menu.Item
+            key={channel.id}
+            onClick={() => changeChannel(channel)}
+            name={channel.name}
+            active={!favouriteActive && activeChannelId === channel.id}
+          >
+            <span style={{ color: "white" }}>
+              # {channel.name} <Icon name="star"></Icon>
+            </span>
+          </Menu.Item>
+        ));
+    }
+  };
+
+  //DISPLAYS CHANNELS
   const displayChannels = () => {
     if (allChannels) {
       if (firstLoad && allChannels[0]) {
         props.setPrivateChannel(false);
         setFirstLoad(false);
       }
-      return allChannels
+
+      const onlyPublicChannels = allChannels.filter(
+        x => !favChannels.filter(y => y.id === x.id).length
+      );
+
+      return onlyPublicChannels
         .sort((a, b) => (a.name > b.name ? 1 : -1))
         .map(channel => (
           <Menu.Item
@@ -469,55 +508,31 @@ function Channels(props) {
               getNotificationCount(channel) && (
                 <Label color="red">{getNotificationCount(channel)}</Label>
               )}
-            <span style={{ color: "#ffbf00" }}> # {channel.name}</span>
+            <span style={{ color: "white" }}> # {channel.name}</span>
           </Menu.Item>
         ));
     }
   };
 
-  //DISPLAYS SEARCHED CHANNELS
-  const displaySearchedChannels = () => {
-    if (allChannels) {
-      return searchResult.map(channel => (
-        <Menu.Item
-          key={channel.id}
-          onClick={() => changeChannel(channel)}
-          name={channel.name}
-          active={!favouriteActive && activeChannelId === channel.id}
-        >
-          <span style={{ color: "	#ffbf00" }}># {channel.name}</span>
-        </Menu.Item>
-      ));
-    }
-  };
-
-  const checkIfSearchedChannelsEmpty = () => {
-    if (searchResultEmpty) {
-      return (
-        <Menu.Item style={{ opacity: 0.7 }}>
-          <span style={{ color: "#ffbf00" }}>
-            We couldn't find any channel with that name
-          </span>
-        </Menu.Item>
-      );
-    }
-  };
-
-  //SEARCH BAR
-  const handleSearchChange = event => {
-    setSearchTerm(event.target.value);
-
-    setSearchLoading(true);
-    setTimeout(() => {
-      setSearchLoading(false);
-    }, 800);
-  };
+  // //DISPLAYS SEARCHED CHANNELS
+  // const displaySearchedChannels = () => {
+  //   return searchResult.map(channel => (
+  //     <Menu.Item
+  //       key={channel.id}
+  //       onClick={() => changeChannel(channel)}
+  //       name={channel.name}
+  //       active={!favouriteActive && activeChannelId === channel.id}
+  //     >
+  //       <span style={{ color: "	#00000" }}># {channel.name}</span>
+  //     </Menu.Item>
+  //   ));
+  // };
 
   useEffect(() => {
     if (searchTerm) {
       handleSearchMessages();
     } else {
-      setSearchResult([]);
+      props.setSearchResultChannels([]);
     }
   }, [searchTerm]);
 
@@ -533,51 +548,35 @@ function Channels(props) {
       return acc;
     }, []);
 
-    setSearchResult(searchResults);
-
-    if (searchResults.length === 0) {
-      setSearchResultEmpty(true);
-    } else {
-      setSearchResultEmpty(false);
-    }
+    props.setSearchResultChannels(searchResults);
   };
 
   return (
     <React.Fragment>
-      <Divider clearing />
+      {/* {displaySearchedChannels()} */}
 
       <Menu.Item>
-        <span style={{ color: "	#ffbf00" }}>
-          <Icon name="search"></Icon> SEARCH CHANNELS
-        </span>
-      </Menu.Item>
-
-      <Menu.Item>
-        <Input
-          onChange={handleSearchChange}
-          size="mini"
-          icon="search"
-          name="searchTerm"
-          loading={searchLoading}
-          placeholder="SEARCH CHANNELS"
-        ></Input>
-      </Menu.Item>
-
-      {displaySearchedChannels()}
-      {checkIfSearchedChannelsEmpty()}
-      <Divider clearing />
-      <Menu.Item>
-        <span style={{ color: "#ffbf00" }}>
-          <Icon name="comments"></Icon> CHANNELS {"  "}(
+        <span style={{ color: "white" }}>
+          <Icon name="comment alternate"></Icon> CHANNELS {"  "}(
           {allChannels !== undefined && allChannels.length})
         </span>
 
         <Icon
           onClick={handleOpenModal}
-          style={{ color: "#ffbf00" }}
+          style={{ color: "white" }}
           name="add"
         ></Icon>
       </Menu.Item>
+
+      <Starred
+        hideSidebar={hideSidebar}
+        currentUser={currentUser}
+        currentChannel={currentChannel}
+        isPrivateChannel={isPrivateChannel}
+        favouriteActiveChange={favouriteActiveChange}
+        favouriteActive={favouriteActive}
+      />
+      {displayFavouritedChannels()}
       {displayChannels()}
 
       <Modal open={modal} onClose={handleCloseModal} size="small">
@@ -615,7 +614,7 @@ function Channels(props) {
             disabled={loading}
             onClick={handleSubmit}
             className={loading ? "checkmark" : ""}
-            color="green"
+            color="black"
           >
             Add
           </Button>
@@ -629,7 +628,6 @@ function Channels(props) {
           </Button>
         </Modal.Actions>
       </Modal>
-      <Divider clearing />
     </React.Fragment>
   );
 }
@@ -639,5 +637,6 @@ export default connect(null, {
   setPrivateChannel,
   setUsersInChannel,
   setChannelFriended,
-  setActiveChannelId
+  setActiveChannelId,
+  setSearchResultChannels
 })(Channels);

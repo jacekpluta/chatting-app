@@ -40,6 +40,7 @@ const MessagesHeader = props => {
   const [popupOpen, setPopupOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [channelsRef] = useState(firebase.database().ref("channels"));
+  const [openModal, setOpenModal] = useState(false);
 
   const handleDisablePopup = () => {
     setPopupOpen(false);
@@ -48,8 +49,6 @@ const MessagesHeader = props => {
   const handleEnablePopup = () => {
     setPopupOpen(true);
   };
-
-  const [openModal, setOpenModal] = useState(false);
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -70,7 +69,8 @@ const MessagesHeader = props => {
       createdBy: {
         uid: "111",
         name: "Admin",
-        avatar: ""
+        avatar:
+          "https://firebasestorage.googleapis.com/v0/b/react-chatting-app-4d9cb.appspot.com/o/avatars%2Fadmin.jpg?alt=media&token=bbcb9b2d-d338-4f02-9fa3-0b2b309c0695"
       }
     };
 
@@ -136,7 +136,7 @@ const MessagesHeader = props => {
             <List.Content>
               <List.Header as="a">
                 {" "}
-                <span style={{ color: "#ffbf00" }}> # {user.name}</span>
+                <span> # {user.name}</span>
               </List.Header>
               <List.Description>In channel</List.Description>
             </List.Content>
@@ -146,19 +146,35 @@ const MessagesHeader = props => {
 
   return (
     <Segment clearing>
-      <Header fluid="true" as="h3" floated="left" className="messagesHeader">
+      <Header style={{ paddingTop: "7px" }} fluid="true" as="h3" floated="left">
+        {displayChannelName()}{" "}
+        {!isPrivateChannel && channelStarred && (
+          <Icon name={"star"} onClick={unstarChannel} color="black"></Icon>
+        )}
+        {!isPrivateChannel && !channelStarred && (
+          <Icon
+            name={"star outline"}
+            onClick={handleStarred}
+            color="black"
+          ></Icon>
+        )}
+        {isPrivateChannel && channelFriended && (
+          <Icon
+            name={"user times"}
+            onClick={handleUnfriendPerson}
+            color="red"
+          ></Icon>
+        )}
+        {isPrivateChannel && !channelFriended && (
+          <Icon
+            name={"user plus"}
+            onClick={handleAddFriend}
+            color="green"
+          ></Icon>
+        )}
+      </Header>
+      <Header fluid="true" as="h3" floated="right" textAlign="center">
         <span>
-          {displayChannelName()}{" "}
-          {!isPrivateChannel && channelStarred && (
-            <Icon name={"star"} onClick={unstarChannel} color="yellow"></Icon>
-          )}
-          {!isPrivateChannel && !channelStarred && (
-            <Icon
-              name={"star outline"}
-              onClick={handleStarred}
-              color="yellow"
-            ></Icon>
-          )}
           {!isPrivateChannel && (
             <Popup
               onOpen={handleEnablePopup}
@@ -167,7 +183,7 @@ const MessagesHeader = props => {
               position="bottom center"
               flowing
               hoverable
-              trigger={<Button size="mini" icon="question" />}
+              trigger={<Icon color="grey" name="question circle" />}
             >
               <MetaPanel
                 key={currentChannel && currentChannel.id}
@@ -181,23 +197,24 @@ const MessagesHeader = props => {
               ></MetaPanel>
             </Popup>
           )}
+          {"  "}
           {!isPrivateChannel && currentChannel && (
             // currentChannel.id !== "mainChannel" &&
             <Popup
               position="bottom center"
+              style={{ paddingRight: "10px" }}
               flowing
               hoverable
-              trigger={<Button size="mini" icon="user" />}
+              trigger={<Icon name="users" color="grey" />}
             >
               {usersInChannel ? displayUsersInChannel() : ""}
-
               {isEmpty(usersInChannel) ? (
                 <List>
                   <List.Item>
                     <List.Content>
                       <List.Header as="a">
                         {" "}
-                        <span style={{ color: "#ffbf00" }}>
+                        <span style={{ color: "#00000" }}>
                           No users in channel
                         </span>
                       </List.Header>
@@ -209,33 +226,20 @@ const MessagesHeader = props => {
               )}
             </Popup>
           )}
-          {isPrivateChannel && channelFriended && (
-            <Icon
-              name={"user times"}
-              onClick={handleUnfriendPerson}
-              color="red"
-            ></Icon>
-          )}
-          {isPrivateChannel && !channelFriended && (
-            <Icon
-              name={"user plus"}
-              onClick={handleAddFriend}
-              color="green"
-            ></Icon>
-          )}
-          {"  "}
+          {"    "}
           <Input
             onChange={handleSearchChange}
-            size="mini"
-            icon="search"
             name="searchTerm"
-            floated="right"
             loading={searchLoading}
-            placeholder="Search messages"
-            style={{ width: "190px" }}
+            placeholder={`search in ${
+              currentChannel ? currentChannel.name : ""
+            }`}
+            maxLength="1"
+            style={{ width: "180px" }}
           ></Input>
         </span>
       </Header>
+
       <DeleteChannelModal
         handleDeleteChannel={handleDeleteChannel}
         handleCloseModal={handleCloseModal}

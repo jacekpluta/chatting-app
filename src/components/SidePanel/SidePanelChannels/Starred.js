@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Menu, Icon } from "semantic-ui-react";
 import { connect } from "react-redux";
-import { setCurrentChannel, setPrivateChannel } from "../../../actions";
+import {
+  setCurrentChannel,
+  setPrivateChannel,
+  setFavChannels
+} from "../../../actions";
 import firebase from "../../Firebase";
 
 const Starred = props => {
@@ -19,13 +23,17 @@ const Starred = props => {
   } = props;
 
   useEffect(() => {
+    props.setFavChannels(starredChannels);
+  }, [starredChannels]);
+
+  useEffect(() => {
     if (currentUser) {
       addListenersStarAdded(currentUser.uid);
       addListenersStarRemoved(currentUser.uid, currentChannel);
     }
 
     return () => {
-      usersRef.off();
+      usersRef.child(`${currentUser.uid}/starred`).off();
     };
   }, [currentUser]);
 
@@ -36,8 +44,8 @@ const Starred = props => {
       .on("child_added", snapshot => {
         const channelToStar = { id: snapshot.key, ...snapshot.val() };
 
-        setStarredChannels(starredChannels => [
-          ...starredChannels,
+        setStarredChannels(starredChannel => [
+          ...starredChannel,
           channelToStar
         ]);
       });
@@ -61,6 +69,7 @@ const Starred = props => {
           return null;
         }
       });
+
       setStarredChannels(filteredChannel);
       setChannelToRemove(null);
     }
@@ -80,33 +89,22 @@ const Starred = props => {
     }
   }, [isPrivateChannel]);
 
-  const displayChannels = starredChannels => {
-    return starredChannels.map(channel => (
-      <Menu.Item
-        key={channel.id}
-        onClick={() => changeChannel(channel)}
-        name={channel.name}
-        active={favouriteActive && activeChannelId === channel.id}
-      >
-        <span style={{ color: "	#ffbf00" }}>
-          <Icon name="comment alternate outline"></Icon> {channel.name}
-        </span>
-      </Menu.Item>
-    ));
-  };
-
   return (
     <React.Fragment>
-      <Menu.Item>
-        <span style={{ color: "	#ffbf00" }}>
+      {/* <Menu.Item>
+        <span style={{ color: "	#00000" }}>
           <Icon name="star"></Icon> FAV CHANNELS ({starredChannels.length})
-        </span>
+        </span> 
         {starredChannels.lenght}
-      </Menu.Item>
+      </Menu.Item> */}
 
-      {displayChannels(starredChannels)}
+      {/* {displayChannels(starredChannels)} */}
     </React.Fragment>
   );
 };
 
-export default connect(null, { setCurrentChannel, setPrivateChannel })(Starred);
+export default connect(null, {
+  setCurrentChannel,
+  setPrivateChannel,
+  setFavChannels
+})(Starred);

@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "../components/App.css";
 import {
   Grid,
-  Button,
   Sidebar,
   Menu,
-  Divider,
   Responsive,
-  Segment
+  Segment,
+  Button,
+  Divider
 } from "semantic-ui-react";
 import Messages from "./Messages/Messages";
 import SidePanelFriends from "./SidePanel/SidePanelFriends/SidePanelFriends";
 import SidePanelChannels from "./SidePanel/SidePanelChannels/SidePanelChannels";
 import { connect } from "react-redux";
+import UserPanel from "../components/SidePanel/SidePanelUser/UserPanel";
+import SearchPanel from "../components/SidePanel/SearchPanel/Search";
 
 const App = props => {
   const {
@@ -26,16 +28,21 @@ const App = props => {
     channelFriended,
     darkMode,
     userRegistered,
-    activeChannelId
+    activeChannelId,
+    searchResultChannels,
+    searchResultFriends,
+    favChannels
   } = props;
 
-  const [visible, setVisible] = useState(false);
+  const [visible, setSidebar] = useState(false);
   const [allwaysVisible] = useState(true);
   const [favouriteActive, setFavouriteActive] = useState(false);
   const [stepsEnabled, setStepsEnabled] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const sidebarStyle = {
-    background: "#0080FF"
+    background: "#373a6d"
   };
 
   const sidebarDarkStyle = {
@@ -51,11 +58,11 @@ const App = props => {
   };
 
   const hideSidebar = () => {
-    setVisible(false);
+    setSidebar(false);
   };
 
   const showSidebar = () => {
-    setVisible(true);
+    setSidebar(true);
   };
 
   const turnOnTutorial = () => {
@@ -64,6 +71,30 @@ const App = props => {
 
   const turnOffTutorial = () => {
     setStepsEnabled(false);
+  };
+
+  const [resetSearch, setResetSearch] = useState(false);
+
+  const resetSearchValue = () => {
+    setResetSearch(true);
+  };
+
+  //SEARCH BAR
+  const handleSearchChange = event => {
+    if (resetSearch) {
+      setSearchTerm("");
+      setResetSearch(false);
+    }
+    if (event.target.value) {
+      setSearchTerm(event.target.value);
+    } else {
+      setSearchTerm(null);
+    }
+
+    setSearchLoading(true);
+    setTimeout(() => {
+      setSearchLoading(false);
+    }, 800);
   };
 
   return (
@@ -99,9 +130,36 @@ const App = props => {
               vertical
               visible={visible}
               style={darkMode ? sidebarDarkStyle : sidebarStyle}
-              onHide={() => setVisible(false)}
+              onHide={() => setSidebar(false)}
               animation={"push"}
             >
+              <UserPanel
+                currentChannel={currentChannel}
+                currentUser={currentUser}
+                isPrivateChannel={isPrivateChannel}
+                darkMode={darkMode}
+                turnOnTutorial={turnOnTutorial}
+                hideSidebar={hideSidebar}
+                visible={visible}
+              ></UserPanel>
+
+              <SearchPanel
+                handleSearchChange={handleSearchChange}
+                searchLoading={searchLoading}
+                searchResultChannels={searchResultChannels}
+                searchResultFriends={searchResultFriends}
+                currentUser={currentUser}
+                isPrivateChannel={isPrivateChannel}
+                usersInChannel={usersInChannel}
+                usersList={usersList}
+                hideSidebar={hideSidebar}
+                favouriteNotActiveChange={favouriteNotActiveChange}
+                favouriteActive={favouriteActive}
+                activeChannelId={activeChannelId}
+                currentChannel={currentChannel}
+                searchTerm={searchTerm}
+                resetSearchValue={resetSearchValue}
+              ></SearchPanel>
               <SidePanelFriends
                 currentUser={currentUser}
                 key={currentUser && currentUser.id}
@@ -114,9 +172,9 @@ const App = props => {
                 favouriteNotActiveChange={favouriteNotActiveChange}
                 favouriteActive={favouriteActive}
                 activeChannelId={activeChannelId}
-                currentChannel={currentChannel}
                 darkMode={darkMode}
                 turnOnTutorial={turnOnTutorial}
+                searchTerm={searchTerm}
               />
               <SidePanelChannels
                 currentUser={currentUser}
@@ -126,73 +184,13 @@ const App = props => {
                 userPosts={userPosts}
                 hideSidebar={hideSidebar}
                 usersInChannel={usersInChannel}
-                userRegistered={userRegistered}
                 activeChannelId={activeChannelId}
+                searchTerm={searchTerm}
+                favChannels={favChannels}
               />
             </Sidebar>
           </Grid.Column>
           <Grid.Column width={12}>
-            <Messages
-              currentChannel={currentChannel}
-              key={currentChannel && currentChannel.id}
-              currentUser={currentUser}
-              isPrivateChannel={isPrivateChannel}
-              userTyping={userTyping}
-              usersList={usersList}
-              userPosts={userPosts}
-              usersInChannel={usersInChannel}
-              turnOnTutorial={turnOnTutorial}
-              stepsEnabled={stepsEnabled}
-              turnOffTutorial={turnOffTutorial}
-              showSidebar={showSidebar}
-              userRegistered={userRegistered}
-            />
-          </Grid.Column>
-        </Grid>
-      </Responsive>
-
-      {/* SCREEN WIDTH OVER 1000 */}
-      <Responsive as={Segment} minWidth={1000}>
-        <Grid
-          columns="3"
-          className="app"
-          style={
-            darkMode ? { background: "#3b3b3b" } : { background: "#ffffff" }
-          }
-        >
-          <Grid.Column width={4}>
-            <Sidebar
-              className="friendsSegment"
-              as={Menu}
-              direction={"left"}
-              inverted
-              vertical
-              visible={allwaysVisible}
-              style={darkMode ? sidebarDarkStyle : sidebarStyle}
-            >
-              <SidePanelFriends
-                currentUser={currentUser}
-                key={currentUser && currentUser.id}
-                currentChannel={currentChannel}
-                isPrivateChannel={isPrivateChannel}
-                usersList={usersList}
-                userPosts={userPosts}
-                hideSidebar={hideSidebar}
-                favouriteActiveChange={favouriteActiveChange}
-                favouriteNotActiveChange={favouriteNotActiveChange}
-                favouriteActive={favouriteActive}
-                activeChannelId={activeChannelId}
-                currentChannel={currentChannel}
-                darkMode={darkMode}
-                turnOnTutorial={turnOnTutorial}
-              />
-            </Sidebar>
-          </Grid.Column>
-          <Grid.Column
-            className="messagesPanel"
-            width={8}
-            style={{ marginLeft: "-5px" }}
-          >
             <Messages
               currentChannel={currentChannel}
               key={currentChannel && currentChannel.id}
@@ -210,17 +208,68 @@ const App = props => {
               userRegistered={userRegistered}
             />
           </Grid.Column>
+        </Grid>
+      </Responsive>
+
+      {/* SCREEN WIDTH OVER 1000 */}
+      <Responsive as={Segment} minWidth={1000}>
+        <Grid
+          columns="2"
+          className="app"
+          style={
+            darkMode ? { background: "#3b3b3b" } : { background: "#ffffff" }
+          }
+        >
           <Grid.Column width={4}>
             <Sidebar
-              className="channelsSegment"
+              className="friendsSegment"
               as={Menu}
-              animation={"push"}
-              direction={"right"}
+              direction={"left"}
               inverted
               vertical
               visible={allwaysVisible}
               style={darkMode ? sidebarDarkStyle : sidebarStyle}
             >
+              <UserPanel
+                currentChannel={currentChannel}
+                currentUser={currentUser}
+                isPrivateChannel={isPrivateChannel}
+                darkMode={darkMode}
+                turnOnTutorial={turnOnTutorial}
+                visible={visible}
+              ></UserPanel>
+              <SearchPanel
+                handleSearchChange={handleSearchChange}
+                searchLoading={searchLoading}
+                searchResultChannels={searchResultChannels}
+                searchResultFriends={searchResultFriends}
+                currentUser={currentUser}
+                isPrivateChannel={isPrivateChannel}
+                usersInChannel={usersInChannel}
+                usersList={usersList}
+                hideSidebar={hideSidebar}
+                favouriteNotActiveChange={favouriteNotActiveChange}
+                favouriteActive={favouriteActive}
+                activeChannelId={activeChannelId}
+                searchTerm={searchTerm}
+                resetSearchValue={resetSearchValue}
+              ></SearchPanel>
+              <SidePanelFriends
+                currentUser={currentUser}
+                key={currentUser && currentUser.id}
+                currentChannel={currentChannel}
+                isPrivateChannel={isPrivateChannel}
+                usersList={usersList}
+                userPosts={userPosts}
+                hideSidebar={hideSidebar}
+                favouriteActiveChange={favouriteActiveChange}
+                favouriteNotActiveChange={favouriteNotActiveChange}
+                favouriteActive={favouriteActive}
+                activeChannelId={activeChannelId}
+                darkMode={darkMode}
+                turnOnTutorial={turnOnTutorial}
+                searchTerm={searchTerm}
+              />
               <SidePanelChannels
                 currentUser={currentUser}
                 key={currentUser && currentUser.id}
@@ -230,8 +279,28 @@ const App = props => {
                 hideSidebar={hideSidebar}
                 usersInChannel={usersInChannel}
                 activeChannelId={activeChannelId}
+                searchTerm={searchTerm}
+                favChannels={favChannels}
               />
             </Sidebar>
+          </Grid.Column>
+          <Grid.Column className="messagesPanel" width={11}>
+            <Messages
+              currentChannel={currentChannel}
+              key={currentChannel && currentChannel.id}
+              currentUser={currentUser}
+              isPrivateChannel={isPrivateChannel}
+              userTyping={userTyping}
+              usersList={usersList}
+              userPosts={userPosts}
+              usersInChannel={usersInChannel}
+              channelFriended={channelFriended}
+              turnOnTutorial={turnOnTutorial}
+              stepsEnabled={stepsEnabled}
+              turnOffTutorial={turnOffTutorial}
+              showSidebar={showSidebar}
+              userRegistered={userRegistered}
+            />
           </Grid.Column>
         </Grid>
       </Responsive>
@@ -249,6 +318,9 @@ const mapStateToProps = state => ({
   usersInChannel: state.usersInChannel.usersInChannel,
   channelFriended: state.channelFriended.channelFriended,
   darkMode: state.darkMode.darkMode,
-  activeChannelId: state.activeChannelId.activeChannelId
+  activeChannelId: state.activeChannelId.activeChannelId,
+  searchResultChannels: state.searchResultChannels.searchResultChannels,
+  searchResultFriends: state.searchResultFriends.searchResultFriends,
+  favChannels: state.favChannels.favChannels
 });
 export default connect(mapStateToProps)(App);

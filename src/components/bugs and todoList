@@ -6,10 +6,13 @@ TO DO:
 BUGS:
 1. only after chhanging public channel public notifications appear, same in private users channels
 2. if someone enters the channel or starts writing is typing icon disapears
-3. avatar cropping doesnt work with not symetrical pictures example 2000 x 500
+3. avatar cropping doesnt work with non square picture, example 2000 x 500
+4. notifications in private channels when only one friend
 
 MINOR BUGS: 
 1. change updateFriendsStatusListeners (really bad loop)
 2. refreshing only oafter change channel after avatar upload
 3. tying some chars into search displays an error
+4. sometimes, after adding a friend, new messages won't show up
+5. errors on search 
 

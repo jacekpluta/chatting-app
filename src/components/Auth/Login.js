@@ -67,8 +67,14 @@ class Login extends Component {
     return (
       <Grid textAlign="center" verticalAlign="middle" className="app">
         <GridColumn style={{ maxWidth: 450 }}>
-          <Header as="h1" icon color="green" textAlign="center">
-            <Icon name="chain" color="green" />
+          <Header
+            as="h1"
+            icon
+            color="blue"
+            textAlign="center"
+            style={{ marginTop: "20px" }}
+          >
+            <Icon name="chain" color="blue" />
             Login
           </Header>
           <Form size="large" onSubmit={this.handleSubmit}>
@@ -106,7 +112,7 @@ class Login extends Component {
               <Button
                 disabled={this.state.loading}
                 className={this.state.loading ? "loading" : ""}
-                color="green"
+                color="blue"
                 fluid
                 size="large"
               >

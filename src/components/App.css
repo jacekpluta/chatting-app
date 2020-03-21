@@ -6,6 +6,7 @@ body,
 .messagesPanel {
   height: 100vh;
   overflow-y: hidden;
+  margin-top: 20px;
 }
 
 .messages {
@@ -32,4 +33,8 @@ body,
 
 .messageForm {
   margin-top: 1em !important;
+}
+
+.friendsSegment {
+  overflow-x: hidden;
 }

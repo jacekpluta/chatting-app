@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 
-import UserPanel from "../SidePanelUser/UserPanel";
 import DirectMessages from "./DirectMessages";
 import Friends from "./Friends";
-import { Header, Icon } from "semantic-ui-react";
 
 export default function SidePanelFriends(props) {
   const {
@@ -13,8 +11,7 @@ export default function SidePanelFriends(props) {
     usersList,
     activeChannelId,
     hideSidebar,
-    darkMode,
-    turnOnTutorial
+    searchTerm
   } = props;
 
   const [friendsMarkActive, setfriendsMarkActive] = useState(false);
@@ -29,24 +26,6 @@ export default function SidePanelFriends(props) {
 
   return (
     <React.Fragment>
-      <UserPanel
-        currentChannel={currentChannel}
-        currentUser={currentUser}
-        isPrivateChannel={isPrivateChannel}
-        darkMode={darkMode}
-        turnOnTutorial={turnOnTutorial}
-      ></UserPanel>
-
-      <Header
-        inverted
-        as="h2"
-        style={{ paddingLeft: "10px", color: "#39ff14" }}
-      >
-        <Icon name="users" />
-
-        <Header.Content>Friends</Header.Content>
-      </Header>
-
       <Friends
         currentChannel={currentChannel}
         currentUser={currentUser}
@@ -65,6 +44,7 @@ export default function SidePanelFriends(props) {
         friendsNotMarkActiveChange={friendsNotMarkActiveChange}
         activeChannelId={activeChannelId}
         currentChannel={currentChannel}
+        searchTerm={searchTerm}
       ></DirectMessages>
     </React.Fragment>
   );

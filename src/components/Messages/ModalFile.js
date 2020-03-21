@@ -1,5 +1,5 @@
 import React from "react";
-import { Input, Button, Icon, Modal, Message } from "semantic-ui-react";
+import { Input, Button, Modal, Message } from "semantic-ui-react";
 export default function ModalFile(props) {
   const {
     modal,
@@ -33,7 +33,7 @@ export default function ModalFile(props) {
         <Button
           disabled={loading}
           className={loading ? "checkmark" : ""}
-          color="green"
+          color="black"
           onClick={sendFile}
         >
           Send

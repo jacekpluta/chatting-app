@@ -1,29 +1,20 @@
 import React, { useState, useEffect } from "react";
 import firebase from "../../Firebase";
-import { Menu, Icon, Image, Input, Divider } from "semantic-ui-react";
+import { Menu, Image } from "semantic-ui-react";
 import { connect } from "react-redux";
 import {
   setCurrentChannel,
   setPrivateChannel,
   setUsersList,
-  setActiveChannelId
+  setActiveChannelId,
+  setSearchResultFriends
 } from "../../../actions";
 
 const DirectMessages = props => {
-  const {
-    currentUser,
-    hideSidebar,
-    activeChannelId,
-    friendsMarkActive,
-    currentChannel
-  } = props;
+  const { currentUser, currentChannel, searchTerm } = props;
 
   const [usersOnline, setUsersOnline] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [searchResult, setSearchResult] = useState([]);
   const [userStatusToChange, setUserStatusToChange] = useState(null);
-  const [searchResultEmpty, setSearchResultEmpty] = useState(false);
 
   const [connectedRef] = useState(firebase.database().ref(".info/connected"));
   const [presenceRef] = useState(firebase.database().ref("presence"));
@@ -31,11 +22,16 @@ const DirectMessages = props => {
 
   useEffect(() => {
     onlineUsersListener();
+
     userConnectedListener(
       currentUser.uid,
       currentUser.displayName,
       currentUser.photoURL
     );
+    return () => {
+      connectedRef.off();
+      presenceRef.off();
+    };
   }, []);
 
   useEffect(() => {
@@ -114,8 +110,7 @@ const DirectMessages = props => {
       const filteredUsers = usersOnline.filter(userOnline => {
         if (userOnline && userOnline.id !== userStatusToChange) {
           return userOnline;
-        }
-        if (userOnline && userOnline.id === userStatusToChange) {
+        } else if (userOnline && userOnline.id === userStatusToChange) {
           presenceRef
             .child(userStatusToChange)
             .once("value")
@@ -130,6 +125,8 @@ const DirectMessages = props => {
             .catch(err => {
               console.log(err);
             });
+        } else {
+          return null;
         }
       });
 
@@ -138,44 +135,35 @@ const DirectMessages = props => {
     }
   }, [userStatusToChange]);
 
-  const changeChannel = user => {
-    const channelId = getChannelId(user.id);
+  // const changeChannel = user => {
+  //   const channelId = getChannelId(user.id);
 
-    const channelData = {
-      id: channelId,
-      name: user.name,
-      status: user.status,
-      photoURL: user.photoURL
-    };
+  //   const channelData = {
+  //     id: channelId,
+  //     name: user.name,
+  //     status: user.status,
+  //     photoURL: user.photoURL
+  //   };
 
-    props.setActiveChannelId(user.id);
-    props.setCurrentChannel(channelData);
-    props.setPrivateChannel(true);
-    hideSidebar();
-  };
+  //   props.setActiveChannelId(user.id);
+  //   props.setCurrentChannel(channelData);
+  //   props.setPrivateChannel(true);
+  //   hideSidebar();
+  // };
 
-  const getChannelId = userId => {
-    const currentUserId = currentUser.uid;
+  // const getChannelId = userId => {
+  //   const currentUserId = currentUser.uid;
 
-    return userId < currentUserId
-      ? `${userId}/${currentUserId}`
-      : `${currentUserId}/${userId}`;
-  };
-
-  //SEARCH BAR
-  const handleSearchChange = event => {
-    setSearchTerm(event.target.value);
-    setSearchLoading(true);
-    setTimeout(() => {
-      setSearchLoading(false);
-    }, 800);
-  };
+  //   return userId < currentUserId
+  //     ? `${userId}/${currentUserId}`
+  //     : `${currentUserId}/${userId}`;
+  // };
 
   useEffect(() => {
     if (searchTerm) {
       handleSearchMessages();
     } else {
-      setSearchResult([]);
+      props.setSearchResultFriends([]);
     }
   }, [searchTerm]);
 
@@ -191,36 +179,21 @@ const DirectMessages = props => {
       return acc;
     }, []);
 
-    setSearchResult(searchResults);
-
-    if (searchResults.length === 0) {
-      setSearchResultEmpty(true);
-    } else {
-      setSearchResultEmpty(false);
-    }
+    props.setSearchResultFriends(searchResults);
   };
 
   return (
     <div>
       <React.Fragment>
-        <Menu.Item>
-          <span style={{ color: "#39ff14" }}>
+        {/* <Menu.Item>
+          <span style={{ color: "#00000" }}>
             <Icon name="search"></Icon>
             SEARCH USERS ({searchResult !== undefined &&
               searchResult.length}){" "}
           </span>
-        </Menu.Item>
-        <Menu.Item>
-          <Input
-            onChange={handleSearchChange}
-            size="mini"
-            icon="search"
-            name="searchTerm"
-            loading={searchLoading}
-            placeholder="SEARCH USERS"
-          ></Input>
-        </Menu.Item>
-        {searchResult
+        </Menu.Item> */}
+
+        {/* {searchResult
           ? searchResult.map(user => (
               <Menu.Item
                 key={user.id}
@@ -228,11 +201,6 @@ const DirectMessages = props => {
                 onClick={() => changeChannel(user)}
                 active={friendsMarkActive && activeChannelId === user.id}
               >
-                {/* <Icon
-                  name="circle"
-                  color={user && user.status ? "green" : "red"}
-                ></Icon> */}
-
                 {user ? (
                   <Image
                     src={user.photoURL}
@@ -242,23 +210,21 @@ const DirectMessages = props => {
                 ) : (
                   ""
                 )}
-                <span style={{ color: "#39ff14" }}>{user.name}</span>
+                <span style={{ color: "#00000" }}>{user.name}</span>
               </Menu.Item>
             ))
           : ""}
 
         {searchResult && searchResultEmpty ? (
           <Menu.Item style={{ opacity: 0.7 }}>
-            <span style={{ color: "#39ff14" }}>
+            <span style={{ color: "#00000" }}>
               {" "}
-              We couldn't find any user with that name{" "}
+              We couldn't find any channel or user with that name{" "}
             </span>
           </Menu.Item>
         ) : (
           ""
-        )}
-
-        <Divider clearing />
+        )} */}
       </React.Fragment>
     </div>
   );
@@ -268,5 +234,6 @@ export default connect(null, {
   setCurrentChannel,
   setPrivateChannel,
   setUsersList,
-  setActiveChannelId
+  setActiveChannelId,
+  setSearchResultFriends
 })(DirectMessages);
