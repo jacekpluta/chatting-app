@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Menu, Input, Image } from "semantic-ui-react";
+import { Menu } from "semantic-ui-react";
 import { Search as SemanticSearch } from "semantic-ui-react";
 import usePrevious from "../../CustomHooks/usePrevious";
 import firebase from "../../Firebase";
@@ -22,7 +22,6 @@ const Search = props => {
     isPrivateChannel,
     hideSidebar,
     favouriteNotActiveChange,
-
     activeChannelId,
     currentUser
   } = props;
@@ -191,6 +190,8 @@ const Search = props => {
               id: result.id,
               name: result.name
             };
+          } else {
+            return;
           }
         });
       const uniqueResults = Array.from(new Set(renamedCombinedResults));

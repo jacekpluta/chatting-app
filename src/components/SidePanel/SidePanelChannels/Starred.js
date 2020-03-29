@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Menu, Icon } from "semantic-ui-react";
 import { connect } from "react-redux";
 import {
   setCurrentChannel,
@@ -9,21 +8,13 @@ import {
 import firebase from "../../Firebase";
 
 const Starred = props => {
-  const [activeChannelId, setActiveChannelId] = useState(null);
   const [starredChannels, setStarredChannels] = useState([]);
   const [channelToRemove, setChannelToRemove] = useState(null);
   const [usersRef] = useState(firebase.database().ref("users"));
-  const {
-    currentUser,
-    currentChannel,
-    hideSidebar,
-    isPrivateChannel,
-    favouriteActiveChange,
-    favouriteActive
-  } = props;
+  const { currentUser, currentChannel, setFavChannels } = props;
 
   useEffect(() => {
-    props.setFavChannels(starredChannels);
+    setFavChannels(starredChannels);
   }, [starredChannels]);
 
   useEffect(() => {
@@ -75,19 +66,19 @@ const Starred = props => {
     }
   }, [channelToRemove]);
 
-  const changeChannel = channel => {
-    props.setCurrentChannel(channel);
-    props.setPrivateChannel(false);
-    setActiveChannelId(channel.id);
-    hideSidebar();
-    favouriteActiveChange();
-  };
+  // const changeChannel = channel => {
+  //   props.setCurrentChannel(channel);
+  //   props.setPrivateChannel(false);
+  //   setActiveChannelId(channel.id);
+  //   hideSidebar();
+  //   favouriteActiveChange();
+  // };
 
-  useEffect(() => {
-    if (isPrivateChannel) {
-      setActiveChannelId(null);
-    }
-  }, [isPrivateChannel]);
+  // useEffect(() => {
+  //   if (isPrivateChannel) {
+  //     setActiveChannelId(null);
+  //   }
+  // }, [isPrivateChannel]);
 
   return (
     <React.Fragment>

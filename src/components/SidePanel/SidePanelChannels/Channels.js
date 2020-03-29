@@ -52,7 +52,8 @@ function Channels(props) {
     activeChannelId,
     favouriteActiveChange,
     searchTerm,
-    favChannels
+    favChannels,
+    setSearchResultChannels
   } = props;
 
   const prevChannelId = usePrevious(activeChannelId);
@@ -72,6 +73,7 @@ function Channels(props) {
       setChannelDetail(event.target.value);
     }
   };
+
   useEffect(() => {
     showChannelsListener();
     return () => {
@@ -81,8 +83,8 @@ function Channels(props) {
       });
     };
   }, []);
-  //CHANNEL LISTENER
 
+  //CHANNEL LISTENER
   const showChannelsListener = () => {
     channelsRef.on(
       "child_added",
@@ -99,11 +101,12 @@ function Channels(props) {
     });
   };
 
-  //ADD MAIN CHANNEL ON START
+  //SHOW MAIN CHANNEL ON START
   useEffect(() => {
     addMainChannel();
   }, []);
 
+  //SHOW MAIN CHANNEL WHEN USER IS REGISTERED
   useEffect(() => {
     if (userRegistered) {
       addMainChannel();
@@ -532,7 +535,7 @@ function Channels(props) {
     if (searchTerm) {
       handleSearchMessages();
     } else {
-      props.setSearchResultChannels([]);
+      setSearchResultChannels([]);
     }
   }, [searchTerm]);
 

@@ -36,6 +36,7 @@ const MessagesHeader = props => {
     usersInChannel,
     channelFriended
   } = props;
+
   const [popupOpen, setPopupOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [channelsRef] = useState(firebase.database().ref("channels"));
@@ -216,13 +217,7 @@ const MessagesHeader = props => {
               style={{ paddingRight: "10px" }}
               flowing
               hoverable
-              trigger={
-                <Icon
-                  className="iconColor"
-                  name="users"
-                  className="iconColor"
-                />
-              }
+              trigger={<Icon className="iconColor" name="users" />}
             >
               {usersInChannel ? displayUsersInChannel() : ""}
               {isEmpty(usersInChannel) ? (

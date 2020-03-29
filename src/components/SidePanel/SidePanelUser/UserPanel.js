@@ -15,7 +15,6 @@ import firebase from "../../Firebase";
 import OnDrop from "./OnDrop";
 import { connect } from "react-redux";
 import { setDarkMode, clearUser } from "../../../actions";
-import Resizer from "react-image-file-resizer";
 
 const userStyle = {
   background: "#373a6d"
