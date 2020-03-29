@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import firebase from "../../Firebase";
-import { Menu, Image } from "semantic-ui-react";
 import { connect } from "react-redux";
 import {
   setCurrentChannel,
@@ -11,7 +10,13 @@ import {
 } from "../../../actions";
 
 const DirectMessages = props => {
-  const { currentUser, currentChannel, searchTerm } = props;
+  const {
+    currentUser,
+    currentChannel,
+    searchTerm,
+    setUsersList,
+    setSearchResultFriends
+  } = props;
 
   const [usersOnline, setUsersOnline] = useState([]);
   const [userStatusToChange, setUserStatusToChange] = useState(null);
@@ -35,7 +40,7 @@ const DirectMessages = props => {
   }, []);
 
   useEffect(() => {
-    props.setUsersList(usersOnline);
+    setUsersList(usersOnline);
   }, [usersOnline]);
 
   const userConnectedListener = (
@@ -101,6 +106,8 @@ const DirectMessages = props => {
     presenceRef.on("child_changed", snapshot => {
       if (currentUser.uid !== snapshot.key) {
         setUserStatusToChange(snapshot.key);
+      } else {
+        return null;
       }
     });
   };
@@ -126,12 +133,14 @@ const DirectMessages = props => {
               console.log(err);
             });
         } else {
-          return null;
+          console.log("userStatusToChange error");
         }
       });
 
       setUsersOnline(filteredUsers);
       setUserStatusToChange(null);
+    } else {
+      console.log("no userStatusToChange");
     }
   }, [userStatusToChange]);
 
@@ -163,7 +172,7 @@ const DirectMessages = props => {
     if (searchTerm) {
       handleSearchMessages();
     } else {
-      props.setSearchResultFriends([]);
+      setSearchResultFriends([]);
     }
   }, [searchTerm]);
 
@@ -179,7 +188,7 @@ const DirectMessages = props => {
       return acc;
     }, []);
 
-    props.setSearchResultFriends(searchResults);
+    setSearchResultFriends(searchResults);
   };
 
   return (

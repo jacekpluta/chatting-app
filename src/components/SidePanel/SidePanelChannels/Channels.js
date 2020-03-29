@@ -53,6 +53,11 @@ function Channels(props) {
     favouriteActiveChange,
     searchTerm,
     favChannels,
+    setCurrentChannel,
+    setActiveChannelId,
+    setUsersInChannel,
+    setChannelFriended,
+    setPrivateChannel,
     setSearchResultChannels
   } = props;
 
@@ -73,7 +78,6 @@ function Channels(props) {
       setChannelDetail(event.target.value);
     }
   };
-
   useEffect(() => {
     showChannelsListener();
     return () => {
@@ -83,8 +87,8 @@ function Channels(props) {
       });
     };
   }, []);
-
   //CHANNEL LISTENER
+
   const showChannelsListener = () => {
     channelsRef.on(
       "child_added",
@@ -101,12 +105,11 @@ function Channels(props) {
     });
   };
 
-  //SHOW MAIN CHANNEL ON START
+  //ADD MAIN CHANNEL ON START
   useEffect(() => {
     addMainChannel();
   }, []);
 
-  //SHOW MAIN CHANNEL WHEN USER IS REGISTERED
   useEffect(() => {
     if (userRegistered) {
       addMainChannel();
@@ -252,8 +255,8 @@ function Channels(props) {
       .child("mainChannel")
       .update(mainChannel)
       .then(() => {
-        props.setCurrentChannel(mainChannel);
-        props.setActiveChannelId(mainChannel.id);
+        setCurrentChannel(mainChannel);
+        setActiveChannelId(mainChannel.id);
       })
       .catch(error => {
         console.log(error);
@@ -283,8 +286,8 @@ function Channels(props) {
         setChannelName("");
         setChannelDetail("");
         handleCloseModal();
-        props.setCurrentChannel(newChannel);
-        props.setActiveChannelId(newChannel.id);
+        setCurrentChannel(newChannel);
+        setActiveChannelId(newChannel.id);
       })
       .catch(error => {
         console.log(error);
@@ -425,7 +428,7 @@ function Channels(props) {
         return usersInCurrentChannel.find(a => a.id === id);
       });
 
-      props.setUsersInChannel(uniqueUsers);
+      setUsersInChannel(uniqueUsers);
     }
   }, [usersInCurrentChannel]);
 
@@ -437,13 +440,13 @@ function Channels(props) {
 
   //CHANGE CURRENT CHANNEL
   const changeChannel = channel => {
-    props.setChannelFriended(false);
+    setChannelFriended(false);
     setUsersInCurrentChannel([]);
-    props.setCurrentChannel(channel);
-    props.setPrivateChannel(false);
+    setCurrentChannel(channel);
+    setPrivateChannel(false);
     hideSidebar();
 
-    props.setActiveChannelId(channel.id);
+    setActiveChannelId(channel.id);
 
     clearNotifications(channel.id);
     clearNotifications(prevChannelId);
@@ -490,7 +493,7 @@ function Channels(props) {
   const displayChannels = () => {
     if (allChannels) {
       if (firstLoad && allChannels[0]) {
-        props.setPrivateChannel(false);
+        setPrivateChannel(false);
         setFirstLoad(false);
       }
 

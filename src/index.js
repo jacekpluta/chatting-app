@@ -29,6 +29,8 @@ const store = createStore(rootReducer, composeWithDevTools());
 const Root = props => {
   const historyPush = props.history.push;
 
+  const { setUser, clearUser } = props;
+
   const [userRegistered, setUserRegistered] = useState(false);
 
   const userCreated = () => {
@@ -38,11 +40,11 @@ const Root = props => {
   useEffect(() => {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        props.setUser(user);
+        setUser(user);
         historyPush("/");
       } else {
         historyPush("/login");
-        props.clearUser();
+        clearUser();
       }
     });
   }, [historyPush, userRegistered]);

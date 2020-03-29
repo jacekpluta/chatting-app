@@ -37,7 +37,9 @@ const UserPanel = props => {
     darkMode,
     turnOnTutorial,
     hideSidebar,
-    visible
+    visible,
+    setDarkMode,
+    clearUser
   } = props;
 
   const [modal, setModal] = useState(false);
@@ -249,7 +251,7 @@ const UserPanel = props => {
 
   const handleDarkMode = () => {
     if (darkMode) {
-      props.setDarkMode(false);
+      setDarkMode(false);
 
       usersRef
         .child(currentUser.uid)
@@ -262,7 +264,7 @@ const UserPanel = props => {
     }
 
     if (!darkMode) {
-      props.setDarkMode(true);
+      setDarkMode(true);
 
       usersRef
         .child(currentUser.uid)
@@ -284,7 +286,7 @@ const UserPanel = props => {
       .signOut()
       .then(() => {
         console.log("signed out!");
-        props.clearUser();
+        clearUser();
         //remove current user from users in channel on sigout
         channelsRef
           .child(currentChannel.id)
