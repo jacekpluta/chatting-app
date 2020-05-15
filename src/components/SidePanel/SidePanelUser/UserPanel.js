@@ -9,7 +9,7 @@ import {
   Button,
   Message,
   Dimmer,
-  Loader
+  Loader,
 } from "semantic-ui-react";
 import firebase from "../../Firebase";
 import OnDrop from "./OnDrop";
@@ -17,19 +17,19 @@ import { connect } from "react-redux";
 import { setDarkMode, clearUser } from "../../../actions";
 
 const userStyle = {
-  background: "#373a6d"
+  background: "#373a6d",
 };
 
 const userDarkStyle = {
-  background: "#1f1f1f"
+  background: "#1f1f1f",
 };
 
 const gridRowStyle = {
   padding: "1.2em",
-  margin: 0
+  margin: 0,
 };
 
-const UserPanel = props => {
+const UserPanel = (props) => {
   const {
     currentUser,
     currentChannel,
@@ -39,7 +39,7 @@ const UserPanel = props => {
     hideSidebar,
     visible,
     setDarkMode,
-    clearUser
+    clearUser,
   } = props;
 
   const [modal, setModal] = useState(false);
@@ -76,7 +76,7 @@ const UserPanel = props => {
     setLoader(true);
   };
 
-  const saveAvatar = image => {
+  const saveAvatar = (image) => {
     setNewAvatar(image);
     const fileName = "croppedImage";
     const fileImage = base64StringtoFile(image, fileName);
@@ -103,16 +103,16 @@ const UserPanel = props => {
     }
   }, [uploadedCroppedImaged]);
 
-  const uploadCroppedImage = croppedAvatar => {
+  const uploadCroppedImage = (croppedAvatar) => {
     storageRef
       .child(`avatars/users/${currentUser.uid}`)
       .put(croppedAvatar, metaData)
-      .then(snap => {
-        snap.ref.getDownloadURL().then(downloadURL => {
+      .then((snap) => {
+        snap.ref.getDownloadURL().then((downloadURL) => {
           setUploadedCroppedImaged(downloadURL);
         });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
   };
@@ -121,13 +121,13 @@ const UserPanel = props => {
     firebase
       .auth()
       .currentUser.updateProfile({
-        photoURL: uploadedCroppedImaged
+        photoURL: uploadedCroppedImaged,
       })
       .then(() => {
         console.log("photo url updated");
         closeModal();
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
 
@@ -139,7 +139,7 @@ const UserPanel = props => {
         setLoader(false);
         setMessageBox(true);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
   };
@@ -160,19 +160,19 @@ const UserPanel = props => {
     if (!isPrivateChannel) {
       messagesRef
         .child(currentChannel.id)
-        .once("value", snapshot => {
+        .once("value", (snapshot) => {
           setMessagesToUpdate(snapshot.val());
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     } else if (isPrivateChannel) {
       privateMessagesRef
         .child(currentChannel.id)
-        .once("value", snapshot => {
+        .once("value", (snapshot) => {
           setMessagesToUpdate(snapshot.val());
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     }
@@ -189,7 +189,7 @@ const UserPanel = props => {
       usersRef
         .child(currentUser.uid)
         .once("value")
-        .then(data => {
+        .then((data) => {
           if (
             data.val() &&
             data.val().darkmode &&
@@ -198,7 +198,7 @@ const UserPanel = props => {
             props.setDarkMode(true);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     }
@@ -212,8 +212,8 @@ const UserPanel = props => {
             currentUser: {
               avatar: currentUser.photoURL,
               id: currentUser.uid,
-              name: currentUser.displayName
-            }
+              name: currentUser.displayName,
+            },
           };
 
           if (isPrivateChannel) {
@@ -221,7 +221,7 @@ const UserPanel = props => {
               .child(currentChannel.id)
               .child(messageId)
               .update(newUserAvatar)
-              .catch(err => {
+              .catch((err) => {
                 console.log(err);
               });
           } else if (!isPrivateChannel) {
@@ -229,7 +229,7 @@ const UserPanel = props => {
               .child(currentChannel.id)
               .child(messageId)
               .update(newUserAvatar)
-              .catch(err => {
+              .catch((err) => {
                 console.log(err);
               });
           }
@@ -256,7 +256,7 @@ const UserPanel = props => {
       usersRef
         .child(currentUser.uid)
         .child("darkmode")
-        .remove(err => {
+        .remove((err) => {
           if (err !== null) {
             console.log(err);
           }
@@ -270,7 +270,7 @@ const UserPanel = props => {
         .child(currentUser.uid)
         .child("darkmode")
         .set(true)
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     }
@@ -292,7 +292,7 @@ const UserPanel = props => {
           .child(currentChannel.id)
           .child("usersInChannel")
           .child(currentUser.uid)
-          .remove(err => {
+          .remove((err) => {
             if (err !== null) {
               console.log(err);
             }
@@ -301,7 +301,7 @@ const UserPanel = props => {
       .then(() => {
         refreshPage();
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
   };
@@ -314,7 +314,7 @@ const UserPanel = props => {
           Signed in as <strong>{currentUser.displayName}</strong>
         </span>
       ),
-      disabled: true
+      disabled: true,
     },
     {
       key: "avatar",
@@ -322,7 +322,7 @@ const UserPanel = props => {
         <Button fluid onClick={openModal} color="blue">
           Change Avatar
         </Button>
-      )
+      ),
     },
     {
       key: "dark",
@@ -330,7 +330,7 @@ const UserPanel = props => {
         <Button fluid onClick={handleDarkMode} color="blue">
           {darkMode ? "Disable Dark Mode" : "Enable Dark Mode"}
         </Button>
-      )
+      ),
     },
     {
       key: "tutorial",
@@ -338,7 +338,7 @@ const UserPanel = props => {
         <Button fluid onClick={turnOnTutorial} color="blue">
           Tutorial
         </Button>
-      )
+      ),
     },
     {
       key: "signout",
@@ -346,8 +346,8 @@ const UserPanel = props => {
         <Button fluid onClick={handleSignout} color="blue">
           Sign Out
         </Button>
-      )
-    }
+      ),
+    },
   ];
   const closeMessage = () => {
     setMessageBox(false);
@@ -385,7 +385,7 @@ const UserPanel = props => {
           {/* User Dropdown  */}
           <Header
             style={{
-              paddingTop: "-2.25em"
+              paddingTop: "-2.25em",
             }}
             as="h4"
             inverted
@@ -445,5 +445,5 @@ const UserPanel = props => {
 
 export default connect(null, {
   setDarkMode,
-  clearUser
+  clearUser,
 })(UserPanel);
