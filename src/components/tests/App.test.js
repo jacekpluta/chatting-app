@@ -29,7 +29,7 @@ it('renders correctly', () => {
 	const tree = renderer
 		.create(
 			<Redux>
-				<App />
+				<App currentUser={currentUser} />
 			</Redux>
 		)
 		.toJSON();

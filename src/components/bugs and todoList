@@ -7,6 +7,10 @@ BUGS:
 1. only after chhanging public channel public notifications appear, same in private users channels
 2. notifications in private channels when only one friend, notifications in private channels appear only when jumping between private channels
 3. if someone enters the channel or starts writing is typing icon disapears
+4. soetimes bugs with adding friends, accepting friend requests with newer accounts
+5. only one person appears in current users in channel
+6. first message dont show when adding friend
+
 
 MINOR BUGS: 
 1. change updateFriendsStatusListeners (really bad loop)

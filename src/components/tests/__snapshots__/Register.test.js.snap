@@ -14,6 +14,11 @@ exports[`renders correctly 1`] = `
   >
     <h1
       className="ui blue icon center aligned header"
+      style={
+        Object {
+          "marginTop": "20px",
+        }
+      }
     >
       <i
         aria-hidden="true"
