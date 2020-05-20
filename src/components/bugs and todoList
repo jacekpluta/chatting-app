@@ -8,14 +8,11 @@ BUGS:
 2. notifications in private channels when only one friend, notifications in private channels appear only when jumping between private channels
 3. if someone enters the channel or starts writing is typing icon disapears
 4. soetimes bugs with adding friends, accepting friend requests with newer accounts
-5. only one person appears in current users in channel
-6. first message dont show when adding friend
+5. only one person appears in current users in channel??
 
 
-MINOR BUGS: 
+SMALLER BUGS: 
 1. change updateFriendsStatusListeners (really bad loop)
-2. refreshing only oafter change channel after avatar upload
+2. refreshing only after change channel after avatar upload
 3. tying some chars into search displays an error
 4. sometimes, after adding a friend, new messages won't show up
-5. errors on search 
-
