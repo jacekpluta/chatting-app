@@ -5,14 +5,14 @@ import FsLightbox from "fslightbox-react";
 import {
   setCurrentChannel,
   setPrivateChannel,
-  setActiveChannelId
+  setActiveChannelId,
 } from "../../actions";
 import { connect } from "react-redux";
 
-const Message = props => {
+const Message = (props) => {
   const { message, currentUser } = props;
 
-  const timeFromNow = timeStamp => moment(timeStamp).fromNow();
+  const timeFromNow = (timeStamp) => moment(timeStamp).fromNow();
 
   const [isMyMessage, setIsMyMessage] = useState(false);
   const [toggler, setToggler] = useState(false);
@@ -36,28 +36,26 @@ const Message = props => {
   const style = {
     image: {
       width: "250px",
-      height: "250px"
-    }
+      height: "250px",
+    },
   };
 
-  const changeChannel = user => {
+  const changeChannel = (user) => {
     const channelId = getChannelId(user.id);
 
     const channelData = {
       id: channelId,
       name: user.name,
       status: null,
-      photoURL: user.avatar
+      photoURL: user.avatar,
     };
 
     props.setCurrentChannel(channelData);
     props.setPrivateChannel(true);
     props.setActiveChannelId(user.id);
-
-    //friendsNotMarkActiveChange();
   };
 
-  const getChannelId = userId => {
+  const getChannelId = (userId) => {
     const currentUserId = currentUser.uid;
 
     return userId < currentUserId
@@ -92,7 +90,7 @@ const Message = props => {
                 src={message.image}
                 alt={"lightbox"}
                 style={style.imageLightbox}
-              />
+              />,
             ]}
           />
         ) : (
@@ -115,5 +113,5 @@ const Message = props => {
 export default connect(null, {
   setCurrentChannel,
   setPrivateChannel,
-  setActiveChannelId
+  setActiveChannelId,
 })(Message);

@@ -3,7 +3,7 @@ import { combineReducers } from "redux";
 
 const initialUserState = {
   currentUser: null,
-  isLoading: true
+  isLoading: true,
 };
 
 const user_reducer = (state = initialUserState, action) => {
@@ -11,12 +11,12 @@ const user_reducer = (state = initialUserState, action) => {
     case actionTypes.SET_USER:
       return {
         currentUser: action.payload.currentUser,
-        isLoading: false
+        isLoading: false,
       };
     case actionTypes.CLEAR_USER:
       return {
         ...state,
-        isLoading: false
+        isLoading: false,
       };
 
     default:
@@ -27,7 +27,7 @@ const user_reducer = (state = initialUserState, action) => {
 const initialChannelState = {
   currentChannel: null,
   isPrivateChannel: false,
-  userPosts: null
+  userPosts: null,
 };
 
 const channel_reducer = (state = initialChannelState, action) => {
@@ -35,17 +35,17 @@ const channel_reducer = (state = initialChannelState, action) => {
     case actionTypes.SET_CURRENT_CHANNEL:
       return {
         ...state,
-        currentChannel: action.payload.currentChannel
+        currentChannel: action.payload.currentChannel,
       };
     case actionTypes.SET_PRIVATE_CHANNEL:
       return {
         ...state,
-        isPrivateChannel: action.payload.isPrivateChannel
+        isPrivateChannel: action.payload.isPrivateChannel,
       };
     case actionTypes.SET_USER_POSTS:
       return {
         ...state,
-        userPosts: action.payload.userPosts
+        userPosts: action.payload.userPosts,
       };
     default:
       return state;
@@ -53,7 +53,7 @@ const channel_reducer = (state = initialChannelState, action) => {
 };
 
 const initialUserTypingState = {
-  userTyping: null
+  userTyping: null,
 };
 
 const userTyping_reducer = (state = initialUserTypingState, action) => {
@@ -61,7 +61,7 @@ const userTyping_reducer = (state = initialUserTypingState, action) => {
     case actionTypes.SET_USER_TYPING:
       return {
         ...state,
-        userTyping: action.payload.userTyping
+        userTyping: action.payload.userTyping,
       };
 
     default:
@@ -70,7 +70,7 @@ const userTyping_reducer = (state = initialUserTypingState, action) => {
 };
 
 const initialUsersListState = {
-  usersList: null
+  usersList: null,
 };
 
 const usersList_reducer = (state = initialUsersListState, action) => {
@@ -78,7 +78,7 @@ const usersList_reducer = (state = initialUsersListState, action) => {
     case actionTypes.SET_USERS_LIST:
       return {
         ...state,
-        usersList: action.payload.usersList
+        usersList: action.payload.usersList,
       };
 
     default:
@@ -87,7 +87,7 @@ const usersList_reducer = (state = initialUsersListState, action) => {
 };
 
 const initialActiveChannelIdState = {
-  activeChannelId: null
+  activeChannelId: null,
 };
 
 const activeChannelId_reducer = (
@@ -98,7 +98,7 @@ const activeChannelId_reducer = (
     case actionTypes.SET_ACTIVE_CHANNEL_ID:
       return {
         ...state,
-        activeChannelId: action.payload.activeChannelId
+        activeChannelId: action.payload.activeChannelId,
       };
 
     default:
@@ -107,7 +107,7 @@ const activeChannelId_reducer = (
 };
 
 const initialUsersInChannelState = {
-  usersInChannel: null
+  usersInChannel: null,
 };
 
 const usersInChannel_reducer = (state = initialUsersInChannelState, action) => {
@@ -115,7 +115,7 @@ const usersInChannel_reducer = (state = initialUsersInChannelState, action) => {
     case actionTypes.SET_USERS_IN_CHANNEL:
       return {
         ...state,
-        usersInChannel: action.payload.usersInChannel
+        usersInChannel: action.payload.usersInChannel,
       };
 
     default:
@@ -124,7 +124,7 @@ const usersInChannel_reducer = (state = initialUsersInChannelState, action) => {
 };
 
 const initialChannelFriended = {
-  channelFriended: null
+  channelFriended: null,
 };
 
 const channelFriended_reducer = (state = initialChannelFriended, action) => {
@@ -132,7 +132,7 @@ const channelFriended_reducer = (state = initialChannelFriended, action) => {
     case actionTypes.SET_CHANNEL_FRIENDED:
       return {
         ...state,
-        channelFriended: action.payload.channelFriended
+        channelFriended: action.payload.channelFriended,
       };
 
     default:
@@ -141,7 +141,7 @@ const channelFriended_reducer = (state = initialChannelFriended, action) => {
 };
 
 const initialDarkMode = {
-  darkMode: false
+  darkMode: false,
 };
 
 const darkMode_reducer = (state = initialDarkMode, action) => {
@@ -149,7 +149,7 @@ const darkMode_reducer = (state = initialDarkMode, action) => {
     case actionTypes.SET_DARK_MODE:
       return {
         ...state,
-        darkMode: action.payload.darkMode
+        darkMode: action.payload.darkMode,
       };
 
     default:
@@ -158,7 +158,7 @@ const darkMode_reducer = (state = initialDarkMode, action) => {
 };
 
 const initialSearchResultChannels = {
-  searchResultChannels: null
+  searchResultChannels: null,
 };
 
 const searchResultChannels_reducer = (
@@ -169,7 +169,7 @@ const searchResultChannels_reducer = (
     case actionTypes.SET_SEARCH_RESULT_CHANNELS:
       return {
         ...state,
-        searchResultChannels: action.payload.searchResultChannels
+        searchResultChannels: action.payload.searchResultChannels,
       };
 
     default:
@@ -178,7 +178,7 @@ const searchResultChannels_reducer = (
 };
 
 const initialSearchResultFriends = {
-  searchResultFriends: null
+  searchResultFriends: null,
 };
 
 const searchResultFriends_reducer = (
@@ -189,7 +189,7 @@ const searchResultFriends_reducer = (
     case actionTypes.SET_SEARCH_RESULT_FRIENDS:
       return {
         ...state,
-        searchResultFriends: action.payload.searchResultFriends
+        searchResultFriends: action.payload.searchResultFriends,
       };
 
     default:
@@ -198,7 +198,7 @@ const searchResultFriends_reducer = (
 };
 
 const initialFavChannels = {
-  favChannels: null
+  favChannels: null,
 };
 
 const favChannels_reducer = (state = initialFavChannels, action) => {
@@ -206,7 +206,7 @@ const favChannels_reducer = (state = initialFavChannels, action) => {
     case actionTypes.SET_FAV_CHANNELS:
       return {
         ...state,
-        favChannels: action.payload.favChannels
+        favChannels: action.payload.favChannels,
       };
 
     default:
@@ -225,7 +225,7 @@ const rootReducer = combineReducers({
   darkMode: darkMode_reducer,
   searchResultChannels: searchResultChannels_reducer,
   searchResultFriends: searchResultFriends_reducer,
-  favChannels: favChannels_reducer
+  favChannels: favChannels_reducer,
 });
 
 export default rootReducer;

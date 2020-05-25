@@ -276,4 +276,5 @@ const mapStateToProps = (state) => ({
   searchResultFriends: state.searchResultFriends.searchResultFriends,
   favChannels: state.favChannels.favChannels,
 });
+
 export default connect(mapStateToProps)(App);

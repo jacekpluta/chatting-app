@@ -1,13 +1,15 @@
 TO DO:
-1. Notifications add to database
-2. Horizontal use on mobile devices
-
+1. TESTING
+2. Notifications add to database
+3. Horizontal use on mobile devices
+4. When a new User joins the chat, a message is displayed to all the existing Users
+5. User can send videos and links which will be displayed properly
 
 BUGS:
-1. only after chhanging public channel public notifications appear, same in private users channels
+1. only after changing public channel public notifications appear, same in private users channels
 2. notifications in private channels when only one friend, notifications in private channels appear only when jumping between private channels
 3. if someone enters the channel or starts writing is typing icon disapears
-4. soetimes bugs with adding friends, accepting friend requests with newer accounts
+4. sometimes bugs with adding friends, accepting friend requests with newer accounts
 5. only one person appears in current users in channel??
 
 
