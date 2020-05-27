@@ -7,7 +7,7 @@ import {
   Icon,
   Popup,
   List,
-  Image
+  Image,
 } from "semantic-ui-react";
 import MetaPanel from "../SidePanel/MetaPanel/MetaPanel";
 import DeleteChannelModal from "../SidePanel/MetaPanel/DeleteChannelModal";
@@ -16,10 +16,10 @@ import firebase from "../Firebase";
 import {
   setCurrentChannel,
   setActiveChannelId,
-  setPrivateChannel
+  setPrivateChannel,
 } from "../../actions";
 
-const MessagesHeader = props => {
+const MessagesHeader = (props) => {
   const {
     displayChannelName,
     handleSearchChange,
@@ -34,7 +34,7 @@ const MessagesHeader = props => {
     userPosts,
     currentUser,
     usersInChannel,
-    channelFriended
+    channelFriended,
   } = props;
 
   const [popupOpen, setPopupOpen] = useState(false);
@@ -70,13 +70,13 @@ const MessagesHeader = props => {
         uid: "111",
         name: "Admin",
         avatar:
-          "https://firebasestorage.googleapis.com/v0/b/react-chatting-app-4d9cb.appspot.com/o/avatars%2Fadmin.jpg?alt=media&token=bbcb9b2d-d338-4f02-9fa3-0b2b309c0695"
-      }
+          "https://firebasestorage.googleapis.com/v0/b/react-chatting-app-4d9cb.appspot.com/o/avatars%2Fadmin.jpg?alt=media&token=bbcb9b2d-d338-4f02-9fa3-0b2b309c0695",
+      },
     };
 
     channelsRef
       .child(currentChannel.id)
-      .remove(err => {
+      .remove((err) => {
         if (err !== null) {
           console.log(err);
         }
@@ -86,25 +86,25 @@ const MessagesHeader = props => {
         props.setCurrentChannel(mainChannel);
         props.setActiveChannelId(mainChannel.id);
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   };
 
-  const getChannelId = userId => {
+  const getChannelId = (userId) => {
     const currentUserId = currentUser.uid;
     return userId < currentUserId
       ? `${userId}/${currentUser.uid}`
       : `${currentUser.uid}/${userId}`;
   };
 
-  const changeChannel = user => {
+  const changeChannel = (user) => {
     const channelId = getChannelId(user.id);
 
     const privateChannelData = {
       id: channelId,
       name: user.name,
-      photoURL: user.avatar
+      photoURL: user.avatar,
     };
 
     props.setActiveChannelId(user.id);
@@ -113,7 +113,7 @@ const MessagesHeader = props => {
   };
 
   //CHECKS IF THERE ARE USERS IN CURRENT CHANNEL
-  const isEmpty = obj => {
+  const isEmpty = (obj) => {
     for (let key in obj) {
       if (obj.hasOwnProperty(key)) return false;
     }
@@ -124,7 +124,7 @@ const MessagesHeader = props => {
   const displayUsersInChannel = () =>
     usersInChannel
       .sort((a, b) => (a.name > b.name ? 1 : -1))
-      .map(user => (
+      .map((user) => (
         <List>
           <List.Item
             key={user.uid}
@@ -146,7 +146,12 @@ const MessagesHeader = props => {
 
   return (
     <Segment clearing className="messagesHeader">
-      <Header style={{ paddingTop: "16px" }} fluid as="h3" floated="left">
+      <Header
+        style={{ paddingTop: "16px" }}
+        fluid="true"
+        as="h3"
+        floated="left"
+      >
         <span style={{ fontWeight: "bold" }}>
           {" "}
           {displayChannelName()}{" "}
@@ -185,7 +190,7 @@ const MessagesHeader = props => {
         floated="right"
         textAlign="center"
         style={{ paddingTop: "6px" }}
-        fluid
+        fluid="true"
       >
         <span>
           {!isPrivateChannel && (
@@ -263,5 +268,5 @@ const MessagesHeader = props => {
 export default connect(null, {
   setCurrentChannel,
   setActiveChannelId,
-  setPrivateChannel
+  setPrivateChannel,
 })(MessagesHeader);

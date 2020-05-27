@@ -10,6 +10,7 @@ import { setUserTyping } from "../../actions";
 
 import { Picker, emojiIndex } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
+import PropTypes from "prop-types";
 
 //cutom hook to focus after sending an emoji
 const useFocus = () => {
@@ -21,7 +22,7 @@ const useFocus = () => {
   return [htmlElRef, setFocus];
 };
 
-const MessagesForm = props => {
+const MessagesForm = (props) => {
   const [storageRef] = useState(firebase.storage().ref());
   const [isTypingRef] = useState(firebase.database().ref("isTyping"));
 
@@ -47,10 +48,19 @@ const MessagesForm = props => {
     messageSendScroll,
     setMessageImageLoadingFalse,
     setMessageImageLoadingTrue,
-    isPrivateChannel
+    isPrivateChannel,
   } = props;
 
-  const handleChange = event => {
+  MessagesForm.propTypes = {
+    isPrivateChannel: PropTypes.bool,
+    setMessageImageLoadingTrue: PropTypes.func,
+    setMessageImageLoadingFalse: PropTypes.func,
+    currentChannel: PropTypes.object,
+    currentUser: PropTypes.object,
+    getMessagesRef: PropTypes.func,
+  };
+
+  const handleChange = (event) => {
     if (event.target.value) {
       setIsTyping(true);
     } else {
@@ -62,38 +72,33 @@ const MessagesForm = props => {
       setMessage(event.target.value);
     }
   };
-  const handlePressEnterToSend = event => {
+
+  const handlePressEnterToSend = (event) => {
     if (event.keyCode === 13) {
       sendMessage();
     }
   };
-  const loadCurrentChannel = () => {
-    isTypingRef.child(currentChannel.id).on("value", snapshot => {
-      if (snapshot.val()) {
-        const isUserTyping = snapshot.val().isUserTyping.isTyping;
-        const userTypingName = snapshot.val().isUserTyping.user;
-        const userTypingUid = snapshot.val().isUserTyping.uid;
-        const userTypingChannelId = snapshot.val().isUserTyping.channelId;
 
+  //set isUserTyping
+  const loadCurrentChannel = () => {
+    isTypingRef.child(currentChannel.id).on("value", (snapshot) => {
+      const { isTyping, user, uid, channelId } = snapshot.val().isUserTyping;
+
+      if (snapshot.val()) {
         const userTyping = {
-          isTyping: isUserTyping,
-          name: userTypingName,
-          uid: userTypingUid,
-          channelId: userTypingChannelId
+          isTyping: isTyping,
+          name: user,
+          uid: uid,
+          channelId: channelId,
         };
 
         props.setUserTyping(userTyping);
       } else {
-        const isUserTyping = false;
-        const userTypingName = currentUser.name;
-        const userTypingUid = currentUser.uid;
-        const userTypingChannelId = currentChannel.id;
-
         const userTyping = {
-          isTyping: isUserTyping,
-          name: userTypingName,
-          uid: userTypingUid,
-          channelId: userTypingChannelId
+          isTyping: false,
+          name: currentUser.name,
+          uid: currentUser.uid,
+          channelId: currentChannel.id,
         };
 
         props.setUserTyping(userTyping);
@@ -108,15 +113,15 @@ const MessagesForm = props => {
           uid: currentUser.uid,
           channelId: currentChannel.id,
           user: currentUser.displayName,
-          isTyping: isTyping
-        }
+          isTyping: isTyping,
+        },
       };
       loadCurrentChannel();
       if (isTyping) {
         isTypingRef
           .child(currentChannel.id)
           .update(isTypingObj)
-          .catch(error => {
+          .catch((error) => {
             console.log(error);
             setLoading(false);
             setMessage("");
@@ -126,7 +131,7 @@ const MessagesForm = props => {
         isTypingRef
           .child(currentChannel.id)
           .update(isTypingObj)
-          .catch(error => {
+          .catch((error) => {
             console.log(error);
             setLoading(false);
             setMessage("");
@@ -145,8 +150,8 @@ const MessagesForm = props => {
       currentUser: {
         id: currentUser.uid,
         name: currentUser.displayName,
-        avatar: currentUser.photoURL
-      }
+        avatar: currentUser.photoURL,
+      },
     };
     if (downloadURL !== null) {
       createMessage.image = downloadURL;
@@ -180,7 +185,7 @@ const MessagesForm = props => {
           setInputFocus();
           messageSendScroll();
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
           setLoading(false);
           setInput("");
@@ -192,7 +197,7 @@ const MessagesForm = props => {
     }
   };
 
-  const handleChangeFileUpload = event => {
+  const handleChangeFileUpload = (event) => {
     const file = event.target.files[0];
 
     if (file) {
@@ -209,6 +214,7 @@ const MessagesForm = props => {
     }
   };
 
+  //check for jpg png of file if not return false
   const isAuthorized = () => {
     closeModal();
     setFile(null);
@@ -233,15 +239,15 @@ const MessagesForm = props => {
     storageRef
       .child(filePath)
       .put(file, metadata)
-      .then(snapshot => {
-        snapshot.ref.getDownloadURL().then(downloadURL => {
+      .then((snapshot) => {
+        snapshot.ref.getDownloadURL().then((downloadURL) => {
           sendFileMessage(downloadURL, messRef, pathToUpload);
         });
       })
       .then(() => {
         setMessageImageLoadingFalse();
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   };
@@ -251,7 +257,7 @@ const MessagesForm = props => {
       .child(pathToUpload)
       .push()
       .set(createMessage(downloadURL))
-      .catch(error => {
+      .catch((error) => {
         setError(error);
         console.log(error);
       });
@@ -262,7 +268,7 @@ const MessagesForm = props => {
     setIsTyping(true);
   };
 
-  const handleAddEmoji = emoji => {
+  const handleAddEmoji = (emoji) => {
     let oldMessage = "";
 
     if (message) {
@@ -278,8 +284,8 @@ const MessagesForm = props => {
     setInputFocus();
   };
 
-  const colonToUnicode = message => {
-    return message.replace(/:[A-Za-z0-9_+-]+:/g, x => {
+  const colonToUnicode = (message) => {
+    return message.replace(/:[A-Za-z0-9_+-]+:/g, (x) => {
       x = x.replace(/:/g, "");
       let emoji = emojiIndex.emojis[x];
       if (typeof emoji !== "undefined") {
@@ -310,7 +316,7 @@ const MessagesForm = props => {
         )}{" "}
         <Input
           value={input}
-          onInput={e => setInput(e.target.value)}
+          onInput={(e) => setInput(e.target.value)}
           autoFocus
           fluid
           name="message"

@@ -5,8 +5,12 @@ import { composeWithDevTools } from "redux-devtools-extension";
 
 import rootReducer from "./reducers/index";
 
-const store = createStore(rootReducer, composeWithDevTools());
-
-export default (props) => {
-  return <Provider store={store}>{props.children}</Provider>;
+export default ({ children, initialState = {} }) => {
+  return (
+    <Provider
+      store={createStore(rootReducer, initialState, composeWithDevTools())}
+    >
+      {children}
+    </Provider>
+  );
 };

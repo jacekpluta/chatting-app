@@ -6,7 +6,7 @@ const initialUserState = {
   isLoading: true,
 };
 
-const user_reducer = (state = initialUserState, action) => {
+export const user_reducer = (state = initialUserState, action) => {
   switch (action.type) {
     case actionTypes.SET_USER:
       return {
@@ -30,7 +30,7 @@ const initialChannelState = {
   userPosts: null,
 };
 
-const channel_reducer = (state = initialChannelState, action) => {
+export const channel_reducer = (state = initialChannelState, action) => {
   switch (action.type) {
     case actionTypes.SET_CURRENT_CHANNEL:
       return {

@@ -11,12 +11,12 @@ import { connect } from "react-redux";
 import {
   setUserPosts,
   setCurrentChannel,
-  setChannelFriended
+  setChannelFriended,
 } from "../../actions";
 import SkeletonMessages from "./SkeletonMessages";
 import Message from "./Message";
 
-const Messages = props => {
+const Messages = (props) => {
   const [channelsRef] = useState(firebase.database().ref("channels"));
   const [privateMessagesRef] = useState(
     firebase.database().ref("privateMessages")
@@ -44,29 +44,29 @@ const Messages = props => {
 
   const [initialStep] = useState(0);
   const [options] = useState({
-    showStepNumbers: false
+    showStepNumbers: false,
   });
   const [steps] = useState([
     {
       element: ".friendsSegment",
       intro:
-        "Main panel. Here you can logout, change your avatar, switch to dark mode and search all channels and users."
+        "Main panel. Here you can logout, change your avatar, switch to dark mode and search all channels and users.",
     },
     {
       element: ".messagesHeader",
       intro:
-        "Channel header. Here you can add channels/friends to favourites by clicking star/plus, check details about channel, delete channel that was created by you, display all users and search specific messages in current channel."
+        "Channel header. Here you can add channels/friends to favourites by clicking star/plus, check details about channel, delete channel that was created by you, display all users and search specific messages in current channel.",
     },
     {
       element: ".messages",
       intro:
-        "Channel messages. Here you can see all messages in current channel."
+        "Channel messages. Here you can see all messages in current channel.",
     },
     {
       element: ".messageForm",
       intro:
-        "Sending messages. Here you can type and send your message, upload images to the channel and add emotes to your message."
-    }
+        "Sending messages. Here you can type and send your message, upload images to the channel and add emotes to your message.",
+    },
   ]);
 
   const {
@@ -82,7 +82,7 @@ const Messages = props => {
     turnOffTutorial,
     stepsEnabled,
     showSidebar,
-    userRegistered
+    userRegistered,
   } = props;
 
   const setMessageImageLoadingTrue = () => {
@@ -93,14 +93,14 @@ const Messages = props => {
     setMessageImageLoading(false);
   };
 
-  const removeListeners = listeners => {
-    listeners.forEach(listener => {
+  const removeListeners = (listeners) => {
+    listeners.forEach((listener) => {
       listener.ref.child(listener.id).off(listener.event);
     });
   };
 
   const addToListeners = (id, ref, event) => {
-    const index = listeners.findIndex(listener => {
+    const index = listeners.findIndex((listener) => {
       return (
         listener.id === id && listener.ref === ref && listener.event === event
       );
@@ -138,7 +138,7 @@ const Messages = props => {
           } else {
             acc[message.currentUser.name] = {
               avatar: message.currentUser.avatar,
-              count: 1
+              count: 1,
             };
           }
           return acc;
@@ -168,17 +168,17 @@ const Messages = props => {
           createdBy: {
             avatar: currentUser.photoURL,
             name: currentChannel.createdBy.name,
-            uid: currentChannel.createdBy.uid
+            uid: currentChannel.createdBy.uid,
           },
           details: currentChannel.details,
           id: currentChannel.id,
-          name: currentChannel.name
+          name: currentChannel.name,
         };
 
         channelsRef
           .child(currentChannel.id)
           .update(newCurrentChannelInfo)
-          .catch(err => {
+          .catch((err) => {
             console.log(err);
           });
 
@@ -199,11 +199,11 @@ const Messages = props => {
             createdBy: {
               uid: currentChannel.createdBy.uid,
               name: currentChannel.createdBy.name,
-              avatar: currentChannel.createdBy.avatar
-            }
-          }
+              avatar: currentChannel.createdBy.avatar,
+            },
+          },
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     }
@@ -222,7 +222,7 @@ const Messages = props => {
     usersRef
       .child(`${currentUser.uid}/starred`)
       .child(currentChannel.id)
-      .remove(err => {
+      .remove((err) => {
         if (err !== null) {
           console.log(err);
         }
@@ -236,14 +236,14 @@ const Messages = props => {
       .child(userId)
       .child("starred")
       .once("value")
-      .then(data => {
+      .then((data) => {
         if (data.val() !== null) {
           const channelIds = Object.keys(data.val());
           const prevStarred = channelIds.includes(channelId);
           setChannelStarred(prevStarred);
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   };
@@ -268,10 +268,10 @@ const Messages = props => {
               id: currentUser.uid,
               name: currentUser.displayName,
               photoURL: currentUser.photoURL,
-              status: currentChannel.status
-            }
+              status: currentChannel.status,
+            },
           })
-          .catch(error => {
+          .catch((error) => {
             console.log(error);
           });
       }
@@ -290,10 +290,10 @@ const Messages = props => {
             userId: currentChannel.id,
             name: currentChannel.name,
             status: currentChannel.status,
-            photoURL: currentChannel.photoURL
-          }
+            photoURL: currentChannel.photoURL,
+          },
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
 
@@ -309,7 +309,7 @@ const Messages = props => {
     usersRef
       .child(`${currentUser.uid}/friends`)
       .child(privateChannel)
-      .remove(err => {
+      .remove((err) => {
         if (err !== null) {
           console.log(err);
         }
@@ -318,7 +318,7 @@ const Messages = props => {
     usersRef
       .child(`${privateChannel}/friends`)
       .child(currentUser.uid)
-      .remove(err => {
+      .remove((err) => {
         if (err !== null) {
           console.log(err);
         }
@@ -327,7 +327,7 @@ const Messages = props => {
     usersRef
       .child(`${privateChannel}/pendingFriends`)
       .child(currentUser.uid)
-      .remove(err => {
+      .remove((err) => {
         if (err !== null) {
           console.log(err);
         }
@@ -346,15 +346,15 @@ const Messages = props => {
       .child(userId)
       .child("friends")
       .once("value")
-      .then(data => {
+      .then((data) => {
         if (data.val() !== null) {
           const friendIds = Object.keys(data.val());
           const prevAdded = friendIds.includes(privateChannel);
           props.setChannelFriended(prevAdded);
-          setFriendsList(allFriendsIds => [...allFriendsIds, friendIds]);
+          setFriendsList((allFriendsIds) => [...allFriendsIds, friendIds]);
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
   };
@@ -367,7 +367,7 @@ const Messages = props => {
     if (usersList && friendsList[0]) {
       const numberOfFriends = friendsList.length - 1;
       for (let i = 0; i < friendsList.length; i++) {
-        usersList.forEach(element => {
+        usersList.forEach((element) => {
           if (friendsList[numberOfFriends].includes(element.uid)) {
             let selectPrivateChannel = element.uid.replace(currentUser.uid, "");
             let privateChannel = selectPrivateChannel.replace("/", "");
@@ -379,10 +379,10 @@ const Messages = props => {
                   channelId: element.uid,
                   name: element.name,
                   status: element.status,
-                  photoURL: element.photoURL
-                }
+                  photoURL: element.photoURL,
+                },
               })
-              .catch(error => {
+              .catch((error) => {
                 console.log(error);
               });
           }
@@ -391,7 +391,7 @@ const Messages = props => {
     }
   };
   //SEARCH BAR
-  const handleSearchChange = event => {
+  const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
     setSearchLoading(true);
   };
@@ -449,7 +449,7 @@ const Messages = props => {
     let loadedMessages = [];
     const ref = getMessagesRef();
 
-    ref.child(currentChannel.id).on("child_added", snapshot => {
+    ref.child(currentChannel.id).on("child_added", (snapshot) => {
       loadedMessages.push(snapshot.val());
       loadedMessages = loadedMessages.slice(
         Math.max(loadedMessages.length - 40, 0)
@@ -465,13 +465,13 @@ const Messages = props => {
     if (userRegistered) {
       usersRef
         .child(currentUser.uid)
-        .once("value", snapshot => {
+        .once("value", (snapshot) => {
           if (snapshot && snapshot.val().tutorial) {
             showSidebar();
             turnOnTutorial();
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     }
@@ -482,7 +482,7 @@ const Messages = props => {
     messagesRef
       .child(currentChannel.id)
       //.limitToLast(5)
-      .once("value", snapshot => {})
+      .once("value", (snapshot) => {})
       .then(() => {
         setMessagesLoaded(true);
       });
@@ -490,7 +490,7 @@ const Messages = props => {
 
   //RENDERS ALL CHANNEL MESSAGES
   const renderMessages = () =>
-    allChannelMessages.loadedMessages.map(message => {
+    allChannelMessages.loadedMessages.map((message) => {
       return (
         <Message
           key={message.timeStamp}
@@ -526,19 +526,20 @@ const Messages = props => {
 
   ////////////////////////////////////////////////////////////
 
+  //turn off tutorial
   const onExit = () => {
     if (messagesLoaded) {
       turnOffTutorial();
     }
   };
-
+ //set tutorial to off in user database
   useEffect(() => {
     if (stepsEnabled === false) {
       usersRef
         .child(currentUser.uid)
         .child("tutorial")
         .remove()
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     }
@@ -595,7 +596,7 @@ const Messages = props => {
               )
             : ""}
           {allChannelMessages.loadedMessages && searchTerm
-            ? searchResult.map(message => {
+            ? searchResult.map((message) => {
                 return (
                   <Message
                     key={message.timeStamp}
@@ -633,5 +634,5 @@ const Messages = props => {
 export default connect(null, {
   setUserPosts,
   setCurrentChannel,
-  setChannelFriended
+  setChannelFriended,
 })(Messages);
