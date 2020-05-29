@@ -7,7 +7,7 @@ export default function ModalFile(props) {
     error,
     loading,
     handleChangeFileUpload,
-    sendFile
+    sendFile,
   } = props;
   return (
     <Modal open={modal} onClose={closeModal}>
@@ -33,6 +33,7 @@ export default function ModalFile(props) {
         <Button
           disabled={loading}
           className={loading ? "checkmark" : ""}
+          className="send"
           color="black"
           onClick={sendFile}
         >
@@ -41,7 +42,7 @@ export default function ModalFile(props) {
         <Button
           disabled={loading}
           onClick={closeModal}
-          className={"cancel"}
+          className="cancel"
           color="red"
         >
           Cancel

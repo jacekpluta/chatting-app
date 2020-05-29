@@ -22,7 +22,7 @@ const useFocus = () => {
   return [htmlElRef, setFocus];
 };
 
-const MessagesForm = (props) => {
+export const MessagesForm = (props) => {
   const [storageRef] = useState(firebase.storage().ref());
   const [isTypingRef] = useState(firebase.database().ref("isTyping"));
 
@@ -30,9 +30,9 @@ const MessagesForm = (props) => {
   const [message, setMessage] = useState();
 
   const [loading, setLoading] = useState(false);
-  const [emojiPicker, setEmojiPicker] = useState(false);
+  const [emojiPicker, setEmojiPicker] = React.useState(false);
   const [error, setError] = useState("");
-  const [modal, setModal] = useState(false);
+  const [modal, setModal] = React.useState(false);
 
   const [file, setFile] = useState(null);
   const [authorized] = useState(["image/jpeg", "image/png"]);
@@ -161,9 +161,6 @@ const MessagesForm = (props) => {
     return createMessage;
   };
 
-  const openModal = () => {
-    setModal(true);
-  };
 
   const closeModal = () => {
     setModal(false);
@@ -194,6 +191,7 @@ const MessagesForm = (props) => {
         });
     } else {
       setError("Add a message");
+      console.log("lol");
     }
   };
 
@@ -328,8 +326,8 @@ const MessagesForm = (props) => {
           onKeyDown={handlePressEnterToSend}
         >
           <Button
-            disabled={props.messageImageLoading}
-            onClick={openModal}
+            disabled={messageImageLoading}
+            onClick={() => setModal(true)}
             size="small"
             color="grey"
             icon="upload"
@@ -349,7 +347,7 @@ const MessagesForm = (props) => {
             color="grey"
             icon={
               isTyping
-                ? "arrow alternate circle right "
+                ? "arrow alternate circle right"
                 : "arrow alternate circle right outline"
             }
           ></Button>

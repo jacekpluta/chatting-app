@@ -3,7 +3,6 @@ import Enzyme, { shallow, mount } from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
 import configureStore from "redux-mock-store";
 import App from "../App";
-import Redux from "../../Redux";
 
 import { Responsive, Sidebar } from "semantic-ui-react";
 

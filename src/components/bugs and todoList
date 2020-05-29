@@ -18,3 +18,6 @@ SMALLER BUGS:
 2. refreshing only after change channel after avatar upload
 3. tying some chars into search displays an error
 4. sometimes, after adding a friend, new messages won't show up
+
+
+it("checks if sendMessage was called after button click", () => {

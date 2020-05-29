@@ -9,11 +9,11 @@ import {
   setActiveChannelId,
   setUsersInChannel,
   setChannelFriended,
-  setSearchResultChannels
+  setSearchResultChannels,
 } from "../../../actions";
 import { connect } from "react-redux";
 
-const Search = props => {
+const Search = (props) => {
   const {
     handleSearchChange,
     searchLoading,
@@ -23,7 +23,7 @@ const Search = props => {
     hideSidebar,
     favouriteNotActiveChange,
     activeChannelId,
-    currentUser
+    currentUser,
   } = props;
 
   const prevChannelId = usePrevious(activeChannelId);
@@ -35,11 +35,11 @@ const Search = props => {
   // const [userInChannelToRemove, setUserInChannelToRemove] = useState(null);
 
   //CURRENT USERS IN CHANNEL
-  const currentUsersInChannel = channel => {
+  const currentUsersInChannel = (channel) => {
     const user = {
       uid: currentUser.uid,
       name: currentUser.displayName,
-      avatar: currentUser.photoURL
+      avatar: currentUser.photoURL,
     };
 
     if (
@@ -53,7 +53,7 @@ const Search = props => {
         .child("usersInChannel")
         .child(currentUser.uid)
         .set(user)
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
 
@@ -61,7 +61,7 @@ const Search = props => {
         .child(prevChannelId)
         .child("usersInChannel")
         .child(currentUser.uid)
-        .remove(err => {
+        .remove((err) => {
           if (err !== null) {
             console.log(err);
           }
@@ -74,7 +74,7 @@ const Search = props => {
         .child("usersInChannel")
         .child(currentUser.uid)
         .set(user)
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     }
@@ -101,7 +101,7 @@ const Search = props => {
   //     });
   // };
 
-  const getChannelId = userId => {
+  const getChannelId = (userId) => {
     const currentUserId = currentUser.uid;
 
     return userId < currentUserId
@@ -109,14 +109,14 @@ const Search = props => {
       : `${currentUserId}/${userId}`;
   };
 
-  const changeChannelPrivate = user => {
+  const changeChannelPrivate = (user) => {
     const channelId = getChannelId(user.id);
 
     const channelData = {
       id: channelId,
       name: user.name,
       status: user.status,
-      photoURL: user.photoURL
+      photoURL: user.photoURL,
     };
 
     props.setActiveChannelId(user.id);
@@ -125,7 +125,7 @@ const Search = props => {
     hideSidebar();
   };
 
-  const changeChannelPublic = channel => {
+  const changeChannelPublic = (channel) => {
     props.setChannelFriended(false);
     props.setCurrentChannel(channel);
     props.setPrivateChannel(false);
@@ -146,10 +146,7 @@ const Search = props => {
       channel &&
       prevChannelId !== channel.id
     ) {
-      channelsRef
-        .child(prevChannelId)
-        .child("usersInChannel")
-        .off();
+      channelsRef.child(prevChannelId).child("usersInChannel").off();
     }
   };
 
@@ -157,12 +154,12 @@ const Search = props => {
     if (searchResultChannels || searchResultFriends) {
       const searchResultsCombined = [
         ...searchResultChannels,
-        ...searchResultFriends
+        ...searchResultFriends,
       ];
 
       const renamedCombinedResults = searchResultsCombined
         .sort((a, b) => (a.name > b.name ? 1 : -1))
-        .map(result => {
+        .map((result) => {
           if (result && result.photoURL) {
             return {
               title: result.name,
@@ -172,7 +169,7 @@ const Search = props => {
 
               name: result.name,
               status: result.status,
-              photoURL: result.photoURL
+              photoURL: result.photoURL,
             };
           } else if (result && !result.photoURL) {
             return {
@@ -184,11 +181,11 @@ const Search = props => {
               createdBy: {
                 uid: result.id,
                 name: result.name,
-                avatar: result.createdBy.avatar
+                avatar: result.createdBy.avatar,
               },
               details: result.details,
               id: result.id,
-              name: result.name
+              name: result.name,
             };
           } else {
             return;
@@ -201,8 +198,6 @@ const Search = props => {
   }, [searchResultChannels, searchResultFriends]);
 
   const handleResultSelect = (e, { result }) => setResult(result);
-
-  console.log(result);
 
   useEffect(() => {
     if (result && result.description === "user") {
@@ -283,5 +278,5 @@ export default connect(null, {
   setUsersInChannel,
   setChannelFriended,
   setActiveChannelId,
-  setSearchResultChannels
+  setSearchResultChannels,
 })(Search);
