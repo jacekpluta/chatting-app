@@ -85,11 +85,11 @@ npm test start
 
 ![](mdimages/headerSection.png)
 
-17. In the middle there is messages section where you can see all the current channel messages.
+177.  In the middle there is messages section where you can see all the current channel messages.
 
 ![](mdimages/messagesSection.png)
 
-18. And lastly in the bottom section you have possibility to write messages, add emotes and upload pictures into the conversation.
+188.  And lastly in the bottom section you have possibility to write messages, add emotes and upload pictures into the conversation.
 
 ![](mdimages/writeMessageSection.png)
 
