@@ -4,6 +4,7 @@ TO DO:
 3. Horizontal use on mobile devices
 4. When a new User joins the chat, a message is displayed to all the existing Users
 5. User can send videos and links which will be displayed properly
+People enter without authentication and are assigned a name, stored for when they come back
 
 BUGS:
 1. only after changing public channel public notifications appear, same in private users channels

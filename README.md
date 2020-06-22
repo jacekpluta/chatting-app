@@ -78,20 +78,16 @@ npm test start
     ![](mdimages/channelStarred.png)
 
 16. In the right side of header there is:
+	- channel details section which contains: channel description, top posters, who created that channel, possibility to delete channel if you are the owner,
+	- list of all users that are currently in the channel,
+	- channel search bar where you can search by username or by a message.
+    ![](mdimages/headerSection.png)
 
-- channel details section which contains: channel description, top posters, who created that channel, possibility to delete channel if you are the owner,
-- list of all users that are currently in the channel,
-- channel search bar where you can search by username or by a message.
+17. In the middle there is messages section where you can see all the current channel messages.
+    ![](mdimages/messagesSection.png)
 
-![](mdimages/headerSection.png)
-
-177.  In the middle there is messages section where you can see all the current channel messages.
-
-![](mdimages/messagesSection.png)
-
-188.  And lastly in the bottom section you have possibility to write messages, add emotes and upload pictures into the conversation.
-
-![](mdimages/writeMessageSection.png)
+18. And lastly in the bottom section you have possibility to write messages, add emotes and upload pictures into the conversation.
+    ![](mdimages/writeMessageSection.png)
 
 ## Contact
 
