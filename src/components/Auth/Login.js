@@ -170,7 +170,7 @@ class Login extends Component {
             style={{ marginTop: "20px" }}
           >
             <Icon name="chain" color="blue" />
-            Login
+            LOGIN
           </Header>
           <Form size="large" onSubmit={this.handleSubmit}>
             <Segment stacked>

@@ -37,7 +37,7 @@ it("should find two input fields", () => {
 
 it("should find one h1 field", () => {
   expect(wrapper.find("h1").length).toEqual(1);
-  expect(wrapper.find("h1").text()).toBe("Login");
+  expect(wrapper.find("h1").text()).toBe("LOGIN");
 });
 
 it("should find one form field", () => {
