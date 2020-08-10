@@ -142,5 +142,5 @@ it("should render `test message` text in message", () => {
   expect(wrapper.render().text()).toContain("test message");
 });
 it("should render `50 years ago` text in comment metadata", () => {
-  expect(wrapper.render().text()).toContain("50 years ago");
+  expect(wrapper.render().text()).toContain("51 years ago");
 });

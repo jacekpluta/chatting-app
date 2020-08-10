@@ -124,7 +124,6 @@ const UserPanel = (props) => {
         photoURL: uploadedCroppedImaged,
       })
       .then(() => {
-        console.log("photo url updated");
         closeModal();
       })
       .catch((err) => {
@@ -135,7 +134,6 @@ const UserPanel = (props) => {
       .child(currentUser.uid)
       .update({ avatar: uploadedCroppedImaged })
       .then(() => {
-        console.log("User avatar updated");
         setLoader(false);
         setMessageBox(true);
       })
@@ -285,7 +283,6 @@ const UserPanel = (props) => {
       .auth()
       .signOut()
       .then(() => {
-        console.log("signed out!");
         clearUser();
         //remove current user from users in channel on sigout
         channelsRef

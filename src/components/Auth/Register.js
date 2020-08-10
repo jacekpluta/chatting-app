@@ -53,11 +53,6 @@ class Register extends Component {
     );
   };
 
-  //display if register was a success or not
-  handleStatusMessage = () => {
-    return console.log("Lol");
-  };
-
   //checking if the password is valid or not then returns true or false
   isPasswordValid = () => {
     if (
@@ -102,15 +97,10 @@ class Register extends Component {
               tutorial: true,
             })
             .then(() => {
-              this.saveUser(createdUser).then(() => {
-                console.log("user saved");
-              });
+              this.saveUser(createdUser).then(() => {});
             })
             .then(() => {
               this.setState({ loading: false, error: "" });
-            })
-            .then(() => {
-              this.props.userCreated();
             })
             .catch((err) => {
               console.log("create user error", err);

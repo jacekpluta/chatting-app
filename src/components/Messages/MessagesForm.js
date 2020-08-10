@@ -161,7 +161,6 @@ export const MessagesForm = (props) => {
     return createMessage;
   };
 
-
   const closeModal = () => {
     setModal(false);
   };
@@ -191,7 +190,6 @@ export const MessagesForm = (props) => {
         });
     } else {
       setError("Add a message");
-      console.log("lol");
     }
   };
 
