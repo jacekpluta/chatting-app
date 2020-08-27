@@ -32,7 +32,7 @@ npm test start
 
 ## Usage example
 
-1. Start by creating an account and logging in the application.  
+1. Start by creating an account or logging as a guest.  
    ![](mdimages/register.png)
 
 2. If you are logging for the first time you will have to go through an intro describing main parts of the app.
@@ -61,7 +61,7 @@ npm test start
 10. User that you added to friends just got an invitation.  
     ![](mdimages/friendInvitation.png)
 
-11. If he accepts you invite, you can chat with him and check for his status if he is online or offline.  
+11. If he accepts your invite, you can chat with him and check for his status if he is online or offline.  
     ![](mdimages/friendAdded.png)
 
 12. The last section of sidebar are public channels. Here you can see a list of all public chat rooms that other users have created.  
@@ -73,21 +73,11 @@ npm test start
 14. Created channel should appear on the left in the channels section.  
     ![](mdimages/createdChannel.png)
 
-15. Next, on the top, there is channel header, where as you already know you can add your friend or add channel to favourites by clicking empty star icon.
-    Starred channel will automaticaly go up top of all channels in channel sidebar.  
-    ![](mdimages/channelStarred.png)
-
 16. In the right side of header there is:
 	- channel details section which contains: channel description, top posters, who created that channel, possibility to delete channel if you are the owner,
 	- list of all users that are currently in the channel,
-	- channel search bar where you can search by username or by a message.
+	- channel search bar where you can search by username or by a message.  
     ![](mdimages/headerSection.png)
-
-17. In the middle there is messages section where you can see all the current channel messages.
-    ![](mdimages/messagesSection.png)
-
-18. And lastly in the bottom section you have possibility to write messages, add emotes and upload pictures into the conversation.
-    ![](mdimages/writeMessageSection.png)
 
 ## Contact
 
